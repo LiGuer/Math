@@ -15,30 +15,7 @@ limitations under the License.
 *[Idea]
 [1] 对于色彩复杂的照片，每个RGB像素就是[R,G,B]三维分布的数据点，可以将其聚类为K个关键簇，簇内像素均用其簇心像素替换，从而实现任意照片的像素纯化。
 [2] 本质上是[K-mean]聚类算法，在图像处理中的运用。
-[3] 该算法思想,编程不难，如下读一遍流程基本就能懂。
-
-*[算法流程]:
-[1] 随机选择 K 个簇心点 Center
-[2] 迭代开始
-	[3] 归零 Cluster , Cluster: 簇,记录ith簇内的数据指针。
-	[4] 计算每个xi到簇心μj的距离
-		[5] 选择距离最小的簇心, 将该点加入其簇内
-	[6] 对每个簇,计算其质心 Center'
-	[7] Center≠Center' , 则更正Center为 Center'
-	[8] 迭代重新开始
-[9] 一轮无更正时，迭代结束
-
-*[Ps]
-[1] 图片的数据点过多，1000x1000彩色图片，有三百万个数值，
-[2] 一百万个三维数据点，在簇数K=5的K_mean中的运行时间约为 1.5s/一次迭代，平均迭代数在50次左右
-[3] 每次运算的结果并不相同，因为初始随机点选择的影响，但结果大体相似。
-[4] 增加簇树K值，即增加新的色彩团，K越大运算耗时也增大，色彩丰富有时反而失去了艺术化效果。
-
-*[Reference]
-[1] 餐具图. 原作 from. 纯玥同学
-[2] 算法流程学习 from. 西瓜书
 */
-
 
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +23,7 @@ limitations under the License.
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include "LiGu_GRAPHICS/Graphics.h"
-#pragma comment(lib,"opencv2-include/opencv_world430d.lib")
+#pragma comment(lib,"opencv2-include/opencv_world430.lib")
 /*--------------------------------[ K聚类 ]--------------------------------
 *	* 对N维分布的数据点，可以将其聚类在 K 个关键簇内
 *	*[流程]:
@@ -60,7 +37,7 @@ limitations under the License.
 			[8] 迭代重新开始
 		[9] 一轮无更正时，迭代结束
 **------------------------------------------------------------------------*/
-void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& Cluster_Cur) {
+void K_Mean(Mat<double>& x, int K, int TimesMax, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& Cluster_Cur) {
 	int Dimension = x.rows, N = x.cols;
 	Center.zero(Dimension, K);
 	Cluster.zero(K, N); Cluster_Cur.zero(K, 1);
@@ -73,11 +50,11 @@ void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<i
 	int Times = 0;
 	while (true) {
 		printf("%d\n", Times);
-		if (Times++ > 100)return;
+		if (Times++ > TimesMax)return;
 		//[3]
 		Cluster.clean(); Cluster_Cur.clean();
 		//[4] 计算每个xi到Center_j的距离
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < N; i++) {	
 			Mat<double> d(1, K);
 			for (int j = 0; j < K; j++)
 				for (int dim = 0; dim < Dimension; dim++)
@@ -90,7 +67,7 @@ void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<i
 		Mat<double> CenterTemp(Dimension, K);
 		for (int i = 0; i < K; i++) {
 			for (int dim = 0; dim < Dimension; dim++) {
-				for (int j = 0; j < Cluster_Cur[i]; j++)
+				for (int j = 0; j < Cluster_Cur[i]; j++) 
 					CenterTemp(dim, i) += x(dim, Cluster(i, j));
 				CenterTemp(dim, i) /= Cluster_Cur[i];
 			}
@@ -106,14 +83,37 @@ void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<i
 		}
 	}
 }
+int ArgPos(char* str, int argc, char** argv) {
+	for (int a = 1; a < argc; a++) if (!strcmp(str, argv[a])) {
+		if (a == argc - 1) {printf("Argument missing for %s\n", str); exit(-1);}
+		return a;
+	}
+	return -1;
+}
 #include <time.h>
-int main()
-{
+int main(int argc, char** argv){
+	char InputImgUrl[1000], OutputUrl[1000];
+	int K = 5, TimesMax = 100;
+	if (argc == 1) {
+		printf("K-Mean__Pixel-Purification__@LiGu\n\n");
+		printf("Options:\n");
+		printf("\t-InputImgUrl <file>\n");
+		printf("\t-OutputUrl <file>\n");
+		printf("\t-TimesMax <int>\n");
+		printf("\t-K <int>\n");
+		return 0;
+	}
+	int i = 0;
+	if ((i = ArgPos((char*)"-InputImgUrl", argc, argv)) > 0) strcpy(InputImgUrl, argv[i + 1]);
+	if ((i = ArgPos((char*)"-OutputUrl", argc, argv)) > 0) strcpy(OutputUrl, argv[i + 1]);
+	if ((i = ArgPos((char*)"-K", argc, argv)) > 0) K = atoi(argv[i + 1]);
+	if ((i = ArgPos((char*)"-TimesMax", argc, argv)) > 0) TimesMax = atoi(argv[i + 1]);
+
 	time_t t;
 	srand((unsigned)time(&t));
 
 	cv::Mat src;
-	src = cv::imread("D:/u=3113697407,1593862331&fm=26&gp=0.jpg", cv::IMREAD_COLOR);
+	src = cv::imread(InputImgUrl, cv::IMREAD_COLOR);
 	int cols = src.cols, rows = src.rows;
 	printf("%d %d %d\n", cols, rows, src.channels());
 	Mat<double> data(3, rows * cols), Center;
@@ -128,9 +128,7 @@ int main()
 		data(2, cur) = (double)(*it)[2];
 		cur++;
 	}
-	int K = 7;
-
-	K_Mean(data, K, Center, Cluster, Cluster_Cur);
+	K_Mean(data, K, TimesMax, Center, Cluster, Cluster_Cur);
 	for (int i = 0; i < K; i++) {
 		printf("%f %f %f\n", Center(0, i), Center(1, i), Center(2, i));
 	}
@@ -147,5 +145,5 @@ int main()
 		g.PaintColor = (RGB)data(2, i) * 0x10000 + (RGB)data(1, i) * 0x100 + (RGB)data(0, i);
 		g.drawPoint(i % cols, i / cols);
 	}
-	g.PicWrite("D:/LIGU.ppm");
+	g.PicWrite(OutputUrl);
 }
