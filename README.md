@@ -2,6 +2,8 @@
 LiGu's Basic Algorithm Library.  
 * <Mat.h>:					矩阵类  
 * <list.h>:					链表类  
+* <PrincipalComponentsAnalysis.h>:  主成分分析|数据降维
+* <K_mean.h>:               K-Mean聚类算法  
 
 ## <Mat.h> 矩阵类  
 ```
