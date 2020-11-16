@@ -46,21 +46,29 @@ public:
 ******************************************************************************/
 	/*---------------- "[]"取元素 ----------------*/
 	T& operator[](int i) { return data[i]; }
+	T& operator()(int i, int j) { return data[i * cols + j]; }
+	T& operator()(int i) { return data[i]; }
 	/*---------------- max/min ----------------*/
 	T max() const {
 		T maxdata = *data;
 		for (int i = 0; i < rows * cols; i++)maxdata = maxdata >= data[i] ? maxdata : data[i];
 		return maxdata;
 	}
-	T max(int index) {
-		T maxdata = *data;
+	T max(int& index) {
+		T maxdata = *data; index = 0;
 		for (int i = 0; i < rows * cols; i++)
-			if (maxdata > data[i]) { maxdata = data[i]; index = i; }
+			if (maxdata < data[i]) { maxdata = data[i]; index = i; }
 		return maxdata;
 	}
 	T min() const {
 		T mindata = *data;
 		for (int i = 0; i < rows * cols; i++)mindata = mindata <= data[i] ? mindata : data[i];
+		return mindata;
+	}
+	T min(int& index) {
+		T mindata = *data; index = 0;
+		for (int i = 0; i < rows * cols; i++)
+			if (mindata > data[i]) { mindata = data[i]; index = i; }
 		return mindata;
 	}
 	/*----------------赋矩阵 [ = ]----------------*/
