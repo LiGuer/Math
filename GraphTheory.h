@@ -43,11 +43,11 @@ GraphTheory_ListNode** bulidGraphList(int u[], int v[], double w[], int n)
 *	[输出]：最小生成树,每一条有向边的 起点[TreeU],终点[TreeV],总边数[TreeCur]
 *	[原理]: 按点贪心, 每次加入已搜索点集u的最短边(u,v)，其中v不属于已搜索点集的点v
 *	[流程]:
-			[1] 初始化[VertexNew]: 已搜索点集的存储数组
-			[2] 将第一个图的节点, 加入VertexNew
-			[3] 开始迭代, 直至所有节点均已搜索完成, 即VertexNew已满
-				[4] 在已搜索点集, 寻找最短边(u,v), 其中u∈VertexNew, v不属于VertexNew
-				[5] 将边(u,v)加入最小生成树， 将v加入已搜索点集VertexNew
+		[1] 初始化[VertexNew]: 已搜索点集的存储数组
+		[2] 将第一个图的节点, 加入VertexNew
+		[3] 开始迭代, 直至所有节点均已搜索完成, 即VertexNew已满
+			[4] 在已搜索点集, 寻找最短边(u,v), 其中u∈VertexNew, v不属于VertexNew
+			[5] 将边(u,v)加入最小生成树， 将v加入已搜索点集VertexNew
 **----------------------------------------------------------------------------------*/
 void Prim(GraphTheory_ListNode* Graph[], int n, int TreeU[], int TreeV[], int& TreeCur)
 {
@@ -125,130 +125,105 @@ void Kruskal(int u[], int v[], double w[], int n, int TreeU[], int TreeV[], int&
 
 
 /*--------------------------------[ 最短路径 Floyd ]--------------------------------
-*	[输入]:	[1] 图的邻接矩阵Graph	[2] 图的总点数N
-*	[输出]: 
-*	Dijkstra的本质是贪心，Floyd的本质的动态规划
-*	Dijkstra一次只能算出给定两点间的最短路径。
-	Floyd   一次可以算出任意两点间的最短路径。
-*	Floyd	时间复杂度O(V³)【3个for()循环嵌套】,空间复杂度O(V²)【2个矩阵】
-*	Dijkstra时间复杂度O(V²)
+*	[输入]:	[1] 图的邻接矩阵Graph
+*	[输出]: [1] 距离矩阵Distance	[2] 后继节点矩阵Path
+*	[数据结构]:
+		* 邻接矩阵Graph, 即.图的权值矩阵
+		* 距离矩阵Distance: i到j最短路径长度
+		* 后继节点矩阵Path: 记录两点间的最短路径, 表示从Vi到Vj需要经过的点
+	[原理]:
+		* Floyd的本质的动态规划, Dijkstra的本质是贪心
+		* 状态转移方程:
+			Distance[i,j] = min{ Distance[i,k] + Distance[k,j] , Distance[i,j] }
+*	[流程]:
+		[1] 初始化距离矩阵Distance = 权值矩阵Graph
+			初始化后继矩阵Path(i,j) = j
+		[2] 对于每一对顶点 i 和 j, 看是否存在点 k 使得u->k->v比已知路径更短
+				即. Distance[i,j] = min{ Distance[i,k] + Distance[k,j] , Distance[i,j] }
+			若是,则更新Distance, Path(i,j) = k
+*	[时间复杂度]:
+		Floyd	时间复杂度O(V³)【3个for()循环嵌套】,空间复杂度O(V²)【2个矩阵】
+		Dijkstra时间复杂度O(V²)
+*	[对比Dijkstra]:
+		Dijkstra一次只能算出给定两点间的最短路径。
+		Floyd   一次可以算出任意两点间的最短路径。
 **----------------------------------------------------------------------------------*/
-void Floyd(Mat<double>& Graph, int N, Mat<double>& curToU, Mat<double>& PassVertex)
+void Floyd(Mat<double>& Graph, Mat<double>& Distance, Mat<double>& Path)
 {
+	int N = Graph.cols;
+	//[1]
+	Distance.assign(Graph);
+	Path.zero(N, N);
+	for (int i = 0; i < N * N; i++)Path[i] = i % N;
+	//[2]
 	for (int k = 1; k <= N; k++) {
 		for (int i = 1; i <= N; i++) {
 			for (int j = 1; j <= N; j++) {
-				if (Graph[i][k] + Graph[k][j] < Graph[i][j]) {
-					Graph[i][j] = Graph[i][k] + Graph[k][j];
-					PassVertex[i][j] = curToU[k];
+				if (Distance(i, j) > Distance(i, k) + Distance(k, j)) {
+					Distance(i, j) = Distance(i, k) + Distance(k, j);
+					Path(i, j) = k;
 				}
 			}
 		}
 	}
-}
-void FloydSearch(int u, int v, int N){
-	int ur = uToCur[u], vr = uToCur[v];
-	int t = PassVertex[ur][vr];
-	if (t != u && t != v) {
-		FloydSearch(u, t, N);
-		FloydSearch(t, v, N);
-	}
-	else PathAns.push_back(u);
 }
 /*--------------------------------[ 网络最大流 Dinic ]--------------------------------
-【/* 图论课 :: 网络最大流 :: Dinic】
-1. 最大流算法的本质是贪心+"反悔"机制。
-2. "增广路",就是源->汇的一条路径。
-3. 利用深搜DFS，找增广路。
-4. 利用广搜BFS，确定此时各顶点的层次。
-5. 利用添加反向边，协助"反悔"。
-6. 广搜BFS是Dinic对于EK的优化。
-(这个解释稍显麻烦，可以问我。)
-7. 广搜BFS，用队列queue。
-	深搜BFS，用递归or栈stack。
+*	[原理]: 贪心 + "反悔"机制
+*	增广路: 就是源->汇的一条路径。
+		利用深搜DFS，找增广路。
+		利用广搜BFS，确定此时各顶点的层次。
+		利用添加反向边，协助"反悔"。
+		广搜BFS是Dinic对于EK的优化。
+		广搜BFS，用队列queue。
+		深搜BFS，用递归or栈stack。
 **----------------------------------------------------------------------------------*/
-double Graph[MAXN][MAXN];
-double GraphOld[MAXN][MAXN];
-map<string, int> uToCur;
-map<int, string> curToU;
-int level[MAXN];
-vector<int> Path;
-
-class Dinic
+void Dinic_bfs(int s, int N)
 {
-private:
-	double minwight;
-	void bfs(int s, int N)
-	{
-		memset(level, -1, sizeof(level));
-		queue<int> Q;
-		Q.push(s); level[s] = 0;
-		while (!Q.empty()) {
-			int temp = Q.front();
-			Q.pop();
-			for (int i = 1; i <= N; i++) {
-				if (level[i] == -1 && Graph[temp][i] > 0) {
-					Q.push(i);
-					level[i] = level[temp] + 1;
-				}
-			}
-		}
-	}
-	void dfs(int s, int t, int N) {
-		if (s == t) {
-			Path.push_back(s);
-			return;
-		}
+	memset(level, -1, sizeof(level));
+	queue<int> Q;
+	Q.push(s); level[s] = 0;
+	while (!Q.empty()) {
+		int temp = Q.front();
+		Q.pop();
 		for (int i = 1; i <= N; i++) {
-			if (level[i] == level[s] + 1) {
-				dfs(i, t, N);
-				if (!Path.empty()) {
-					Path.push_back(s);
-					minwight = minwight < Graph[s][i] ? minwight : Graph[s][i];
-					return;
-				}
+			if (level[i] == -1 && Graph[temp][i] > 0) {
+				Q.push(i);
+				level[i] = level[temp] + 1;
 			}
 		}
 	}
-public:
-	int DinicAns(int s, int t, int N) {
-		double Ans = 0;
-		bfs(s, N);
-		while (level[t] != -1) {
-			minwight = 99999999;
-			Path.clear();
-			dfs(s, t, N);
-			for (int i = Path.size() - 1; i > 0; i--) {
-				int u = Path[i], v = Path[i - 1];
-				Graph[u][v] -= minwight;
-				Graph[v][u] += minwight;
-			}
-			Ans += minwight;
-			bfs(s, N);
-		}
-		return Ans;
-	}
-};
-void View(int ans, int N);
-int main()
-{
-	memset(Graph, 0, sizeof(Graph));
-	int M, N = 0;
-	cin >> M;
-	for (int i = 0; i < M; i++) {
-		string u, v; double w;
-		cin >> u >> v >> w;
-		if (uToCur[u] == 0) { uToCur[u] = ++N; curToU[N] = u; };
-		if (uToCur[v] == 0) { uToCur[v] = ++N; curToU[N] = v; };
-		Graph[uToCur[u]][uToCur[v]] = w;
-	}
-	memcpy(GraphOld, Graph, sizeof(Graph));
-	string sn, tn;
-	cin >> sn >> tn;
-	int s = uToCur[sn], t = uToCur[tn];
-	Dinic dinic;
-	int ans = dinic.DinicAns(s, t, N);
-	View(ans, N);
 }
-/*--------------------------------[ 网络最大流 EdmondsKarp ]--------------------------------*/
+void Dinic_dfs(int s, int t, int N) {
+	if (s == t) {
+		Path.push_back(s);
+		return;
+	}
+	for (int i = 1; i <= N; i++) {
+		if (level[i] == level[s] + 1) {
+			dfs(i, t, N);
+			if (!Path.empty()) {
+				Path.push_back(s);
+				minwight = minwight < Graph[s][i] ? minwight : Graph[s][i];
+				return;
+			}
+		}
+	}
+}
+int Dinic(int s, int t, int N) {
+	double Ans = 0;
+	bfs(s, N);
+	while (level[t] != -1) {
+		int minwight = 0x7FFFFFFF;
+		Path.clear();
+		dfs(s, t, N);
+		for (int i = Path.size() - 1; i > 0; i--) {
+			int u = Path[i], v = Path[i - 1];
+			Graph[u][v] -= minwight;
+			Graph[v][u] += minwight;
+		}
+		Ans += minwight;
+		bfs(s, N);
+	}
+	return Ans;
+}
 #endif
