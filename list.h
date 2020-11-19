@@ -1,14 +1,14 @@
 #ifndef _LIST_H
 #define _LIST_H
 /*
-API:	begin, end, empty, size,				//»ù±¾ÊôĞÔ
-		insert, push_front, push_back,			//²åÈë
-		erase, pop_front, pop_back, clear		//É¾³ı
-		search,									//²éÕÒ
+API:	begin, end, empty, size,				//åŸºæœ¬å±æ€§
+		insert, push_front, push_back,			//æ’å…¥
+		erase, pop_front, pop_back, clear		//åˆ é™¤
+		search,									//æŸ¥æ‰¾
 */
 #include<stdlib.h>
 /***********************************************
-*				_list_node ½Úµã
+*				_list_node èŠ‚ç‚¹
 ************************************************/
 template<class T>
 struct _list_node {
@@ -17,8 +17,8 @@ struct _list_node {
 	T data;
 };
 /***********************************************
-*				_list_iterator µü´úÆ÷
-*	µü´úÆ÷±ØĞëÄÜÖ¸Ïò1ist µÄ½Úµã£¬²¢ÄÜ½øĞĞÕıÈ·µÄµİÔö¡¢µİ¼õ¡¢È¡Öµ¡¢³ÉÔ±´æÈ¡µÈ²Ù×÷¡£
+*				_list_iterator è¿­ä»£å™¨
+*	è¿­ä»£å™¨å¿…é¡»èƒ½æŒ‡å‘1ist çš„èŠ‚ç‚¹ï¼Œå¹¶èƒ½è¿›è¡Œæ­£ç¡®çš„é€’å¢ã€é€’å‡ã€å–å€¼ã€æˆå‘˜å­˜å–ç­‰æ“ä½œã€‚
 ************************************************/
 template<class T>
 struct _list_iterator {
@@ -29,27 +29,27 @@ struct _list_iterator {
 	_list_iterator() {}
 	_list_iterator(_list_node<T>* node) { this->node = node; }
 	/***********************************************
-	*				ÔËËã·ûÖØÔØ
+	*				è¿ç®—ç¬¦é‡è½½
 	************************************************/
-	/*----------------±È½Ï [ == ][ != ]----------------*/
+	/*----------------æ¯”è¾ƒ [ == ][ != ]----------------*/
 	bool operator== (const self& x) const { return node == x.node; }
 	bool operator!= (const self& x) const { return node != x.node; }
-	/*----------------µİÔö [ ++ ]----------------*/
+	/*----------------é€’å¢ [ ++ ]----------------*/
 	self& operator++ () {
 		node = node->next;
 		return *this;
 	}
-	/*----------------µİ¼õ [ -- ]----------------*/
+	/*----------------é€’å‡ [ -- ]----------------*/
 	self& operator-- () {
 		node = node->prev;
 		return *this;
 	}
-	/*----------------Ö¸Õë [ * ][ -> ]----------------*/
+	/*----------------æŒ‡é’ˆ [ * ][ -> ]----------------*/
 	T operator* ()const { return (*node).data; }
 	T* operator-> ()const { return &(operator*()); }
 };
 /***********************************************
-*				list (Ö÷) »·×´Ë«ÏòÁ´±í
+*				list (ä¸») ç¯çŠ¶åŒå‘é“¾è¡¨
 *
 ************************************************/
 template<class T>
@@ -59,7 +59,7 @@ public:
 	typedef _list_iterator<T> iterator;
 	typedef _list_node<T> node;
 private:
-	node* head;		//»·×´Ë«ÏòÁ´±í£¬Í·µØÖ·
+	node* head;		//ç¯çŠ¶åŒå‘é“¾è¡¨ï¼Œå¤´åœ°å€
 
 public:
 	list() {
@@ -67,19 +67,19 @@ public:
 		head->next = head;
 		head->prev = head;
 	}
-	/*----------------Ê×Ä©µØÖ· [ begin ][ end ]----------------*/
-	iterator begin() { return iterator(head->next); }	//Á´±í¿ªÊ¼µØÖ·
-	iterator end() { return iterator(head); }			//Á´±í½áÊøµØÖ·
-	/*----------------ÊÇ·ñÎª¿Õ [ empty ]----------------*/
+	/*----------------é¦–æœ«åœ°å€ [ begin ][ end ]----------------*/
+	iterator begin() { return iterator(head->next); }	//é“¾è¡¨å¼€å§‹åœ°å€
+	iterator end() { return iterator(head); }			//é“¾è¡¨ç»“æŸåœ°å€
+	/*----------------æ˜¯å¦ä¸ºç©º [ empty ]----------------*/
 	bool empty() { return head.next == head; }
-	/*----------------ÔªËØ¶àÉÙ [ size ]----------------*/
+	/*----------------å…ƒç´ å¤šå°‘ [ size ]----------------*/
 	int size() {
 		int ans = 0;
 		for (iterator it = begin(); it != end(); ++it) {
 			ans++;
 		}return ans;
 	}
-	/*----------------²åÈë [ insert ]----------------*/
+	/*----------------æ’å…¥ [ insert ]----------------*/
 	node* insert(iterator position, const T& x) {
 		node* tmp = new node();
 		node* old = position.node;
@@ -90,7 +90,7 @@ public:
 		old->prev = tmp;
 		return tmp;
 	}
-	/*----------------É¾³ı [ erase ]----------------*/
+	/*----------------åˆ é™¤ [ erase ]----------------*/
 	void erase(iterator position) {
 		node* prev = position.node->prev;
 		node* next = position.node->next;
@@ -98,12 +98,12 @@ public:
 		next->prev = prev;
 		delete position.node;
 	}
-	/*----------------Ê×Ä©ÔªËØ ²åÈë,É¾³ı----------------*/
+	/*----------------é¦–æœ«å…ƒç´  æ’å…¥,åˆ é™¤----------------*/
 	void push_front(const T& x) { insert(begin(), x); }
 	void push_back(const T& x) { insert(end(), x); }
 	void pop_front() { erase(begin()); }
 	void pop_back() { erase(--end()); }
-	/*----------------È«Çå [ clear ]----------------*/
+	/*----------------å…¨æ¸… [ clear ]----------------*/
 	void clear() {
 		for (iterator it = begin(); it != end();) {
 			iterator temp = it;
@@ -111,7 +111,7 @@ public:
 			erase(temp);
 		}
 	}
-	/*----------------²éÕÒ [ search ]----------------*/
+	/*----------------æŸ¥æ‰¾ [ search ]----------------*/
 	iterator search(const T& x) {
 		for (iterator it = begin(); it != end(); ++it) {
 			if (it.node->data == x)return it;
