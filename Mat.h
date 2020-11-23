@@ -21,10 +21,13 @@ class Mat
 {
 public:
 /******************************************************************************
-*                    基础数据
+*                    核心数据
 ******************************************************************************/
 	T* data = NULL;
 	int rows = 0, cols = 0;
+/******************************************************************************
+*                    基础函数
+******************************************************************************/
 	/*---------------- 构造析构函数 ----------------*/
 	Mat() { ; }
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
@@ -33,6 +36,11 @@ public:
 	/*---------------- 基础函数 ----------------*/
 	void clean() {memset(data, 0, sizeof(T) * rows * cols);}		//清零 
 	void error() { exit(-1);}
+	void eatMat(Mat& a) {											//吃掉另一个矩阵的数据 (指针操作)
+		if (data != NULL)free(data); 
+		data = a.data; a.data = NULL;
+		rows = a.rows; cols = a.cols; a.rows = a.cols = 0;
+	}
 /******************************************************************************
 *                    基础矩阵
 ******************************************************************************/
@@ -50,11 +58,18 @@ public:
 			data[i * cols + i] = 1;
 		}
 	}
+	/*---------------- 随机元 ----------------*/
+	void rands(const int _rows, const int _cols,T st,T ed) {
+		zero(_rows, _cols);
+		for (int i = 0; i < rows * cols; i++) {
+			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
+		}
+	}
 /******************************************************************************
-*                    运算
-*	* "[]"取元素
-	* max/min
-	* [ = ]assign	* [ + ]add		* [ * ]mult 矩阵乘/数乘
+*                    基础运算
+*******************************************************************************
+*	运算嵌套,暂不稳定, 最好别用
+		Eg: b.add(b.mult(a, b), a.mult(-1, a)); 不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解。
 ******************************************************************************/
 	/*---------------- "[]"取元素 ----------------*/
 	T& operator[](int i) { return data[i]; }
@@ -83,23 +98,28 @@ public:
 			if (mindata > data[i]) { mindata = data[i]; index = i; }
 		return mindata;
 	}
-	/*----------------赋矩阵 [ = ]----------------*/
+	/*----------------赋矩阵 [ = ]----------------*/ //不能赋值自己
 	void assign(const Mat& a) {
 		if (a.data == NULL)error();
 		zero(a.rows, a.cols);
 		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
 	}
+	Mat& operator=(const Mat& a) {
+		if (a.data == NULL)error();
+		zero(a.rows, a.cols);
+		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
+		return *this;
+	}
 	/*----------------加法 [ + ]----------------*/
-	void add(Mat& a, Mat& b, Mat& ans) {
+	Mat& add(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols)error();
 		Mat ansTemp(a);
 		for (int i = 0; i < a.rows * a.cols; i++)ansTemp[i] += b[i];
-		// Save Ans
-		if (ans.data != NULL)free(ans.data); ans.data = ansTemp.data; ansTemp.data = NULL;
-		ans.rows = ansTemp.rows; ans.cols = ansTemp.cols;
+		eatMat(ansTemp);
+		return *this;
 	}
 	/*----------------乘法 [ * ]----------------*/
-	void mult(const Mat& a, const Mat& b, Mat& ans) {
+	Mat& mult(const Mat& a, const Mat& b) {
 		if (a.cols != b.rows) error();
 		Mat ansTemp(a.rows, b.cols);
 		for (int i = 0; i < a.rows; i++) {
@@ -114,17 +134,24 @@ public:
 				ansTemp.data[i * ansTemp.cols + j] = sum;
 			}
 		}
-		// Save Ans
-		if (ans.data != NULL)free(ans.data); ans.data = ansTemp.data; ansTemp.data = NULL;
-		ans.rows = ansTemp.rows; ans.cols = ansTemp.cols;
+		eatMat(ansTemp);
+		return *this;
 	}
-	void mult(const double a, const Mat& b, Mat& ans) {
+	/*----------------数乘 [ * ]----------------*/
+	Mat& mult(const double a, const Mat& b) {
 		Mat ansTemp(b.rows, b.cols);
 		for (int i = 0; i < b.rows * b.cols; i++)
 			ansTemp.data[i] = a * b.data[i];
-		// Save Ans
-		if (ans.data != NULL)free(ans.data); ans.data = ansTemp.data; ansTemp.data = NULL;
-		ans.rows = ansTemp.rows; ans.cols = ansTemp.cols;
+		eatMat(ansTemp);
+		return *this;
+	}
+	/*----------------点乘 [ · ]----------------*/	//a·b= aT * b
+	Mat& dot(const Mat& a, const Mat& b) {
+		Mat ansTemp;
+		a.transposi(ansTemp);
+		ansTemp.mult(ansTemp, b);
+		eatMat(ansTemp);
+		return *this;
 	}
 	/*----------------元素求和 [ sum() ]----------------*/
 	void sum(int dim, Mat& ans) {
@@ -146,9 +173,7 @@ public:
 				ansTemp.data[j * rows + i] = data[i * cols + j];
 			}
 		}
-		// Save Ans
-		if (ans.data != NULL)free(ans.data); ans.data = ansTemp.data; ansTemp.data = NULL;
-		ans.rows = ansTemp.rows; ans.cols = ansTemp.cols;
+		ans.eatMat(ansTemp);
 	}
 	/*----------------余子式 [ comi ]----------------*/
 	/*----------------取逆 [ inv ]----------------*/
@@ -188,14 +213,14 @@ public:
 	*------------------------------------------------*/
 	void eig(T esp, Mat& eigvec, Mat& eigvalue) {
 		if (rows != cols)return;
-		// init
+		//[1] init
 		eigvalue.assign(*this);
 		eigvec.E(rows);
 		int n = rows;
 		Mat<double> R, RT;
-		// begin iteration
+		//[2] begin iteration
 		while (true) {
-			// Calculate row p and col q
+			//[3] Calculate row p and col q
 			int p, q;
 			T maxelement = eigvalue[1];
 			for (int i = 0; i < n; i++) {
@@ -204,18 +229,38 @@ public:
 						maxelement = fabs(eigvalue[i * n + j]); p = i; q = j;
 					}
 				}
-			}if (maxelement < esp)return;
-			// eigvalue eigvec
+			}if (maxelement < esp)return;			// [2]
+			//[4] eigvalue eigvec
 			T theta = 0.5 * atan2(2 * eigvalue[p * n + q], eigvalue[q * n + q] - eigvalue[p * n + p]);
 			T c = cos(theta), s = sin(theta);		// c,s
 			R.E(n);
-			R[p * n + p] = c; R[p * n + q] = s;	// R
+			R[p * n + p] = c; R[p * n + q] = s;		// R
 			R[q * n + p] = -s; R[q * n + q] = c;
 			R.transposi(RT);
-			eigvalue.mult(RT, eigvalue, eigvalue);		// Dj = RjT Dj-1 Rj
-			eigvalue.mult(eigvalue, R, eigvalue);
-			eigvec.mult(eigvec, R, eigvec);				// X = R Y
+			eigvalue.mult(RT, eigvalue);			// Dj = RjT Dj-1 Rj
+			eigvalue.mult(eigvalue, R);
+			eigvec.mult(eigvec, R);					// X = R Y
 		}
+	}
+/******************************************************************************
+*                    基础运算
+******************************************************************************/
+	/*----------------水平向拼接 [ eig() ]----------------*/
+	void horizStack(Mat& a, Mat& b) {
+		if (a.rows != b.rows)error();
+		Mat ansTemp(a.rows, a.cols + b.cols);
+		for (int i = 0; i < ansTemp.row; i++) {
+			for (int j = 0; j < ansTemp.cols; j++) {
+				ansTemp.data[i * cols + j] = j < a.cols ? a(i, j) : b(i, j - a.cols);
+			}
+		}
+		eatMat(ansTemp);
+		return *this;
+	}
+	void swap(Mat& a) {
+		T* tptr = a.data;a.data = data;data = tptr;
+		int t = a.rows; a.rows = rows; rows = t;
+		t = a.cols; a.cols = cols; cols = t;
 	}
 };
 #endif

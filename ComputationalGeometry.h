@@ -2,29 +2,16 @@
 #define COMPUTATIONAL_GEOMETRY_H
 struct position { double x, y; };
 struct triangle { position p[3]; };
-/*--------------------------------[ CircumCircleRadius ]--------------------------------*/
-double CircumCircleRadius(triangle tri)
+struct segment { point p[2]; };
+/*--------------------------------[ CircumCircle 三角形外接圆 ]--------------------------------*/
+doubel CircumCircle(triangle& tri, pposition& center)
 {
 	double x[3], y[3];
 	for (int i = 0; i < 3; i++) {
 		x[i] = tri.p[i].x;
 		y[i] = tri.p[i].y;
 	}
-	double a = sqrt(pow((x[0] - x[1]), 2) + pow((y[0] - y[1]), 2));
-	double b = sqrt(pow((x[0] - x[2]), 2) + pow((y[0] - y[2]), 2));
-	double c = sqrt(pow((x[1] - x[2]), 2) + pow((y[1] - y[2]), 2));
-	double p = (a + b + c) / 2;
-	double S = sqrt(p * (p - a) * (p - b) * (p - c));
-	double radius = a * b * c / (4 * S);
-	return radius;
-}
-position CircumCircleCenter(triangle tri)
-{
-	double x[3], y[3];
-	for (int i = 0; i < 3; i++) {
-		x[i] = tri.p[i].x; y[i] = tri.p[i].y;
-	}
-	position center;
+	//三角形外接圆圆心
 	double t[3];
 	for (int i = 0; i < 3; i++) {
 		t[i] = x[i] * x[i] + y[i] * y[i];
@@ -35,9 +22,50 @@ position CircumCircleCenter(triangle tri)
 		+ (t[2] - t[1]) * (y[1] - y[0])) / (2 * temp);
 	center.y = (+(t[1] - t[0]) * (x[2] - x[1])
 		- (t[2] - t[1]) * (x[1] - x[0])) / (2 * temp);
-	return center;
+	//三角形外接圆半径
+	double a = sqrt(pow((x[0] - x[1]), 2) + pow((y[0] - y[1]), 2));
+	double b = sqrt(pow((x[0] - x[2]), 2) + pow((y[0] - y[2]), 2));
+	double c = sqrt(pow((x[1] - x[2]), 2) + pow((y[1] - y[2]), 2));
+	double p = (a + b + c) / 2;
+	double S = sqrt(p * (p - a) * (p - b) * (p - c));
+	double radius = a * b * c / (4 * S);
+	return radius;
 }
-/*--------------------------------[ ConvexHull ]--------------------------------*/
+/*--------------------------------[ segment 线段 ]--------------------------------*/
+int CrossProduct(point origin, point a, point b)	//叉乘
+{
+	a.x -= origin.x; a.y -= origin.y;
+	b.x -= origin.x; b.y -= origin.y;
+	double ans = a.x * b.y - a.y * b.x;
+	if (ans > 0)return 1;
+	else if (ans < 0)return -1;
+	return 0;
+}
+bool OnSegments_judge(segment seg, point point)
+{
+	seg.p[0].x += -point.x + seg.p[0].y - point.y;
+	seg.p[1].x += -point.x + seg.p[1].y - point.y;
+	if (seg.p[0].x * seg.p[1].x <= 0)return true;
+	return false;
+}
+bool SegmentsIntersect_judge(segment a, segment b)
+{
+	int dir_a1 = CrossProduct(a.p[0], a.p[1], b.p[0]);
+	int dir_a2 = CrossProduct(a.p[0], a.p[1], b.p[1]);
+	int dir_b1 = CrossProduct(b.p[0], b.p[1], a.p[0]);
+	int dir_b2 = CrossProduct(b.p[0], b.p[1], a.p[1]);
+	if (dir_a1 == 0)
+		if (OnSegments_judge(a, b.p[0])) return true; else {}
+	else if (dir_a2 == 0)
+		if (OnSegments_judge(a, b.p[1])) return true; else {}
+	else if (dir_b1 == 0)
+		if (OnSegments_judge(b, a.p[0])) return true; else {}
+	else if (dir_b2 == 0)
+		if (OnSegments_judge(b, a.p[1])) return true; else {}
+	else if (dir_a1 != dir_a2 && dir_b1 != dir_b2) return true;
+	return false;
+}
+/*--------------------------------[ ConvexHull 凸包 ]--------------------------------*/
 struct position {
 	double x, y, angle = 0;
 };
@@ -96,7 +124,7 @@ void ConvexHull(position arr[], int N, int cur)
 		if (ansPoint.empty())ansPoint.push(arr[i]);
 	}ansPoint.push(arr[cur]);
 }
-/*--------------------------------[ Delaunay ]--------------------------------*/
+/*--------------------------------[ Delaunay 三角剖分 ]--------------------------------*/
 struct position {
 	double x, y;
 	bool friend operator<(position a, position b) {
@@ -219,39 +247,5 @@ void Delaunay(position p)
 	for (int i = 0; i < edgetemp.size(); i++)
 		tritemp[tritemppos++] = { edgetemp[i].a, edgetemp[i].b, p };
 }
-/*--------------------------------[ segment ]--------------------------------*/
-struct segment { point p[2]; };
-int CrossProduct(point origin, point a, point b)
-{
-	a.x -= origin.x; a.y -= origin.y;
-	b.x -= origin.x; b.y -= origin.y;
-	double ans = a.x * b.y - a.y * b.x;
-	if (ans > 0)return 1;
-	else if (ans < 0)return -1;
-	return 0;
-}
-bool OnSegments_judge(segment seg, point point)
-{
-	seg.p[0].x += -point.x + seg.p[0].y - point.y;
-	seg.p[1].x += -point.x + seg.p[1].y - point.y;
-	if (seg.p[0].x * seg.p[1].x <= 0)return true;
-	return false;
-}
-bool SegmentsIntersect_judge(segment a, segment b)
-{
-	int dir_a1 = CrossProduct(a.p[0], a.p[1], b.p[0]);
-	int dir_a2 = CrossProduct(a.p[0], a.p[1], b.p[1]);
-	int dir_b1 = CrossProduct(b.p[0], b.p[1], a.p[0]);
-	int dir_b2 = CrossProduct(b.p[0], b.p[1], a.p[1]);
-	if (dir_a1 == 0)
-		if (OnSegments_judge(a, b.p[0])) return true; else {}
-	else if (dir_a2 == 0)
-		if (OnSegments_judge(a, b.p[1])) return true; else {}
-	else if (dir_b1 == 0)
-		if (OnSegments_judge(b, a.p[0])) return true; else {}
-	else if (dir_b2 == 0)
-		if (OnSegments_judge(b, a.p[1])) return true; else {}
-	else if (dir_a1 != dir_a2 && dir_b1 != dir_b2) return true;
-	return false;
-}
+
 #endif
