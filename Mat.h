@@ -13,7 +13,6 @@ limitations under the License.
 #ifndef _MAT_H
 #define _MAT_H
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <math.h>
 template<class T>
@@ -43,6 +42,7 @@ public:
 	}
 /******************************************************************************
 *                    基础矩阵
+*	[1] 零元 zero		[2] 单位元 E		[3] 随机元 rands
 ******************************************************************************/
 	/*---------------- 零元 ----------------*/
 	void zero(const int _rows, const int _cols) {
@@ -67,9 +67,27 @@ public:
 	}
 /******************************************************************************
 *                    基础运算
-*******************************************************************************
-*	运算嵌套,暂不稳定, 最好别用
-		Eg: b.add(b.mult(a, b), a.mult(-1, a)); 不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解。
+-------------------------------------------------------------------------------
+	T& operator[](int i)                        // "[]"取元素
+	T& operator()(int i, int j)                 // "()"取元素
+	T& operator()(int i)
+	T max()                                     // max/min
+	T max(int& index)
+	T min()
+	T min(int& index)
+	Mat& operator=(const Mat& a)                //赋矩阵 [ = ]  //不能赋值自己
+	Mat& add(Mat& a, Mat& b)                    //加法 [ add ]
+	Mat& mult(const Mat& a, const Mat& b)       //乘法 [ mult ]
+	Mat& mult(const double a, const Mat& b)     //数乘 [ mult ]
+	Mat& dot(const Mat& a, const Mat& b)        //点乘 [ dot ]
+	Mat& negative(Mat& ans)                     //负 [ negative ]
+	Mat& transposi(Mat& ans)                    //转置 [ trans ]
+	void sum(int dim, Mat& ans)                 //元素求和 [ sum ]
+	T norm()                 //范数 [ norm ]
+	void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
+-------------------------------------------------------------------------------
+*	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
+		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
 ******************************************************************************/
 	/*---------------- "[]"取元素 ----------------*/
 	T& operator[](int i) { return data[i]; }
@@ -99,11 +117,6 @@ public:
 		return mindata;
 	}
 	/*----------------赋矩阵 [ = ]----------------*/ //不能赋值自己
-	void assign(const Mat& a) {
-		if (a.data == NULL)error();
-		zero(a.rows, a.cols);
-		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
-	}
 	Mat& operator=(const Mat& a) {
 		if (a.data == NULL)error();
 		zero(a.rows, a.cols);
@@ -153,6 +166,25 @@ public:
 		eatMat(ansTemp);
 		return *this;
 	}
+	/*----------------负 [ negative() ]----------------*/
+	Mat& negative(Mat& ans) {
+		Mat ansTemp(*this);
+		for (int i = 0; i < rows * cols; i++)
+			ansTemp[i] = -ansTemp[i];
+		ans.eatMat(ansTemp);
+		return ans;
+	}
+	/*----------------转置 [ trans() ]----------------*/
+	Mat& transposi(Mat& ans) {
+		Mat ansTemp(cols, rows);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				ansTemp.data[j * rows + i] = data[i * cols + j];
+			}
+		}
+		ans.eatMat(ansTemp);
+		return ans;
+	}
 	/*----------------元素求和 [ sum() ]----------------*/
 	void sum(int dim, Mat& ans) {
 		int _col = 1, _row = 1;
@@ -165,15 +197,12 @@ public:
 			}
 		}
 	}
-	/*----------------转置 [ trans() ]----------------*/
-	void transposi(Mat& ans) {
-		Mat ansTemp(cols, rows);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				ansTemp.data[j * rows + i] = data[i * cols + j];
-			}
-		}
-		ans.eatMat(ansTemp);
+	/*----------------范数 [ norm ]----------------*/
+	T norm() {
+		double s = 0;
+		for (int i = 0; i < a.rows; i++)
+			s += (a[0] - b[0]) * (a[0] - b[0]);
+		return sqrt(s);
 	}
 	/*----------------余子式 [ comi ]----------------*/
 	/*----------------取逆 [ inv ]----------------*/
@@ -243,7 +272,7 @@ public:
 		}
 	}
 /******************************************************************************
-*                    基础运算
+*                    特殊操作
 ******************************************************************************/
 	/*----------------水平向拼接 [ eig() ]----------------*/
 	void horizStack(Mat& a, Mat& b) {
@@ -257,10 +286,17 @@ public:
 		eatMat(ansTemp);
 		return *this;
 	}
+	/*----------------交换数据 [ swap() ]----------------*/
 	void swap(Mat& a) {
 		T* tptr = a.data;a.data = data;data = tptr;
 		int t = a.rows; a.rows = rows; rows = t;
 		t = a.cols; a.cols = cols; cols = t;
+	}
+	/*----------------得到一列 [ getCol() ]----------------*/
+	Mat& getCol(int _col, Mat& a) {
+		a.zero(rows, 1);
+		for (int i = 0; i < rows; i++) a[i] = data[i * cols + _col];
+		return a;
 	}
 };
 #endif
