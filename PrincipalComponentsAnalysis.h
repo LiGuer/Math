@@ -36,18 +36,18 @@ void PrincipalComponentsAnalysis(Mat<double>& x, Mat<double>& y, int yDim) {
 	//[1] 数据中心化
 	Mat<double> mean;
 	x.sum(0, mean);
-	mean.mult(1.0 / x.cols, mean, mean);		//得到均值
+	mean.mult(1.0 / x.cols, mean);		//得到均值
 	Mat<double> x2(x.rows, x.cols);
 	for (int i = 0; i < x.rows; i++) {
 		for (int j = 0; j < x.cols; j++) {
 			x2[i * x.cols + j] = -mean[i];
 		}
 	}
-	x2.add(x, x2, x2);
+	x2.add(x, x2);
 	//[2] 计算协方差矩阵
 	Mat<double> Cov;
 	x2.transposi(Cov);			//XT
-	Cov.mult(x2, Cov, Cov);		//X*XT
+	Cov.mult(x2, Cov);		//X*XT
 	//[3] 对协方差特征值分解
 	Mat<double> eigVec, eigValue;
 	Cov.eig(1e-5, eigVec, eigValue);
@@ -71,5 +71,5 @@ void PrincipalComponentsAnalysis(Mat<double>& x, Mat<double>& y, int yDim) {
 	}
 	W.transposi(W);
 	//[5]
-	y.mult(W, x, y);
+	y.mult(W, x);
 }

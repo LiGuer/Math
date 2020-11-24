@@ -1,45 +1,35 @@
 #ifndef COMPUTATIONAL_GEOMETRY_H
 #define COMPUTATIONAL_GEOMETRY_H
-struct position { double x, y; };
-struct triangle { position p[3]; };
-struct segment { point p[2]; };
-/*--------------------------------[ CircumCircle 三角形外接圆 ]--------------------------------*/
-doubel CircumCircle(triangle& tri, pposition& center)
+#include"Mat.h"
+/*--------------------------------[ CircumCircle 三角形外接圆 ]--------------------------------
+*	三角形外接圆圆心, 是任意两边的垂直平分线的交点.
+*	正弦定理: a/sinA = b/sinB = c/sinC = 2R
+*	半径,在求得圆心坐标后，直接用距离公式。
+**------------------------------------------------------------------*/
+double CircumCircle(Mat<double>& triangle, Mat<double>& center)
 {
-	double x[3], y[3];
-	for (int i = 0; i < 3; i++) {
-		x[i] = tri.p[i].x;
-		y[i] = tri.p[i].y;
-	}
+	Mat<double> point[3];
+	for (int i = 0; i < 3; i++) triangle.getCol(i, point[i]);
 	//三角形外接圆圆心
+	center.zero(triangle.rows, 1);
 	double t[3];
-	for (int i = 0; i < 3; i++) {
-		t[i] = x[i] * x[i] + y[i] * y[i];
-	}
-	double temp = (x[2] - x[1]) * (y[1] - y[0])
-		- (x[1] - x[0]) * (y[2] - y[1]);
-	center.x = (-(t[1] - t[0]) * (y[2] - y[1])
-		+ (t[2] - t[1]) * (y[1] - y[0])) / (2 * temp);
-	center.y = (+(t[1] - t[0]) * (x[2] - x[1])
-		- (t[2] - t[1]) * (x[1] - x[0])) / (2 * temp);
-	//三角形外接圆半径
-	double a = sqrt(pow((x[0] - x[1]), 2) + pow((y[0] - y[1]), 2));
-	double b = sqrt(pow((x[0] - x[2]), 2) + pow((y[0] - y[2]), 2));
-	double c = sqrt(pow((x[1] - x[2]), 2) + pow((y[1] - y[2]), 2));
-	double p = (a + b + c) / 2;
-	double S = sqrt(p * (p - a) * (p - b) * (p - c));
-	double radius = a * b * c / (4 * S);
-	return radius;
+	for (int i = 0; i < 3; i++) t[i] = x[i] * x[i] + y[i] * y[i];
+	double temp = (x[2] - x[1]) * (y[1] - y[0]) - (x[1] - x[0]) * (y[2] - y[1]);
+	center[0] = (-(t[1] - t[0]) * (y[2] - y[1]) + (t[2] - t[1]) * (y[1] - y[0])) / (2 * temp);
+	center[1] = (+(t[1] - t[0]) * (x[2] - x[1]) - (t[2] - t[1]) * (x[1] - x[0])) / (2 * temp);
+	//半径
+	point[0].add(point[0].negative(point[0]), center);
+	return point[0].norm();
 }
-/*--------------------------------[ segment 线段 ]--------------------------------*/
-int CrossProduct(point origin, point a, point b)	//叉乘
+/*--------------------------------[ CrossProduct 叉乘 ]--------------------------------
+*	利用叉积，可以判断两条向量之间的旋转方向
+*	𝑎 × 𝑏 ⃑ = | 𝑥		𝑦	𝑧 | = z ∙ (𝑥𝑎 ∙ 𝑦𝑏 − 𝑥𝑏 ∙ 𝑦𝑎)
+				| 𝑥𝑎	𝑦𝑎	0 |
+				| 𝑥𝑏	𝑦𝑏	0 |
+**---------------------------------------------------------*/
+double CrossProduct(Mat<double>& a, Mat<double>& b)
 {
-	a.x -= origin.x; a.y -= origin.y;
-	b.x -= origin.x; b.y -= origin.y;
-	double ans = a.x * b.y - a.y * b.x;
-	if (ans > 0)return 1;
-	else if (ans < 0)return -1;
-	return 0;
+	return a[0] * b[1] - a[1] * b[0];
 }
 bool OnSegments_judge(segment seg, point point)
 {
@@ -48,12 +38,17 @@ bool OnSegments_judge(segment seg, point point)
 	if (seg.p[0].x * seg.p[1].x <= 0)return true;
 	return false;
 }
-bool SegmentsIntersect_judge(segment a, segment b)
+/*--------------------------------[ Segments Intersect 线段相交判断 ]--------------------------------
+*	判定条件：
+	1.Each segment straddles the line containing the other.
+	2.An endpoint of one segment line on the other segment. (the boundary case.)
+**---------------------------------------------------------*/
+bool isSegmentsIntersect(Mat<double>& a, Mat<double>& b)
 {
-	int dir_a1 = CrossProduct(a.p[0], a.p[1], b.p[0]);
-	int dir_a2 = CrossProduct(a.p[0], a.p[1], b.p[1]);
-	int dir_b1 = CrossProduct(b.p[0], b.p[1], a.p[0]);
-	int dir_b2 = CrossProduct(b.p[0], b.p[1], a.p[1]);
+	double dir_a1 = CrossProduct(a.p[0], a.p[1], b.p[0]),
+		dir_a2 = CrossProduct(a.p[0], a.p[1], b.p[1]),
+		dir_b1 = CrossProduct(b.p[0], b.p[1], a.p[0]),
+		dir_b2 = CrossProduct(b.p[0], b.p[1], a.p[1]);
 	if (dir_a1 == 0)
 		if (OnSegments_judge(a, b.p[0])) return true; else {}
 	else if (dir_a2 == 0)
@@ -65,45 +60,19 @@ bool SegmentsIntersect_judge(segment a, segment b)
 	else if (dir_a1 != dir_a2 && dir_b1 != dir_b2) return true;
 	return false;
 }
-/*--------------------------------[ ConvexHull 凸包 ]--------------------------------*/
-struct position {
-	double x, y, angle = 0;
-};
-stack<position> ansPoint;
-bool cmd(position a, position b) { return a.angle < b.angle; }
-
-position findCur(position arr[], int N)
+/*--------------------------------[ ConvexHull 凸包 ]--------------------------------
+*	[算法]: Graham 扫描法
+*	[流程]:
+		[1] 选择y最小的点 p0,若多个则选其中最靠左的点
+		[2] 根据相对p0的极角,对剩余点排序
+**----------------------------------------------------------------------------*/
+void ConvexHull(Mat<double>& points)
 {
-	position mincur = { 99999 ,99999 ,-1 };
-	for (int i = 1; i < N; i++) {
-		if (arr[i].y < mincur.y || (arr[i].y == mincur.y
-			&& arr[i].x < mincur.x)) {
-			mincur.angle = i;
-			mincur.y = arr[i].y;
-			mincur.x = arr[i].x;
-		}
-	}return mincur;
-}
-void setAngle(position arr[], int N, int cur)
-{
-	for (int i = 0; i < N; i++) {
-		double b = sqrt(pow(arr[i].x - arr[cur].x, 2) +
-			pow(arr[i].y + arr[cur].y, 2));
-		double c = arr[i].x - arr[cur].x;
-		arr[i].angle = c / b;
-	}
-}
-bool CrossProduct(position a, position b)
-{
-	double crossproduct = a.x * b.y - a.y * b.x;
-	if (crossproduct >= 0)return false;
-	else true;
-}
-void ConvexHull(position arr[], int N, int cur)
-{
-	for (int i = 0; i < N; i++) {
+	Mat<double> Stack(points.rows, points.cols);
+	int StackPos = 0;
+	for (int i = 0; i < points.cols; i++) {
 		if (i == cur)continue;
-		while (!ansPoint.empty()) {
+		while (StackPos == 0) {
 			position prePoint = ansPoint.top();
 			ansPoint.pop();
 			if (ansPoint.empty()) {
@@ -111,53 +80,95 @@ void ConvexHull(position arr[], int N, int cur)
 				ansPoint.push(arr[i]);
 				break;
 			}
-			position a = { prePoint.x - ansPoint.top().x,
-						   prePoint.y - ansPoint.top().y };
-			position b = { arr[i].x - prePoint.x,arr[i].y - prePoint.y };
+			double ax = prePoint.x - ansPoint.top().x;
+			double ay = prePoint.y - ansPoint.top().y;
+			double bx = arr[i].x - prePoint.x;
+			double by = arr[i].y - prePoint.y;
 			if (CrossProduct(a, b)) {
 				ansPoint.push(prePoint);
 				ansPoint.push(arr[i]);
 				break;
 			}
-			else {}
 		}
 		if (ansPoint.empty())ansPoint.push(arr[i]);
 	}ansPoint.push(arr[cur]);
 }
-/*--------------------------------[ Delaunay 三角剖分 ]--------------------------------*/
-struct position {
-	double x, y;
-	bool friend operator<(position a, position b) {
-		if (a.x != b.x)return a.x < b.x;
-		return a.y < b.y;
-	}
-	bool friend operator==(position a, position b) {
-		if (a.x == b.x && a.y == b.y)return true;
-		return false;
-	}
-};
-struct edge {
-	position a, b;
-	bool friend operator==(edge e1, edge e2) {
-		if ((e1.a == e2.a && e1.b == e2.b) ||
-			(e1.a == e2.b && e1.b == e2.a))return true;
-		return false;
-	}
-	bool friend operator<(edge e1, edge e2) {
-		position mine1 = e1.a < e1.b ? e1.a : e1.b;
-		position mine2 = e2.a < e2.b ? e2.a : e2.b;
-		if (mine1 < mine2)return true;
-		if (mine2 < mine1)return false;
-		position maxe1 = e1.a < e1.b ? e1.b : e1.a;
-		position maxe2 = e2.a < e2.b ? e2.b : e2.a;
-		if (maxe1 < maxe2)return true;
-		if (maxe2 < maxe1)return false;
-	}
-};
+/*--------------------------------[ Delaunay 三角剖分 ]--------------------------------
+*	[定义]:
+		[1] 三角剖分：假设V是二维实数域上的有限点集，边e是由点集中的点作为端点构成的封闭线段, E为e的集合。那么该点集V的一个三角剖分T=(V,E)是一个平面图G，该平面图满足条件：
+			1.除了端点，平面图中的边不包含点集中的任何点。
+			2.没有相交边。
+			3.平面图中所有的面都是三角面，且所有三角面的合集是散点集V的凸包。
+		[2] Delaunay边：假设E中的一条边e（两个端点为a,b），e若满足下列条件，则称之为Delaunay边：
+				存在一个圆经过a,b两点，圆内(注意是圆内，圆上最多三点共圆)不含点集V中任何其他的点，这一特性又称空圆特性。
+		[3] Delaunay三角剖分：如果点集V的一个三角剖分T只包含Delaunay边，那么该三角剖分称为Delaunay三角剖分。
+				假设T为V的任一三角剖分，则T是V的一个Delaunay三角剖分，当前仅当T中的每个三角形的外接圆的内部不包含V中任何的点
+	[流程]:
+		input: 顶点列表(vertices)　　　　　　　　　　　　　　　　　　　　  　//vertices为外部生成的随机或乱序顶点列表
+output:已确定的三角形列表(triangles)
+　　　　初始化顶点列表
+　　　　创建索引列表(indices = new Array(vertices.length))　　　　//indices数组中的值为0,1,2,3,......,vertices.length-1
+　　　　基于vertices中的顶点x坐标对indices进行sort　　  　　　　　  //sort后的indices值顺序为顶点坐标x从小到大排序（也可对y坐标，本例中针对x坐标）
+　　　　确定超级三角形
+　　　　将超级三角形保存至未确定三角形列表（temp triangles）
+　　　　将超级三角形push到triangles列表
+　　　　遍历基于indices顺序的vertices中每一个点　　　　　　　　　  　//基于indices后，则顶点则是由x从小到大出现
+　　　　　　初始化边缓存数组（edge buffer）
+　　　　　　遍历temp triangles中的每一个三角形
+　　　　　　　　计算该三角形的圆心和半径
+　　　　　　　　如果该点在外接圆的右侧
+　　　　　　　　　　则该三角形为Delaunay三角形，保存到triangles
+　　　　　　　　　　并在temp里去除掉
+　　　　　　　　　　跳过
+　　　　　　　　如果该点在外接圆外（即也不是外接圆右侧）
+　　　　　　　　　　则该三角形为不确定        　　　　　　　　　     //后面会在问题中讨论
+　　　　　　　　　　跳过
+　　　　　　　　如果该点在外接圆内
+　　　　　　　　　　则该三角形不为Delaunay三角形
+　　　　　　　　　　将三边保存至edge buffer
+　　　　　　　　　　在temp中去除掉该三角形
+　　　　　　对edge buffer进行去重
+　　　　　　将edge buffer中的边与当前的点进行组合成若干三角形并保存至temp triangles中
+　　　　将triangles与temp triangles进行合并
+　　　　除去与超级三角形有关的三角形
+end
+**----------------------------------------------------------------------*/
 struct triangle { position a, b, c; };
 triangle trians[10 * MAXN + 1], tritemp[10 * MAXN + 1];
 int trianspos = 0, tritemppos = 0;
-
+void Delaunay(position p)
+{
+	edgetemp.clear();
+	for (int i = 0; i < tritemppos; i++) {
+		if (judge(tritemp[i], p) == 1) {
+			trians[trianspos++] = tritemp[i];
+			deletearr(tritemp, i, tritemppos);
+			tritemppos--; i--;
+		}
+		else if (judge(tritemp[i], p) == 0) {
+			edge temp[3] = { { tritemp[i].a, tritemp[i].b } ,
+							 { tritemp[i].a, tritemp[i].c } ,
+							 { tritemp[i].b, tritemp[i].c } };
+			for (int j = 0; j < 3; j++) edgetemp.push_back(temp[j]);
+			deletearr(tritemp, i, tritemppos);
+			tritemppos--; i--;
+		}
+		else {}
+	}
+	sort(edgetemp.begin(), edgetemp.end());
+	for (int i = 0; i < edgetemp.size() - 1; i++) {
+		int flag = 0;
+		while (i + 1 < edgetemp.size() && edgetemp[i] == edgetemp[i + 1]) {
+			flag = 1;
+			edgetemp.erase(edgetemp.begin() + i + 1);
+		}
+		if (flag) {
+			edgetemp.erase(edgetemp.begin() + i); i--;
+		}
+	}
+	for (int i = 0; i < edgetemp.size(); i++)
+		tritemp[tritemppos++] = { edgetemp[i].a, edgetemp[i].b, p };
+}
 triangle SuperTriangle(position arr[], int N)
 {
 	position mincur = { arr[0].x ,99999 },
@@ -201,8 +212,7 @@ int judge(triangle tri, position point)
 }
 void deletearr(triangle arr[], int cur, int N)
 {
-	for (int i = cur + 1; i < N; i++)
-		arr[i - 1] = arr[i];
+	for (int i = cur + 1; i < N; i++)arr[i - 1] = arr[i];
 }
 bool supertriangle_judge(triangle t1, triangle t2)
 {
@@ -214,38 +224,6 @@ bool supertriangle_judge(triangle t1, triangle t2)
 	return false;
 }
 vector<edge> edgetemp;
-void Delaunay(position p)
-{
-	edgetemp.clear();
-	for (int i = 0; i < tritemppos; i++) {
-		if (judge(tritemp[i], p) == 1) {
-			trians[trianspos++] = tritemp[i];
-			deletearr(tritemp, i, tritemppos);
-			tritemppos--; i--;
-		}
-		else if (judge(tritemp[i], p) == 0) {
-			edge temp[3] = { { tritemp[i].a, tritemp[i].b } ,
-							 { tritemp[i].a, tritemp[i].c } ,
-							 { tritemp[i].b, tritemp[i].c } };
-			for (int j = 0; j < 3; j++) edgetemp.push_back(temp[j]);
-			deletearr(tritemp, i, tritemppos);
-			tritemppos--; i--;
-		}
-		else {}
-	}
-	sort(edgetemp.begin(), edgetemp.end());
-	for (int i = 0; i < edgetemp.size() - 1; i++) {
-		int flag = 0;
-		while (i + 1 < edgetemp.size() && edgetemp[i] == edgetemp[i + 1]) {
-			flag = 1;
-			edgetemp.erase(edgetemp.begin() + i + 1);
-		}
-		if (flag) {
-			edgetemp.erase(edgetemp.begin() + i); i--;
-		}
-	}
-	for (int i = 0; i < edgetemp.size(); i++)
-		tritemp[tritemppos++] = { edgetemp[i].a, edgetemp[i].b, p };
-}
+
 
 #endif

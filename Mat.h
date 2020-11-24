@@ -83,7 +83,10 @@ public:
 	Mat& negative(Mat& ans)                     //负 [ negative ]
 	Mat& transposi(Mat& ans)                    //转置 [ trans ]
 	void sum(int dim, Mat& ans)                 //元素求和 [ sum ]
-	T norm()                 //范数 [ norm ]
+	T norm()                                    //范数 [ norm ]
+	T comi(int i0, int j0)                      //余子式 [ comi ]
+	T abs()                                     //行列式 [ abs ]
+	Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
 	void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
 -------------------------------------------------------------------------------
 *	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
@@ -123,7 +126,7 @@ public:
 		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
 		return *this;
 	}
-	/*----------------加法 [ + ]----------------*/
+	/*----------------加法 [ add ]----------------*/
 	Mat& add(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols)error();
 		Mat ansTemp(a);
@@ -131,7 +134,7 @@ public:
 		eatMat(ansTemp);
 		return *this;
 	}
-	/*----------------乘法 [ * ]----------------*/
+	/*----------------乘法 [ mult ]----------------*/
 	Mat& mult(const Mat& a, const Mat& b) {
 		if (a.cols != b.rows) error();
 		Mat ansTemp(a.rows, b.cols);
@@ -150,7 +153,7 @@ public:
 		eatMat(ansTemp);
 		return *this;
 	}
-	/*----------------数乘 [ * ]----------------*/
+	/*----------------数乘 [ mult ]----------------*/
 	Mat& mult(const double a, const Mat& b) {
 		Mat ansTemp(b.rows, b.cols);
 		for (int i = 0; i < b.rows * b.cols; i++)
@@ -158,15 +161,16 @@ public:
 		eatMat(ansTemp);
 		return *this;
 	}
-	/*----------------点乘 [ · ]----------------*/	//a·b= aT * b
-	Mat& dot(const Mat& a, const Mat& b) {
-		Mat ansTemp;
-		a.transposi(ansTemp);
-		ansTemp.mult(ansTemp, b);
-		eatMat(ansTemp);
-		return *this;
+	/*----------------点乘 [ dot ]----------------
+	*	a·b = Σ ai·bi = aT * b
+	**------------------------------------------------*/
+	T dot(const Mat& a, const Mat& b) {
+		T ans;
+		memset(ans, 0, sizeof(T));
+		for (int i = 0; i < rows; i++)ans += a[i] * b[i];
+		return ans;
 	}
-	/*----------------负 [ negative() ]----------------*/
+	/*----------------负 [ negative ]----------------*/
 	Mat& negative(Mat& ans) {
 		Mat ansTemp(*this);
 		for (int i = 0; i < rows * cols; i++)
@@ -174,7 +178,7 @@ public:
 		ans.eatMat(ansTemp);
 		return ans;
 	}
-	/*----------------转置 [ trans() ]----------------*/
+	/*----------------转置 [ transposi ]----------------*/
 	Mat& transposi(Mat& ans) {
 		Mat ansTemp(cols, rows);
 		for (int i = 0; i < rows; i++) {
@@ -185,7 +189,7 @@ public:
 		ans.eatMat(ansTemp);
 		return ans;
 	}
-	/*----------------元素求和 [ sum() ]----------------*/
+	/*----------------元素求和 [ sum ]----------------*///########
 	void sum(int dim, Mat& ans) {
 		int _col = 1, _row = 1;
 		if (dim == 0)_row = rows;
@@ -197,18 +201,58 @@ public:
 			}
 		}
 	}
-	/*----------------范数 [ norm ]----------------*/
-	T norm() {
-		double s = 0;
-		for (int i = 0; i < a.rows; i++)
-			s += (a[0] - b[0]) * (a[0] - b[0]);
-		return sqrt(s);
+	/*----------------范数 [ norm ]----------------
+	*	||a|| = sqrt(a·a)
+	**-------------------------------------------*/
+	T norm() { return sqrt(dot(*this, *this)); }
+	/*----------------余子式 [ comi ]----------------
+	*	Mij: A 去掉第i行，第j列
+	**-----------------------------------------------*/
+	T comi(int i0, int j0) {
+		Mat temp(rows - 1, cols - 1);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (i == i0 || j == j0)continue;
+				temp(i < i0 ? i : i - 1, j < j0 ? j : j - 1) = data[i * cols + j];
+			}
+		}
+		return temp.abs();
 	}
-	/*----------------余子式 [ comi ]----------------*/
-	/*----------------取逆 [ inv ]----------------*/
-	/*----------------行列式 [ abs() ]----------------*/
-	/*--------------伴随矩阵 [ adj() ]----------------*/
-	/*----------------特征值特征向量 [ eig() ]----------------
+	/*----------------取逆 [ inv ]----------------
+	**------------------------------------------*/
+	Mat& inv(Mat& ans) {
+		return ans;
+	}
+	/*----------------行列式 [ abs ]----------------
+	*	|A| = Σiorj aij·Aij
+	*	Aij = (-1)^(i+j)·Mij		// Mij余子式
+	**----------------------------------------------*/
+	T abs() {
+		if (rows != cols)error();
+		if (rows == 1)return data[0];
+		T ans;
+		memset(ans, 0, sizeof(T));
+		Mat Mij;
+		for (int i = 0; i < rows; i++)
+			ans += data[i * cols] * (i % 2 == 0 ? 1 : -1) * comi(i, 0, Mij);
+		return ans;
+	}
+	/*--------------伴随矩阵 [ adjugate ]----------------
+	*	定义: 伴随矩阵A* 由(i,j)代数余子式Aij构成
+				 [ A00  ... ]
+			A* = | A01  Aij |
+			     [ A02  ... ]
+	*	性质: A* A = |A|
+	**---------------------------------------------*/
+	Mat& adjugate(Mat& ans) {
+		ans.zero(rows, cols);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				ans(i, j) = ((i + j) % 2 == 0 ? 1 : -1)* comi(i, j);
+			}
+		}
+	}
+	/*----------------特征值特征向量 [ eig ]----------------
 	*	特征方程: AX = λX
 	*		A: 目标矩阵		X: 特征向量		λ: 特征值
 	*	性质:
@@ -271,11 +315,13 @@ public:
 			eigvec.mult(eigvec, R);					// X = R Y
 		}
 	}
+	/*----------------解方程组 [  ]----------------*/
+
 /******************************************************************************
 *                    特殊操作
 ******************************************************************************/
-	/*----------------水平向拼接 [ eig() ]----------------*/
-	void horizStack(Mat& a, Mat& b) {
+	/*----------------水平向拼接 [ horizStack ]----------------*/
+	Mat& horizStack(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
 		Mat ansTemp(a.rows, a.cols + b.cols);
 		for (int i = 0; i < ansTemp.row; i++) {
@@ -286,13 +332,13 @@ public:
 		eatMat(ansTemp);
 		return *this;
 	}
-	/*----------------交换数据 [ swap() ]----------------*/
+	/*----------------交换数据 [ swap ]----------------*/
 	void swap(Mat& a) {
 		T* tptr = a.data;a.data = data;data = tptr;
 		int t = a.rows; a.rows = rows; rows = t;
 		t = a.cols; a.cols = cols; cols = t;
 	}
-	/*----------------得到一列 [ getCol() ]----------------*/
+	/*----------------得到一列 [ getCol ]----------------*/
 	Mat& getCol(int _col, Mat& a) {
 		a.zero(rows, 1);
 		for (int i = 0; i < rows; i++) a[i] = data[i * cols + _col];
