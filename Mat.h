@@ -9,6 +9,9 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+Reference.
+[1]Introduction Algorithms.THOMAS H.CORMEN,CHARLES E.LEISERSON,RONALD L.RIVEST,CLIFFORD STEIN
 ==============================================================================*/
 #ifndef _MAT_H
 #define _MAT_H
@@ -83,10 +86,7 @@ public:
 	Mat& negative(Mat& ans)                     //负 [ negative ]
 	Mat& transposi(Mat& ans)                    //转置 [ trans ]
 	void sum(int dim, Mat& ans)                 //元素求和 [ sum ]
-	T norm()                                    //范数 [ norm ]
-	T comi(int i0, int j0)                      //余子式 [ comi ]
-	T abs()                                     //行列式 [ abs ]
-	Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
+	T norm()                 //范数 [ norm ]
 	void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
 -------------------------------------------------------------------------------
 *	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
@@ -181,11 +181,9 @@ public:
 	/*----------------转置 [ transposi ]----------------*/
 	Mat& transposi(Mat& ans) {
 		Mat ansTemp(cols, rows);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
+		for (int i = 0; i < rows; i++) 
+			for (int j = 0; j < cols; j++) 
 				ansTemp.data[j * rows + i] = data[i * cols + j];
-			}
-		}
 		ans.eatMat(ansTemp);
 		return ans;
 	}
@@ -232,9 +230,8 @@ public:
 		if (rows == 1)return data[0];
 		T ans;
 		memset(ans, 0, sizeof(T));
-		Mat Mij;
 		for (int i = 0; i < rows; i++)
-			ans += data[i * cols] * (i % 2 == 0 ? 1 : -1) * comi(i, 0, Mij);
+			ans += data[i * cols] * (i % 2 == 0 ? 1 : -1) * comi(i, 0);
 		return ans;
 	}
 	/*--------------伴随矩阵 [ adjugate ]----------------
@@ -246,11 +243,9 @@ public:
 	**---------------------------------------------*/
 	Mat& adjugate(Mat& ans) {
 		ans.zero(rows, cols);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++)
 				ans(i, j) = ((i + j) % 2 == 0 ? 1 : -1)* comi(i, j);
-			}
-		}
 	}
 	/*----------------特征值特征向量 [ eig ]----------------
 	*	特征方程: AX = λX
@@ -315,8 +310,105 @@ public:
 			eigvec.mult(eigvec, R);					// X = R Y
 		}
 	}
-	/*----------------解方程组 [  ]----------------*/
+	/*----------------解方程组 [ solveEquations ]----------------
+	*	[公式]: A x = b
+	*			ps.直接x = b A~¹ 会存在数值不稳定现象
+	*	[算法]: LUP分解
+	*	[推导]
+			P A = L U
+			L: 单位下三角矩阵  U: 上三角矩阵  P: 置换矩阵
+			*	置换矩阵:是一个方阵，每行和每列只有一个1，其他均为0，表示矩阵初等行变化
+			*	置换矩阵是可逆的
+			*	因为置换矩阵每行只有一个1，可以变为一维数组，每行计入改行1的位置
+			*	P b 是对b的行互换，即.由上条，相当于b[Pi]
+			可得 L U x = P b
+			令 y = U x  =>  L y = P b	解得 y
+			代入 U x = y  解得 x
+			即. A x = P~¹ L U x = P~¹ L y = P~¹ P b = b
+		[过程]:
+			[1] LUP分解
+			[2] LUP-Solve
+				[3] Solve y:
+					for i = 1 to n
+								  j=1toi-1   
+						yi = b[Pi] - Σ   Lij yj
+				[4] Solve x:
+					for i = n to 1
+								j=i+1toN   
+						x = ( yi - Σ  uij xj ) / uii
+	**--------------------------------------------*/
+	Mat& solveEquations(Mat& b, Mat& x) {
+		int n = rows;
+		x.zero(n, 1);
+		//[1] LUP分解
+		Mat U, L, P;
+		LUPdecomposition(U, L, P);
+		//[2] LUP - Solve
+		//[3] solve y
+		for (int i = 0; i < n; i++) {
+			x[i] = b[P[i]];		//yi
+			for (int j = 0; j < i - 1; j++) x[i] -= x[j] * L(i, j);
+		}
+		//[4] solve x
+		for (int i = n - 1; i >= 0; i--) {
+			for (int j = i + 1; j < n; j++) x[i] -= x[j] * U(i, j);
+			x[i] /= U(i, i);
+		}
+	}
+	/*----------------LPU分解 [ LUPdecomposition ]----------------
+	*	[公式]: P A = L U		其中 L: 单位下三角矩阵  U: 上三角矩阵  P: 置换矩阵
+			*	因为置换矩阵每行只有一个1，可以变为一维数组，每行计入改行1的位置
+	*	[算法]: 高斯消元法
+			[1] 从其他方程中减去第1方程的倍数，以把那些方程第1变量消去。
+			[2] 从第3及以后方程中减去第2方程倍数，以把这些方程的第1,2变量都消去。
+			[3] 重复过程，直至变为上三角矩阵U，单位下三角L是由消去变量所用行的乘数组成
 
+			* 主元pivot: LPU分解中所除元素称为主元，它们处于矩阵U的对角线上。
+			* 选主元: 采用置换避免除0，避免除数很小(数值会不稳定)的操作
+			* 把第1行与第k行互换 <=> 置换矩阵Q左乘A--QA
+	*	[过程]:
+			[1] 对于每一列
+				[2] 选主元
+				[3] 置换行,记录在P中
+				[4] LU分解: 高斯消元法
+			[5] A中包含U,L，分离出来即可
+	**---------------------------------------------*/
+	void LUPdecomposition(Mat& U, Mat& L, Mat& P) {
+		if (rows != cols)error();
+		int n = rows;
+		Mat A(*this);
+		P.zero(n, 1);
+		for (int i = 0; i < n; i++)P[i] = i;
+		//[1]
+		for (int k = 0; k < n; k++) {
+			//[2] 选主元
+			T maxvalue = 0;
+			int kt;
+			for (int i = k; i < n; i++) {
+				if (fabs(A(i, k) > maxvalue)) { maxvalue = fabs(A(i, k)); kt = i; }
+			}
+			if (maxvalue == 0)error();	// singular matrix，秩 rank<n
+			//[3] 置换行
+			for (int i = 0; i < n; i++) {
+				T t = A(k, i); A(k, i) = A(kt, i); A(kt, i) = t;
+			}
+			int t = P[k]; P[k] = P[kt]; P[kt] = t;
+			//[4] LU分解: 高斯消元法
+			for (int i = k + 1; i < n; i++) {
+				A(i, k) /= A(k, k);		//aik存储消去该行第k位所需的乘数,即L
+				for (int j = k + 1; j < n; j++)
+					A(i, j) -= A(i, k) * A(k, j);	//初等行变换，消去该行第k位
+			}
+		}
+		//[5] A中包含U,L，分离出来即可
+		U.zero(n, n); L.E(n);
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if(i > j)L(i, j) = A(i, j);
+				else U(i, j) = A(i, j)
+			}
+		}
+	}
 /******************************************************************************
 *                    特殊操作
 ******************************************************************************/
@@ -324,11 +416,9 @@ public:
 	Mat& horizStack(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
 		Mat ansTemp(a.rows, a.cols + b.cols);
-		for (int i = 0; i < ansTemp.row; i++) {
-			for (int j = 0; j < ansTemp.cols; j++) {
+		for (int i = 0; i < ansTemp.row; i++)
+			for (int j = 0; j < ansTemp.cols; j++)
 				ansTemp.data[i * cols + j] = j < a.cols ? a(i, j) : b(i, j - a.cols);
-			}
-		}
 		eatMat(ansTemp);
 		return *this;
 	}
