@@ -16,6 +16,7 @@ Reference.
 #ifndef _MAT_H
 #define _MAT_H
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 template<class T>
@@ -33,7 +34,7 @@ public:
 	/*---------------- 构造析构函数 ----------------*/
 	Mat() { ; }
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
-	Mat(const Mat& a) { assign(a); }
+	Mat(const Mat& a) { *this = a; }
 	~Mat() { free(data); }
 	/*---------------- 基础函数 ----------------*/
 	void clean() {memset(data, 0, sizeof(T) * rows * cols);}		//清零 
@@ -71,23 +72,29 @@ public:
 /******************************************************************************
 *                    基础运算
 -------------------------------------------------------------------------------
-	T& operator[](int i)                        // "[]"取元素
-	T& operator()(int i, int j)                 // "()"取元素
-	T& operator()(int i)
-	T max()                                     // max/min
-	T max(int& index)
-	T min()
-	T min(int& index)
-	Mat& operator=(const Mat& a)                //赋矩阵 [ = ]  //不能赋值自己
-	Mat& add(Mat& a, Mat& b)                    //加法 [ add ]
-	Mat& mult(const Mat& a, const Mat& b)       //乘法 [ mult ]
-	Mat& mult(const double a, const Mat& b)     //数乘 [ mult ]
-	Mat& dot(const Mat& a, const Mat& b)        //点乘 [ dot ]
-	Mat& negative(Mat& ans)                     //负 [ negative ]
-	Mat& transposi(Mat& ans)                    //转置 [ trans ]
-	void sum(int dim, Mat& ans)                 //元素求和 [ sum ]
-	T norm()                 //范数 [ norm ]
-	void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
+T& operator[](int i)                        // "[]"取元素
+T& operator()(int i, int j)                 // "()"取元素
+T& operator()(int i)
+T max()                                     // max/min
+T max(int& index)
+T min()
+T min(int& index)
+Mat& operator=(const Mat& a)                //赋矩阵 [ = ]  //不能赋值自己
+Mat& add(Mat& a, Mat& b)                    //加法 [ add ]
+Mat& mult(const Mat& a, const Mat& b)       //乘法 [ mult ]
+Mat& mult(const double a, const Mat& b)     //数乘 [ mult ]
+Mat& dot(const Mat& a, const Mat& b)        //点乘 [ dot ]
+Mat& negative(Mat& ans)                     //负 [ negative ]
+Mat& transposi(Mat& ans)                    //转置 [ trans ]
+void sum(int dim, Mat& ans)                 //元素求和 [ sum ]
+T norm()                                    //范数 [ norm ]
+T comi(int i0, int j0)                      //余子式 [ comi ]
+Mat& inv(Mat& ans)                          //取逆 [ inv ]
+T abs()                                     //行列式 [ abs ]
+Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
+void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
+Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
+void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LPU分解 [ LUPdecomposition ]
 -------------------------------------------------------------------------------
 *	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
 		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
@@ -217,8 +224,35 @@ public:
 		return temp.abs();
 	}
 	/*----------------取逆 [ inv ]----------------
+	*	[定义]: A A~¹ = E
+	*	[方法]: 利用不断解线性方程组，对每一列求解.
 	**------------------------------------------*/
 	Mat& inv(Mat& ans) {
+		if (rows != cols)error();
+		Mat temp(rows, cols);
+		int n = rows;
+		// LUP分解
+		Mat L, U; Mat<int> P;
+		LUPdecomposition(U, L, P);
+		//对每一列
+		Mat b(n, 1), x(n, 1);
+		for (int k = 0; k < n; k++) {
+			b.clean(); b[k] = 1;
+			// 解线性方程组
+			//solve y
+			for (int i = 0; i < n; i++) {
+				x[i] = b[P[i]];		//yi
+				for (int j = 0; j < i; j++) x[i] -= x[j] * L(i, j);
+			}
+			//solve x
+			for (int i = n - 1; i >= 0; i--) {
+				for (int j = i + 1; j < n; j++) x[i] -= x[j] * U(i, j);
+				x[i] /= U(i, i);
+			}
+			//合并至结果
+			for (int i = 0; i < rows; i++)temp(k, i) = x[i];
+		}
+		ans.eatMat(temp);
 		return ans;
 	}
 	/*----------------行列式 [ abs ]----------------
@@ -229,17 +263,17 @@ public:
 		if (rows != cols)error();
 		if (rows == 1)return data[0];
 		T ans;
-		memset(ans, 0, sizeof(T));
+		memset(&ans, 0, sizeof(T));
 		for (int i = 0; i < rows; i++)
 			ans += data[i * cols] * (i % 2 == 0 ? 1 : -1) * comi(i, 0);
 		return ans;
 	}
 	/*--------------伴随矩阵 [ adjugate ]----------------
-	*	定义: 伴随矩阵A* 由(i,j)代数余子式Aij构成
+	*	[定义]: 伴随矩阵A* 由(i,j)代数余子式Aij构成
 				 [ A00  ... ]
 			A* = | A01  Aij |
 			     [ A02  ... ]
-	*	性质: A* A = |A|
+	*	[性质]: A* A = |A|
 	**---------------------------------------------*/
 	Mat& adjugate(Mat& ans) {
 		ans.zero(rows, cols);
@@ -248,12 +282,12 @@ public:
 				ans(i, j) = ((i + j) % 2 == 0 ? 1 : -1)* comi(i, j);
 	}
 	/*----------------特征值特征向量 [ eig ]----------------
-	*	特征方程: AX = λX
+	*	[定义]: 特征方程: AX = λX
 	*		A: 目标矩阵		X: 特征向量		λ: 特征值
-	*	性质:
-	*		若 R 为正交矩阵 (R'R = E),有B = R`¹A R , 使得 BY = λY, 特征值不变.
+	*	[性质]:
+	*		若 R 为正交矩阵 (R'R = E),有B = R~¹A R , 使得 BY = λY, 特征值不变.
 	*				又有 X = R Y.
-	*	[算法]雅可比迭代:
+	*	[算法]: 雅可比迭代:
 	*	* 原理:
 	*		对于目标实矩阵A, 构造正交矩阵序列 R1, R2, ... , Rn，
 	*			D0 = A
@@ -311,7 +345,7 @@ public:
 		}
 	}
 	/*----------------解方程组 [ solveEquations ]----------------
-	*	[公式]: A x = b
+	*	[定义]: A x = b
 	*			ps.直接x = b A~¹ 会存在数值不稳定现象
 	*	[算法]: LUP分解
 	*	[推导]
@@ -325,7 +359,7 @@ public:
 			令 y = U x  =>  L y = P b	解得 y
 			代入 U x = y  解得 x
 			即. A x = P~¹ L U x = P~¹ L y = P~¹ P b = b
-		[过程]:
+	*	[过程]:
 			[1] LUP分解
 			[2] LUP-Solve
 				[3] Solve y:
@@ -341,22 +375,23 @@ public:
 		int n = rows;
 		x.zero(n, 1);
 		//[1] LUP分解
-		Mat U, L, P;
+		Mat U, L; Mat<int> P;
 		LUPdecomposition(U, L, P);
 		//[2] LUP - Solve
 		//[3] solve y
 		for (int i = 0; i < n; i++) {
 			x[i] = b[P[i]];		//yi
-			for (int j = 0; j < i - 1; j++) x[i] -= x[j] * L(i, j);
+			for (int j = 0; j < i; j++) x[i] -= x[j] * L(i, j);
 		}
 		//[4] solve x
 		for (int i = n - 1; i >= 0; i--) {
 			for (int j = i + 1; j < n; j++) x[i] -= x[j] * U(i, j);
 			x[i] /= U(i, i);
 		}
+		return x;
 	}
 	/*----------------LPU分解 [ LUPdecomposition ]----------------
-	*	[公式]: P A = L U		其中 L: 单位下三角矩阵  U: 上三角矩阵  P: 置换矩阵
+	*	[定义]: P A = L U		其中 L: 单位下三角矩阵  U: 上三角矩阵  P: 置换矩阵
 			*	因为置换矩阵每行只有一个1，可以变为一维数组，每行计入改行1的位置
 	*	[算法]: 高斯消元法
 			[1] 从其他方程中减去第1方程的倍数，以把那些方程第1变量消去。
@@ -373,7 +408,7 @@ public:
 				[4] LU分解: 高斯消元法
 			[5] A中包含U,L，分离出来即可
 	**---------------------------------------------*/
-	void LUPdecomposition(Mat& U, Mat& L, Mat& P) {
+	void LUPdecomposition(Mat& U, Mat& L, Mat<int>& P) {
 		if (rows != cols)error();
 		int n = rows;
 		Mat A(*this);
@@ -385,7 +420,7 @@ public:
 			T maxvalue = 0;
 			int kt;
 			for (int i = k; i < n; i++) {
-				if (fabs(A(i, k) > maxvalue)) { maxvalue = fabs(A(i, k)); kt = i; }
+				if (fabs(A(i, k)) > maxvalue) { maxvalue = fabs(A(i, k)); kt = i; }
 			}
 			if (maxvalue == 0)error();	// singular matrix，秩 rank<n
 			//[3] 置换行
@@ -404,8 +439,8 @@ public:
 		U.zero(n, n); L.E(n);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				if(i > j)L(i, j) = A(i, j);
-				else U(i, j) = A(i, j)
+				if (i > j)L(i, j) = A(i, j);
+				else U(i, j) = A(i, j);
 			}
 		}
 	}
