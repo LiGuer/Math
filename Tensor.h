@@ -13,7 +13,7 @@ limitations under the License.
 Reference.
 [1]Introduction Algorithms.THOMAS H.CORMEN,CHARLES E.LEISERSON,RONALD L.RIVEST,CLIFFORD STEIN
 ==============================================================================*/
-#include "Mat.h"
+#include "LiGu_GRAPHICS/Mat.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -33,6 +33,7 @@ public:
 	/*---------------- 构造析构函数 ----------------*/
 	Tensor() { ; }
 	Tensor(int dimNum, int* dimLength) { zero(dimNum, dimLength); }
+	Tensor(Tensor& a) { *this = a; }
 	~Tensor() { free(data); }
 	/*---------------- 基础函数 ----------------*/
 	void clean() { 											//清零 
@@ -63,12 +64,21 @@ public:
 	*	[Data堆叠方向]: 满x,一列 => 满xy,一矩阵 => 满xyz,一方块 => ....
 	**-------------------------------------------*/
 	T& operator[](int i) { return data[i]; }
-	T& operator()(int* dimLength) {
+	T& operator()(int* dimIndex) {
 		int index = 0, step = 1;
 		for (int i = 0; i < dimension.rows; i++) {
-			if (i > 0)step *= dimension[i - 1];
-			index += step * dimLength[i];
+			index += step * dimIndex[i];
+			step *= dimension[i];
 		}
 		return data[index];
+	}
+	/*----------------赋值 [ = ]----------------*/ //不能赋值自己
+	Tensor& operator=(const Tensor& a) {
+		if (a.data == NULL)error();
+		zero(a.dimension.rows, a.dimension.data);
+		int N = 1;
+		for (int i = 0; i < dimension.rows; i++)N *= a.dimension.data[i];
+		memcpy(data, a.data, sizeof(T) * N);
+		return *this;
 	}
 };

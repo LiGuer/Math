@@ -7,8 +7,7 @@ LiGu's Basic Algorithm Library.
 * <BasicAlgorithm.h>        基础算法类
 * <ComputationalGeometry.h> 计算几何类
 * <PartialDifferentialEquation.h>   偏微分方程类
-* <PrincipalComponentsAnalysis.h>:  主成分分析|数据降维
-* <K_mean.h>                K-Mean聚类算法  
+* <BasicMachineLearning.h>  基础机器学习类|K-Mean|主成分分析
 * <rb_tree.h>               红黑树
 * <BigNum.h>				大数类
 * <LSTM.h>                  长短期记忆网络

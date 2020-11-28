@@ -95,17 +95,8 @@ void ConvexHull(Mat<double>& points)
 }
 /*--------------------------------[ Delaunay 三角剖分 ]--------------------------------
 *	[定义]:
-		[1] 三角剖分：假设V是二维实数域上的有限点集，边e是由点集中的点作为端点构成的封闭线段, E为e的集合。那么该点集V的一个三角剖分T=(V,E)是一个平面图G，该平面图满足条件：
-			1.除了端点，平面图中的边不包含点集中的任何点。
-			2.没有相交边。
-			3.平面图中所有的面都是三角面，且所有三角面的合集是散点集V的凸包。
-		[2] Delaunay边：假设E中的一条边e（两个端点为a,b），e若满足下列条件，则称之为Delaunay边：
-				存在一个圆经过a,b两点，圆内(注意是圆内，圆上最多三点共圆)不含点集V中任何其他的点，这一特性又称空圆特性。
-		[3] Delaunay三角剖分：如果点集V的一个三角剖分T只包含Delaunay边，那么该三角剖分称为Delaunay三角剖分。
-				假设T为V的任一三角剖分，则T是V的一个Delaunay三角剖分，当前仅当T中的每个三角形的外接圆的内部不包含V中任何的点
+		[1] Delaunay三角剖分: 每个三角形的外接圆内不包含V中任何点
 	[流程]:
-		input: 顶点列表(vertices)　　　　　　　　　　　　　　　　　　　　  　//vertices为外部生成的随机或乱序顶点列表
-output:已确定的三角形列表(triangles)
 　　　　初始化顶点列表
 　　　　创建索引列表(indices = new Array(vertices.length))　　　　//indices数组中的值为0,1,2,3,......,vertices.length-1
 　　　　基于vertices中的顶点x坐标对indices进行sort　　  　　　　　  //sort后的indices值顺序为顶点坐标x从小到大排序（也可对y坐标，本例中针对x坐标）
@@ -131,7 +122,6 @@ output:已确定的三角形列表(triangles)
 　　　　　　将edge buffer中的边与当前的点进行组合成若干三角形并保存至temp triangles中
 　　　　将triangles与temp triangles进行合并
 　　　　除去与超级三角形有关的三角形
-end
 **----------------------------------------------------------------------*/
 struct triangle { position a, b, c; };
 triangle trians[10 * MAXN + 1], tritemp[10 * MAXN + 1];
