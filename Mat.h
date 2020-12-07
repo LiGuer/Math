@@ -34,6 +34,7 @@ public:
 	/*---------------- 构造析构函数 ----------------*/
 	Mat() { ; }
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
+	Mat(const int _rows) { E(_rows); }
 	Mat(const Mat& a) { *this = a; }
 	~Mat() { free(data); }
 	/*---------------- 基础函数 ----------------*/
@@ -49,25 +50,28 @@ public:
 *	[1] 零元 zero		[2] 单位元 E		[3] 随机元 rands
 ******************************************************************************/
 	/*---------------- 零元 ----------------*/
-	void zero(const int _rows, const int _cols) {
+	Mat& zero(const int _rows, const int _cols) {
 		if (data != NULL)free(data);
 		data = (T*)malloc(sizeof(T) * _rows * _cols);
 		memset(data, 0, sizeof(T) * _rows * _cols);
 		rows = _rows;	cols = _cols;
+		return *this;
 	}
 	/*---------------- 单位元 ----------------*/
-	void E(const int _rows) {
+	Mat& E(const int _rows) {
 		zero(_rows, _rows);
 		for (int i = 0; i < rows; i++) {
 			data[i * cols + i] = 1;
 		}
+		return *this;
 	}
 	/*---------------- 随机元 ----------------*/
-	void rands(const int _rows, const int _cols,T st,T ed) {
+	Mat& rands(const int _rows, const int _cols,T st,T ed) {
 		zero(_rows, _cols);
 		for (int i = 0; i < rows * cols; i++) {
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		}
+		return *this;
 	}
 /******************************************************************************
 *                    基础运算
@@ -84,6 +88,7 @@ Mat& add(Mat& a, Mat& b)                    //加法 [ add ]
 Mat& mult(const Mat& a, const Mat& b)       //乘法 [ mult ]
 Mat& mult(const double a, const Mat& b)     //数乘 [ mult ]
 Mat& dot(const Mat& a, const Mat& b)        //点乘 [ dot ]
+Mat& crossProduct(Mat& a, Mat& b)			//叉乘 [ crossProduct ]
 Mat& negative(Mat& ans)                     //负 [ negative ]
 Mat& transposi(Mat& ans)                    //转置 [ trans ]
 void sum(int dim, Mat& ans)                 //元素求和 [ sum ]
@@ -95,6 +100,7 @@ Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
 void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
 Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
 void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
+Mat& normalization()						//归一化 [ normalization ]
 -------------------------------------------------------------------------------
 *	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
 		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
@@ -171,11 +177,26 @@ void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
 	/*----------------点乘 [ dot ]----------------
 	*	a·b = Σ ai·bi = aT * b
 	**------------------------------------------------*/
-	T dot(const Mat& a, const Mat& b) {
+	T dot(Mat& a, Mat& b) {
 		T ans;
-		memset(ans, 0, sizeof(T));
+		memset(&ans, 0, sizeof(T));
 		for (int i = 0; i < rows; i++)ans += a[i] * b[i];
 		return ans;
+	}
+	/*----------------叉乘 [ crossProduct ]----------------
+	//####################### 暂时只三维
+	*	𝑎 × 𝑏 ⃑ = | 𝑥		𝑦	 𝑧  |
+					| 𝑥𝑎	𝑦𝑎	 za |
+					| 𝑥𝑏	𝑦𝑏	 zb |
+	**------------------------------------------------*/
+	Mat& crossProduct(Mat& a, Mat& b) {
+		if (a.rows != b.rows)error();
+		Mat ansTemp(a.rows, a.cols);
+		ansTemp[0] = a[1] * b[2] - a[2] * b[1];
+		ansTemp[1] = a[2] * b[0] - a[0] * b[2];
+		ansTemp[2] = a[0] * b[1] - a[1] * b[0];
+		eatMat(ansTemp);
+		return *this;
 	}
 	/*----------------负 [ negative ]----------------*/
 	Mat& negative(Mat& ans) {
@@ -443,6 +464,18 @@ void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
 				else U(i, j) = A(i, j);
 			}
 		}
+	}
+	/*----------------归一化 [ normalization ]----------------
+	*	[定义]: 使得|| x || = 1
+	**---------------------------------------------*/
+	Mat& normalization() {
+		T sum;
+		memset(&sum, 0, sizeof(T));
+		for (int i = 0; i < rows * cols; i++)sum += data[i] * data[i];
+		sum = sqrt(sum);
+		if (sum == 0)error();
+		for (int i = 0; i < rows * cols; i++)data[i] /= sum;
+;		return *this;
 	}
 /******************************************************************************
 *                    特殊操作
