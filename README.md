@@ -1,16 +1,17 @@
 # LiGu_AlgorithmLib
 LiGu's Basic Algorithm Library.  
 * <Mat.h>                   矩阵类  
+* <ComputationalGeometry.h> 计算几何类  
+*   
 * <Tensor.h>                张量类  
+* <GraphTheory.h>           图论类 
+* <BasicMachineLearning.h>  基础机器学习类|K-Mean|主成分分析 
 * <list.h>                  链表类  
-* <GraphTheory.h>           图论类
 * <NumberTheory.h>          数论类
-* <BasicAlgorithm.h>        基础算法类
-* <ComputationalGeometry.h> 计算几何类
-* <PartialDifferentialEquation.h>   偏微分方程类
-* <BasicMachineLearning.h>  基础机器学习类|K-Mean|主成分分析
-* <rb_tree.h>               红黑树
-* <LSTM.h>                  长短期记忆网络
+* <BasicAlgorithm.h>        基础算法类  
+* <PartialDifferentialEquation.h>   偏微分方程类  
+* <rb_tree.h>               红黑树  
+* <LSTM.h>                  长短期记忆网络  
 
 ## <Mat.h> 矩阵类  
 ```
@@ -57,4 +58,15 @@ Mat& normalization()                        //归一化 [ normalization ]
 Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack() ]
 void swap(Mat& a)                           //交换数据 [ swap() ]
 Mat& getCol(int _col, Mat& a)               //得到一列 [ getCol() ]
+```
+
+## <ComputationalGeometry.h> 计算几何类
+```
+/*----------------[ 2D 二维 ]----------------*/
+void ThreePointsToCircle(Mat<double> Points[], Mat<double>& center, double& R); //平面三点确定圆方程
+bool isInCircle(Mat<double> Points[]);                                          //判断四点共圆
+Mat<double>* ConvexHull(Mat<double> point[], int n, int& ansPointNum);          //凸包
+Mat<double>* Delaunay(Mat<double> point[], int n, int& TrianglesNum);           //Delaunay三角剖分
+/*----------------[ 3D 三维 ]----------------*/
+Mat<double>* getSphereFibonacciPoint(int& n);                                   //球面均匀点分布
 ```
