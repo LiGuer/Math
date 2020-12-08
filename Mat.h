@@ -83,6 +83,7 @@ T max()                                     // max/min
 T max(int& index)
 T min()
 T min(int& index)
+bool operator==(const Mat& b);				//判断相等 [ == ]
 Mat& operator=(const Mat& a)                //赋矩阵 [ = ]  //不能赋值自己
 Mat& add(Mat& a, Mat& b)                    //加法 [ add ]
 Mat& mult(const Mat& a, const Mat& b)       //乘法 [ mult ]
@@ -131,6 +132,13 @@ Mat& normalization()						//归一化 [ normalization ]
 		for (int i = 0; i < rows * cols; i++)
 			if (mindata > data[i]) { mindata = data[i]; index = i; }
 		return mindata;
+	}
+	/*----------------判断相等 [ == ]----------------*/
+	bool operator==(const Mat& b) {
+		if (rows != b.rows || cols != b.cols)return false;
+		for (int i = 0; i < rows * cols; i++)
+			if (data[i] != b.data[i])return false;
+		return true;
 	}
 	/*----------------赋矩阵 [ = ]----------------*/ //不能赋值自己
 	Mat& operator=(const Mat& a) {
@@ -479,6 +487,10 @@ Mat& normalization()						//归一化 [ normalization ]
 	}
 /******************************************************************************
 *                    特殊操作
+-------------------------------------------------------------------------------
+Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack ]
+void swap(Mat& a)                           //交换数据 [ swap ]
+Mat& getCol(int _col, Mat& a)               //读/写一列 [ getCol/setCol ]
 ******************************************************************************/
 	/*----------------水平向拼接 [ horizStack ]----------------*/
 	Mat& horizStack(Mat& a, Mat& b) {
@@ -496,10 +508,14 @@ Mat& normalization()						//归一化 [ normalization ]
 		int t = a.rows; a.rows = rows; rows = t;
 		t = a.cols; a.cols = cols; cols = t;
 	}
-	/*----------------得到一列 [ getCol ]----------------*/
+	/*----------------读/写一列 [ getCol/setCol ]----------------*/
 	Mat& getCol(int _col, Mat& a) {
 		a.zero(rows, 1);
 		for (int i = 0; i < rows; i++) a[i] = data[i * cols + _col];
+		return a;
+	}
+	Mat& setCol(int _col, Mat& a) {
+		for (int i = 0; i < rows; i++)data[i * cols + _col] = a[i];
 		return a;
 	}
 };

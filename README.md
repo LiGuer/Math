@@ -36,6 +36,7 @@ T max()                                     // max/min
 T max(int& index) 
 T min()  
 T min(int& index)  
+bool operator==(const Mat& b);              //判断相等 [ == ]
 Mat& operator=(const Mat& a)                //赋矩阵 [ = ]  //不能赋值自己
 Mat& add(Mat& a, Mat& b)                    //加法 [ add ]
 Mat& mult(const Mat& a, const Mat& b)       //乘法 [ mult ]
@@ -55,9 +56,9 @@ Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
 void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
 Mat& normalization()                        //归一化 [ normalization ]
 /**************** 特殊操作 ****************/  
-Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack() ]
-void swap(Mat& a)                           //交换数据 [ swap() ]
-Mat& getCol(int _col, Mat& a)               //得到一列 [ getCol() ]
+Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack ]
+void swap(Mat& a)                           //交换数据 [ swap ]
+Mat& getCol(int _col, Mat& a)               //读/写一列 [ getCol/setCol ]
 ```
 
 ## <ComputationalGeometry.h> 计算几何类
