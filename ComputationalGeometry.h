@@ -1,5 +1,6 @@
 #ifndef COMPUTATIONAL_GEOMETRY_H
 #define COMPUTATIONAL_GEOMETRY_H
+#include <stdlib.h>
 #include <float.h>
 #include <algorithm>
 #include <vector>
@@ -9,8 +10,8 @@ const double PI = 3.141592653589;
 /*----------------[ 2D 二维 ]----------------*/
 void ThreePointsToCircle(Mat<double> Points[], Mat<double>& center, double& R);	//平面三点确定圆方程
 bool isInCircle(Mat<double> Points[]);											//判断四点共圆
-void ConvexHull(Mat<double> point[], int n);									//凸包
-void Delaunay(Mat<double> point[], int n);										//Delaunay三角剖分
+Mat<double>* ConvexHull(Mat<double> point[], int n, int& ansPointNum);			//凸包
+Mat<double>* Delaunay(Mat<double> point[], int n, int& TrianglesNum);			//Delaunay三角剖分
 /*----------------[ 3D 三维 ]----------------*/
 Mat<double>* getSphereFibonacciPoint(int& n);									//球面均匀点分布
 
@@ -94,68 +95,91 @@ bool isInCircle(Mat<double> Points[]) {
 	double t = A.abs();
 	return t == 0 ? 1 : 0;
 }
-bool isInCircle(Mat<double> Points[], Mat<double> p0) {
-	Mat<double> A(4, 4);
-	for (int i = 0; i < 4; i++) {
-		A(i, 0) = Points[i].norm();
-		A(i, 1) = Points[i][0];
-		A(i, 2) = Points[i][1];
-		A(i, 4) = 1;
-	}
-	double t = A.abs();
-	return t == 0 ? 1 : 0;
-}
 /*--------------------------------[ ConvexHull 凸包 ]--------------------------------
 *	[算法]: Graham 扫描法
+*	[时间复杂度]: O(n logn)
 *	[流程]:
-		[1] 选择y最小的点 p0,若多个则选其中x最小的
-		[2] 根据相对p0的极角,对剩余点排序
+		[1] 选择y最小点 p0, 若多个则选其中x最小
+		[2] sorted by polar angle in counterclockwise order around p0
+			(if more than one point has the same angle, remove all but the one that is farthest from p0)
+			* 几何可知，排序后 P1 和最后一点 Pn-1 一定是凸包上的点
+		[3] P0,P1 入栈S，P2 为当前点
+			if n<2, error "Convex Hull is empty"
+		[4] 遍历剩余点 P3 -> Pn-1
+			[4.1] while the angle formed by points NEXT-TO-TOP(S),TOP(S),and p makes a nonleft turn
+					POP(S)
+			[4.2] Pi 入栈
+		[5] 最后栈中元素，即结果
 **----------------------------------------------------------------------------*/
-void ConvexHull(Mat<double> point[], int n){/*
-	std::stack<Mat<double>> ConvexHullPoint;
-	// [1]
+Mat<double>* ConvexHull(Mat<double> point[], int n, int& ansPointNum){
+	// [1] 
 	int minCur = 0;
 	Mat<double> minPoint(point[0]);
 	for (int i = 1; i < n; i++)
-		if ((point[i][1] < minPoint[1])|| (point[i][1] == minPoint[1] && point[i][0] < minPoint[0])){ 
+		if (point[i][1] < minPoint[1] || (point[i][1] == minPoint[1] && point[i][0] < minPoint[0])) {
 			minPoint = point[i]; minCur = i;
 		}
-	// [2]
-	double* angle = (double*)malloc(n * sizeof(double));
-	for (int i = 0; i < n; i++) {
-		double b = sqrt(pow(point[i][0] - minPoint[0], 2) + pow(point[i][1] + minPoint[1], 2));
-		double c = point[i][0] - minPoint[0];
-		angle[i] = c / b;
-	}
-	//std::sort(point, point + n, [](){ return angle[a] < angle[b]; });
+	point[0].swap(point[minCur]);
+	// [2] 
+	std::sort(point + 1, point + n, [&minPoint](Mat<double>& a, Mat<double>& b) {
+		if (atan2(a[1] - minPoint[1], a[0] - minPoint[0]) != atan2(b[1] - minPoint[1], b[0] - minPoint[0]))
+			return (atan2(a[1] - minPoint[1], a[0] - minPoint[0])) < (atan2(b[1] - minPoint[1], b[0] - minPoint[0]));
+		return (a[0] - minPoint[0])* (a[0] - minPoint[0])+ (a[1] - minPoint[1]) * (a[1] - minPoint[1]) 
+			< (b[0] - minPoint[0]) * (b[0] - minPoint[0]) + (b[1] - minPoint[1]) * (b[1] - minPoint[1]);
+	});
 	// [3]
-	for (int i = 0; i < n; i++)
-		if (point[i][0] == minPoint[0] && point[i][1] == minPoint[1]) angle[minCur] = i;
+	std::stack<Mat<double>> ConvexHullPoint;
+	for (int i = 0; i <= 2; i++)ConvexHullPoint.push(point[i]);
 	// [4]
-	for (int i = 0; i < n; i++) {
-		if (i == minCur)continue;
-		while (!ConvexHullPoint.empty()) {
+	for (int i = 3; i < n; i++) {
+		while (true) {
 			Mat<double> prePoint = ConvexHullPoint.top();
 			ConvexHullPoint.pop();
-			if (ConvexHullPoint.empty()) {
-				ConvexHullPoint.push(prePoint); ConvexHullPoint.push(point[i]);break;
-			}
-			Mat<double> a = { prePoint[0] - ConvexHullPoint.top()[0],prePoint[1] - ConvexHullPoint.top()[1] };
-			Mat<double> b = { point[i][0] - prePoint[0],point[i][1] - prePoint[1] };
-			if (a[0] * b[1] - a[1] * b[0] < 0) {
-				ConvexHullPoint.push(prePoint); ConvexHullPoint.push(point[i]);break;
-			}
+			Mat<double> prePointNext = ConvexHullPoint.top(); 
+			ConvexHullPoint.push(prePoint);
+			// 叉乘判断角度转向
+			Mat<double> a, b;
+			a.add(prePointNext, prePoint.negative(a));
+			b.add(point[i], prePoint.negative(b));
+			if (a[0] * b[1] - a[1] * b[0] < 0) break;
+			ConvexHullPoint.pop();
 		}
-		if (ConvexHullPoint.empty())ConvexHullPoint.push(point[i]);
-	}ConvexHullPoint.push(minPoint);*/
+		ConvexHullPoint.push(point[i]);
+	}
+	// [5] Output
+	ansPointNum = ConvexHullPoint.size();
+	Mat<double>* outputPoint = (Mat<double>*)malloc(ansPointNum * sizeof(Mat<double>));
+	memset(outputPoint, 0, ansPointNum * sizeof(Mat<double>));
+	for (int i = 0; i < ansPointNum; i++) {
+		outputPoint[i] = ConvexHullPoint.top();
+		ConvexHullPoint.pop();
+	}
+	return outputPoint;
 }
+/*int main() {
+	Plot p;
+	p.setAxisRange(0, 0, 100, 100);
+	Mat<double> point[100],* ConvexHullPoint;
+	p.g->PaintColor = 0xFF0000; p.g->PaintSize = 3;
+	for (int i = 0; i < 30; i++) {
+		point[i].rands(2, 1, 10, 90);
+		p.plotPoint(point[i][0], point[i][1]);
+	}
+	int ConvexHullnum;
+	ConvexHullPoint = ConvexHull(point, 30, ConvexHullnum);
+	p.g->PaintColor = 0xFFFFFF; p.g->PaintSize = 0;
+	for (int i = 0; i < ConvexHullnum; i++) {
+		p.plotLine(ConvexHullPoint[i][0], ConvexHullPoint[i][1]
+			, ConvexHullPoint[(i + 1) % ConvexHullnum][0], ConvexHullPoint[(i + 1) % ConvexHullnum][1]);
+	}p.g->PicWrite("D:/LIGU.ppm");
+}*/
 /*--------------------------------[ Delaunay 三角剖分 ]--------------------------------
 *	[定义]:
 		[1] Delaunay三角剖分: 每个三角形的外接圆内不包含V中任何点
 	[流程]:
 　　　　[1] 将点按坐标x从小到大排序
 　　　　[2] 确定超级三角形
-　　　　	将超级三角形保存至未确定三角形列表 trianglesTemp, 将超级三角形push到triangles列表
+　　　　	将超级三角形保存至未确定三角形列表 trianglesTemp
 　　　　[3] 遍历每一个点
 　　　　　　[3.1] 初始化边缓存数组 edgeBuffer
 　　　　　　[3.2] 遍历 trianglesTemp 中的每一个三角形
@@ -165,10 +189,10 @@ void ConvexHull(Mat<double> point[], int n){/*
 　　　　　　　　[3.2.3] 如果该点在外接圆外（即也不是外接圆右侧）
 　　　　　　　　　　则该三角形为不确定,跳过
 　　　　　　　　[3.2.4] 如果该点在外接圆内
-　　　　　　　　　　则该三角形不为Delaunay三角形,将三边保存至edge buffer,在temp中去除掉该三角形
-　　　　　　[3.3] 对edge buffer进行去重
-　　　　　　[3.4] 将edge buffer中的边与当前的点进行组合成若干三角形并保存至temp triangles中
-　　　　[4] 将triangles与temp triangles进行合并, 并除去与超级三角形有关的三角形
+　　　　　　　　　　则该三角形不为Delaunay三角形,将三边保存至edgeBuffer,在temp中去除掉该三角形
+　　　　　　[3.3] 对edgeBuffer进行去重
+　　　　　　[3.4] 将edgeBuffer中的边与当前的点进行组合成若干三角形并保存至temp triangles中
+　　　　[4] 将triangles与trianglesTemp进行合并, 并除去与超级三角形有关的三角形
 **----------------------------------------------------------------------*/
 Mat<double>* Delaunay(Mat<double> point[], int n, int& TrianglesNum) {
 	std::vector<Mat<double>> triAns, triTemp, edgeBuffer;
