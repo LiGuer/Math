@@ -125,6 +125,9 @@ bool isInCircle(Mat<double> Points[]) {
 					POP(S)
 			[4.2] Pi 入栈
 		[5] 最后栈中元素，即结果
+*	[Referance]:
+		[1] Introduction Algorithms.THOMAS H.CORMEN,CHARLES E.LEISERSON,RONALD L.RIVEST,CLIFFORD STEIN
+		[2] Thanks for https://www.cnblogs.com/aiguona/p/7232243.html
 **----------------------------------------------------------------------------*/
 Mat<double>* ConvexHull(Mat<double> point[], int n, int& ansPointNum){
 	// [1] 
@@ -192,22 +195,24 @@ Mat<double>* ConvexHull(Mat<double> point[], int n, int& ansPointNum){
 *	[定义]:
 		[1] Delaunay三角剖分: 每个三角形的外接圆内不包含V中任何点
 	[流程]:
-　　　　[1] 将点按坐标x从小到大排序
-　　　　[2] 确定超级三角形
-　　　　	将超级三角形保存至未确定三角形列表 trianglesTemp
-　　　　[3] 遍历每一个点
-　　　　　　[3.1] 初始化边缓存数组 edgeBuffer
-　　　　　　[3.2] 遍历 trianglesTemp 中的每一个三角形
-　　　　　　　　[3.2.1] 计算该三角形的圆心和半径
-　　　　　　　　[3.2.2] 如果该点在外接圆的右侧
-　　　　　　　　　　则该三角形为Delaunay三角形，保存到triangles,并在temp里去除掉,跳过
-　　　　　　　　[3.2.3] 如果该点在外接圆外（即也不是外接圆右侧）
-　　　　　　　　　　则该三角形为不确定,跳过
-　　　　　　　　[3.2.4] 如果该点在外接圆内
-　　　　　　　　　　则该三角形不为Delaunay三角形,将三边保存至edgeBuffer,在temp中去除掉该三角形
-　　　　　　[3.3] 对edgeBuffer进行去重
-　　　　　　[3.4] 将edgeBuffer中的边与当前的点进行组合成若干三角形并保存至temp triangles中
-　　　　[4] 将triangles与trianglesTemp进行合并, 并除去与超级三角形有关的三角形
+		[1] 将点按坐标x从小到大排序
+		[2] 确定超级三角形
+			将超级三角形保存至未确定三角形列表 trianglesTemp
+		[3] 遍历每一个点
+			[3.1] 初始化边缓存数组 edgeBuffer
+			[3.2] 遍历 trianglesTemp 中的每一个三角形
+				[3.2.1] 计算该三角形的圆心和半径
+				[3.2.2] 如果该点在外接圆的右侧
+					则该三角形为Delaunay三角形，保存到triangles,并在temp里去除掉,跳过
+				[3.2.3] 如果该点在外接圆外（即也不是外接圆右侧）
+					则该三角形为不确定,跳过
+				[3.2.4] 如果该点在外接圆内
+					则该三角形不为Delaunay三角形,将三边保存至edgeBuffer,在temp中去除掉该三角形
+			[3.3] 对edgeBuffer进行去重
+			[3.4] 将edgeBuffer中的边与当前的点进行组合成若干三角形并保存至temp triangles中
+		[4] 将triangles与trianglesTemp进行合并, 并除去与超级三角形有关的三角形
+*	[Referance]:
+		[1] http://paulbourke.net/papers/triangulate/
 **----------------------------------------------------------------------*/
 Mat<double>* Delaunay(Mat<double> point[], int n, int& TrianglesNum) {
 	std::vector<Mat<double>> triAns, triTemp, edgeBuffer;
