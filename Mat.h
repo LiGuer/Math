@@ -491,6 +491,7 @@ Mat& normalization()						//归一化 [ normalization ]
 Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack ]
 void swap(Mat& a)                           //交换数据 [ swap ]
 Mat& getCol(int _col, Mat& a)               //读/写一列 [ getCol/setCol ]
+Mat& setCol(int _col, Mat& a)
 ******************************************************************************/
 	/*----------------水平向拼接 [ horizStack ]----------------*/
 	Mat& horizStack(Mat& a, Mat& b) {

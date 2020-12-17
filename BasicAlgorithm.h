@@ -77,4 +77,60 @@ bool next_permutation(T* first, T* last) {
 		i--;
 	}
 }
-#endif // ! SORT_H
+/*--------------------------------[ Huffman编码 ]--------------------------------
+*	[定义]: Huffman Tree: 带权路径长度最短的树，权值较大的叶结点离根较近。
+*	[节点结构]: [1]权值	[2]该节点编码值	[3]父节点指针
+*	[建树流程]:
+		[1] 初始w1,w2,…,wn，为各自均为根节点的森林。
+		[2] 从森林中选出2个根结点权值最小的树合并，作为一棵新树的左右子树，
+			且新树的根结点权值为其左、右子树根结点权值之和。
+		[3] 从森林中删除选取的两棵树，并将新树加入森林。
+		[4] 重复[2][3]，直至森林中只剩一棵树。
+		//左节点编码0, 右节点编码1
+**-----------------------------------------------------------------------*/
+template<class T>
+struct HuffmanTreeNode {
+	T weight;
+	bool binary = 0;
+	HuffmanTreeNode* parent = NULL, * child[2] = { NULL,NULL };
+};
+
+template<class T>
+HuffmanTreeNode<T>* HuffmanCode(T weight[], int N, int codeLen[], unsigned long long codeHuffman[]) {
+	// [Tree] 建树 build Huffman tree
+	// [1]
+	HuffmanTreeNode<T>* HuffmanTree = (HuffmanTreeNode<T>*)calloc(N * 2 + 1, sizeof(HuffmanTreeNode<T>));
+	for (int i = 0; i < N; i++) HuffmanTree[i].weight = weight[i];
+	for (int i = N; i < N * 2; i++) HuffmanTree[i].weight = 1e9;
+	// [2] find two smallest nodes 'min1, min2'
+	int min1, min2, pos1 = N - 1, pos2 = N;
+	for (int i = 0; i < N - 1; i++) {
+		if (pos1 >= 0 && HuffmanTree[pos1].weight < HuffmanTree[pos2].weight) min1 = pos1--;
+		else min1 = pos2++;
+		if (pos1 >= 0 && HuffmanTree[pos1].weight < HuffmanTree[pos2].weight) min2 = pos1--;
+		else min2 = pos2++; 
+		// [3] combine to new tree 
+		HuffmanTree[N + i].child[0] = &HuffmanTree[min1];	HuffmanTree[N + i].child[1] = &HuffmanTree[min2];
+		HuffmanTree[N + i].weight = HuffmanTree[min1].weight + HuffmanTree[min2].weight;
+		HuffmanTree[min1].parent = HuffmanTree[min2].parent = &HuffmanTree[N + i];
+		HuffmanTree[min2].binary = 1;
+	}
+	HuffmanTreeNode<T>* root = &HuffmanTree[N * 2 - 2];
+	// [Code] Huffman编码 // assign binary code
+	for (int i = 0; i < N; i++) {
+		HuffmanTreeNode<T>* treeCur = &HuffmanTree[i];
+		int cur = 0;
+		unsigned long long codeTemp = 0;
+		while (treeCur != root) {
+			if (treeCur->binary)codeTemp += (unsigned long long)1 << cur;
+			cur++;
+			treeCur = treeCur->parent;
+		}
+		codeLen[i] = cur;
+		for (int j = 0; j < codeLen[i]; j++) //反序
+			if (((unsigned long long)1 << (codeLen[i] - 1 - j)) & codeTemp)
+				codeHuffman[i] += (unsigned long long)1 << j;
+	}
+	return root;
+}
+#endif 
