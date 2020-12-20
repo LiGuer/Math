@@ -136,8 +136,8 @@ void PrincipalComponentsAnalysis(Mat<double>& x, Mat<double>& y, int yDim) {
 		选择动作: ε-greedy方法: 
 			每个状态以ε概率随机选取动作，1-ε概率选择当前最优解
 		眼前利益R: 反馈值.
-		记忆中的利益 max Q(s',:): 小鸟记忆里，新位置[公式]能给出的最大效用值.
-		forget factor越大，小鸟就会越重视以往经验，越小，小鸟只重视眼前利益R.
+		记忆中的利益 max Q(s',:): 记忆里，新位置s'能给出的最大效用值.
+		forget factor越大，越重视以往经验，越小，则只重视眼前利益R.
 *	[流程]:
 		[1] Init Q table arbitrarily
 		[2] Repeat (for each episode), until s is terminal
