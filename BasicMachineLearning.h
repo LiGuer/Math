@@ -200,10 +200,10 @@ public:
 				⊙: 逐元素乘法
 			[结论]: (矩阵式)
 				[1] ∂E/∂wL = δL·y_L-1'
-				[2] ∂E/∂bL = δL
-				[3] δL = ((w_L+1)'δ_L+1) ⊙ σ'(zL)
-				[4] δoutL = ▽aE ⊙ σ'(z_outL)
-			[目的]: wL_new = wL - lr·∂E/∂wL, 求∂E/∂wL						(and bL)
+					∂E/∂bL = δL
+				[2] δL = ((w_L+1)'δ_L+1) ⊙ σ'(zL)
+					δoutL = ▽aE ⊙ σ'(z_outL)
+			[目的]: wL_new = wL + lr·∂E/∂wL, 求∂E/∂wL						(and bL)
 			[链式法则]: ∂E/∂wL_jk = ∂E/∂yL_j·∂yL_j/∂zL_j·∂zL_j/∂wL_jk	(and bL)
 			[推导]:
 				[* 输出层]: L = outL
@@ -241,27 +241,27 @@ public:
 	*-------------------------------------------*/
 	void forward(Mat<float>& input) {
 		linearOut.mult(weight, input);
-		relu(linearOut, output);
+		sigmoid(linearOut, output);
 	}
 	/*----------------[ backward ]----------------
 	[1] ∂E/∂wL = δL·y_L-1'
-	[2] ∂E/∂bL = δL
-	[3] δL = ((w_L+1)'δ_L+1) ⊙ σ'(zL)
-	[4] δoutL = ▽aE ⊙ σ'(z_outL)	
-		▽aE  = -2(target - y_outL)
-	[*] wL = wL - lr·∂E/∂wL
+		∂E/∂bL = δL
+	[2] δL = ((w_L+1)'δ_L+1) ⊙ σ'(zL)
+		δoutL = ▽aE ⊙ σ'(z_outL)
+			▽aE  = -2(target - y_outL)
+	[*] wL = wL + lr·∂E/∂wL
 	*-------------------------------------------*/
 	void backward(Mat<float>& preInput, Mat<float>& error, double learnRate) {
-		//[3][4]
+		//[2]
 		delta = error;
-		for (int j = 0; j < output.rows; j++) 
-			delta[j] *= linearOut[j] > 0 ? 1 : 0;		//σ'(z_outL) 激活函数导数
+		for (int j = 0; j < output.rows; j++)
+			delta[j] *= output[j] * (1 - output[j]);		//σ'(z_outL) 激活函数导数
 		Mat<float> t;
 		error.mult(weight.transposi(t), delta);
-		//[1][2][*]
+		//[1][*]
 		t.mult(delta, preInput.transposi(t));
-		weight.add(weight, t.mult(learnRate, t.negative(t)));
-		bias.add(bias, t.mult(learnRate, delta.negative(t)));
+		weight.add(weight, t.mult(learnRate, t));
+		bias.add(bias, t.mult(learnRate, delta));
 	}
 	/*----------------[ ReLU ]----------------*/
 	void relu(Mat<float>& x, Mat<float>& y) {
@@ -269,36 +269,42 @@ public:
 		for (int i = 0; i < y.rows; i++)
 			y[i] = y[i] < 0 ? y[i] : 0;
 	}
+	/*----------------[ sigmoid ]----------------*/
+	void sigmoid(Mat<float>& x, Mat<float>& y) {
+		y.zero(x.rows, 1);
+		for (int i = 0; i < x.rows; i++)
+			y[i] = 1 / (1 + exp(-x[i]));
+	}
 };
 /*--------------------------------[ NeuralNetworks ]--------------------------------*/
 class NeuralNetworks{
 public:
-	std::vector<NeuralLayer> layer;
+	std::vector<NeuralLayer*> layer;
 	Mat<float> preIntput;
 	float learnRate = 0.1;
 	/*----------------[ set Layer ]----------------*/
 	void addLayer(int inputSize, int outputSize) {
-		layer.push_back(*(new NeuralLayer(inputSize, outputSize)));
+		layer.push_back(new NeuralLayer(inputSize, outputSize));
 	}
 	void setLayer(int index, int inputSize, int outputSize) {
 		if (index >= layer.size())exit(1);
-		layer[index] = *new NeuralLayer(inputSize, outputSize);
+		free(layer[index]);
+		layer[index] = new NeuralLayer(inputSize, outputSize);
 	}
 	/*----------------[ forward ]----------------*/
 	void forward(Mat<float>& input, Mat<float>& output) {
-		layer[0].forward(input);
+		layer[0]->forward(input);
 		for (int i = 1; i < layer.size(); i++) 
-			layer[i].forward(layer[i - 1].output);
-		output = layer[layer.size() - 1].output;
+			layer[i]->forward(layer[i - 1]->output);
+		output = layer.back()->output;
 		preIntput = input;
 	}
 	/*----------------[ backward ]----------------*/
 	void backward(Mat<float>& target) {
 		Mat<float> error;
-		error.add(target, layer[layer.size() - 1].output.negative(error));
-		for (int i = layer.size() - 1; i >= 1; i--) {
-			layer[i].backward(layer[i - 1].output, error, learnRate);
-		}
-		layer[0].backward(preIntput, error, learnRate);
+		error.add(target, layer.back()->output.negative(error));
+		for (int i = layer.size() - 1; i >= 1; i--)
+			layer[i]->backward(layer[i - 1]->output, error, learnRate);
+		layer[0]->backward(preIntput, error, learnRate);
 	}
 };
