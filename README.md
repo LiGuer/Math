@@ -2,13 +2,13 @@
 LiGu's Basic Algorithm Library.  
 * <Mat.h>                   矩阵类  
 * <ComputationalGeometry.h> 计算几何类  
+* <BasicMachineLearning.h>  基础机器学习类
 *   
 * <Tensor.h>                张量类  
 * <GraphTheory.h>           图论类 
-* <BasicMachineLearning.h>  基础机器学习类|K-Mean|主成分分析 
+* <BasicAlgorithm.h>        基础算法类  
 * <list.h>                  链表类  
 * <NumberTheory.h>          数论类
-* <BasicAlgorithm.h>        基础算法类  
 * <PartialDifferentialEquation.h>   偏微分方程类  
 * <rb_tree.h>               红黑树  
 * <LSTM.h>                  长短期记忆网络  
