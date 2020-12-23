@@ -147,7 +147,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
 		return *this;
 	}
-	/*----------------加法 [ add ]----------------*/
+	/*----------------加法 [ add + ]----------------*/
 	Mat& add(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols)error();
 		Mat ansTemp(a);
@@ -155,7 +155,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		eatMat(ansTemp);
 		return *this;
 	}
-	/*----------------乘法 [ mult ]----------------*/
+	/*----------------乘法 [ mult × ]----------------*/
 	Mat& mult(const Mat& a, const Mat& b) {
 		if (a.cols != b.rows) error();
 		Mat ansTemp(a.rows, b.cols);
@@ -174,7 +174,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		eatMat(ansTemp);
 		return *this;
 	}
-	/*----------------数乘 [ mult ]----------------*/
+	/*----------------数乘 [ mult × ]----------------*/
 	Mat& mult(const double a, const Mat& b) {
 		Mat ansTemp(b.rows, b.cols);
 		for (int i = 0; i < b.rows * b.cols; i++)
@@ -182,7 +182,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		eatMat(ansTemp);
 		return *this;
 	}
-	/*----------------点乘 [ dot ]----------------
+	/*----------------点乘 [ dot · ]----------------
 	*	a·b = Σ ai·bi = aT * b
 	**------------------------------------------------*/
 	T dot(Mat& a, Mat& b) {
@@ -191,7 +191,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		for (int i = 0; i < rows; i++)ans += a[i] * b[i];
 		return ans;
 	}
-	/*----------------叉乘 [ crossProduct ]----------------
+	/*----------------叉乘 [ crossProduct × ]----------------
 	//####################### 暂时只三维
 	*	𝑎 × 𝑏 ⃑ = | 𝑥		𝑦	 𝑧  |
 					| 𝑥𝑎	𝑦𝑎	 za |
@@ -206,7 +206,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		eatMat(ansTemp);
 		return *this;
 	}
-	/*----------------负 [ negative ]----------------*/
+	/*----------------负 [ negative - ]----------------*/
 	Mat& negative(Mat& ans) {
 		Mat ansTemp(*this);
 		for (int i = 0; i < rows * cols; i++)
@@ -214,7 +214,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		ans.eatMat(ansTemp);
 		return ans;
 	}
-	/*----------------转置 [ transposi ]----------------*/
+	/*----------------转置 [ transposi T ]----------------*/
 	Mat& transposi(Mat& ans) {
 		Mat ansTemp(cols, rows);
 		for (int i = 0; i < rows; i++) 
@@ -223,19 +223,21 @@ Mat& normalization()						//归一化 [ normalization ]
 		ans.eatMat(ansTemp);
 		return ans;
 	}
-	/*----------------元素求和 [ sum ]----------------*///########
-	void sum(int dim, Mat& ans) {
-		int _col = 1, _row = 1;
-		if (dim == 0)_row = rows;
-		else if (dim == 1)_col = cols;
-		ans.zero(_row, _col);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				ans[i] += data[i * cols + j];
-			}
-		}
+	/*----------------求和 [ sum Σ ]----------------*/
+	void sum() {
+		T ans;
+		memset(&T, 0, sizeof(T));
+		for (int i = 0; i < rows * cols; i++)ans += data[i];
+		return ans;
 	}
-	/*----------------范数 [ norm ]----------------
+	/*----------------求积 [ product Π ]----------------*/
+	T product() {
+		T ans;
+		memset(&T, 0, sizeof(T));
+		for (int i = 0; i < rows * cols; i++)ans *= data[i];
+		return ans;
+	}
+	/*----------------范数 [ norm ||x|| ]----------------
 	*	||a|| = sqrt(a·a)
 	**-------------------------------------------*/
 	T norm() { return sqrt(dot(*this, *this)); }
@@ -252,7 +254,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		}
 		return temp.abs();
 	}
-	/*----------------取逆 [ inv ]----------------
+	/*----------------取逆 [ inv x~¹ ]----------------
 	*	[定义]: A A~¹ = E
 	*	[方法]: 利用不断解线性方程组，对每一列求解.
 	**------------------------------------------*/
@@ -284,7 +286,7 @@ Mat& normalization()						//归一化 [ normalization ]
 		ans.eatMat(temp);
 		return ans;
 	}
-	/*----------------行列式 [ abs ]----------------
+	/*----------------行列式 [ abs |x| ]----------------
 	*	|A| = Σiorj aij·Aij
 	*	Aij = (-1)^(i+j)·Mij		// Mij余子式
 	**----------------------------------------------*/
@@ -297,7 +299,7 @@ Mat& normalization()						//归一化 [ normalization ]
 			ans += data[i * cols] * (i % 2 == 0 ? 1 : -1) * comi(i, 0);
 		return ans;
 	}
-	/*--------------伴随矩阵 [ adjugate ]----------------
+	/*--------------伴随矩阵 [ adjugate A* ]----------------
 	*	[定义]: 伴随矩阵A* 由(i,j)代数余子式Aij构成
 				 [ A00  ... ]
 			A* = | A01  Aij |

@@ -13,11 +13,7 @@ limitations under the License.
 Reference.
 [1]Introduction Algorithms.THOMAS H.CORMEN,CHARLES E.LEISERSON,RONALD L.RIVEST,CLIFFORD STEIN
 ==============================================================================*/
-#include "LiGu_GRAPHICS/Mat.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
+#include "Mat.h"
 template<class T>
 class Tensor
 {
@@ -26,7 +22,7 @@ public:
 *                    核心数据
 ******************************************************************************/
 	T* data = NULL;	
-	Mat<int> dimension;										//{x, y, z, ...}
+	Mat<int> dim;										//{x, y, z, ...}
 /******************************************************************************
 *                    函数
 ******************************************************************************/
@@ -36,27 +32,37 @@ public:
 	Tensor(Tensor& a) { *this = a; }
 	~Tensor() { free(data); }
 	/*---------------- 基础函数 ----------------*/
-	void clean() { 											//清零 
-		int N = 1;
-		for (int i = 0; i < dimension.rows; i++)N *= dimension[i];
-		memset(data, 0, sizeof(T) * N);
-	}
+	void clean() { memset(data, 0, sizeof(T) * dim.product()); }											//清零 
 	void error() { exit(-1); }
 	void eatMat(Tensor& a) {									//吃掉另一个矩阵的数据 (指针操作)
 		if (data != NULL)free(data);
 		data = a.data; a.data = NULL;
-		dimension = a.dimension; a.dimension.zero(1, 1);
+		dim = a.dim; a.dim.zero(1, 1);
 	}
 	/*---------------- 零元 ----------------*/
 	Tensor& zero(int dimNum, int* dimLength) {
-		dimension.zero(dimNum, 1);
-		int N = 1;
-		for (int i = 0; i < dimNum; i++) {
-			dimension[i] = dimLength[i];
-			N *= dimLength[i];
-		}
-		data = (T*)malloc(N * sizeof(T));
-		memset(data, 0, N * sizeof(T));
+		dim.zero(dimNum, 1);
+		memcpy(dim.data, dimLength, dimNum * sizeof(int));
+		data = (T*)calloc(dim.product(), sizeof(T));
+		return *this;
+	}
+	Tensor& zero(int x0, int y0, int z0) {
+		dim.zero(3, 1);
+		dim[0] = x0; dim[1] = y0; dim[2] = z0;
+		data = (T*)calloc(dim.product(), sizeof(T));
+		return *this;
+	}
+	/*---------------- 随机元 ----------------*/
+	Mat& rands(int dimNum, int* dimLength) {
+		zero(dimNum, dimLength);
+		for (int i = 0; i < dim.product(); i++)
+			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
+		return *this;
+	}
+	Mat& rands(int x0, int y0, int z0) {
+		zero(x0, y0, z0);
+		for (int i = 0; i < dim.product(); i++)
+			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
 	}
 	/*---------------- "[]"取元素 ----------------
@@ -64,20 +70,25 @@ public:
 	*	[Data堆叠方向]: 满x,一列 => 满xy,一矩阵 => 满xyz,一方块 => ....
 	**-------------------------------------------*/
 	T& operator[](int i) { return data[i]; }
+	T& operator()(int i) { return data[i]; }
+	T& operator()(int x, int y) { return data[y * dim[0] + x]; }
+	T& operator()(int x, int y, int z) {
+		return data[z * dim[1] * dim[0] + y * dim[0] + x];
+	}
 	T& operator()(int* dimIndex) {
 		int index = 0, step = 1;
-		for (int i = 0; i < dimension.rows; i++) {
+		for (int i = 0; i < dim.rows; i++) {
 			index += step * dimIndex[i];
-			step *= dimension[i];
+			step *= dim[i];
 		}
 		return data[index];
 	}
 	/*----------------赋值 [ = ]----------------*/ //不能赋值自己
 	Tensor& operator=(const Tensor& a) {
 		if (a.data == NULL)error();
-		zero(a.dimension.rows, a.dimension.data);
+		zero(a.dim.rows, a.dim.data);
 		int N = 1;
-		for (int i = 0; i < dimension.rows; i++)N *= a.dimension.data[i];
+		for (int i = 0; i < dim.rows; i++)N *= a.dim.data[i];
 		memcpy(data, a.data, sizeof(T) * N);
 		return *this;
 	}

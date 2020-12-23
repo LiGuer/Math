@@ -13,6 +13,7 @@ limitations under the License.
 #ifndef NEURAL_NETWORKS_H
 #define NEURAL_NETWORKS_H
 #include "Mat.h"
+#include "Tensor.h"
 /*************************************************************************************************
 *							NeuralLayer	神经网络层
 *	[公式]:
@@ -56,8 +57,7 @@ public:
 	Mat<float> weight, bias;
 	Mat<float> output, linearOut, delta;
 	/*----------------[ init ]----------------*/
-	NeuralLayer(int inputSize, int outputSize) { init(inputSize, outputSize); }
-	void init(int inputSize, int outputSize) {
+	NeuralLayer(int inputSize, int outputSize) {
 		weight.rands(outputSize, inputSize, -1, 1);
 		bias.rands(outputSize, 1, -1, 1);
 	}
@@ -88,6 +88,16 @@ public:
 		weight.add(weight, t.mult(learnRate, t));
 		bias.add(bias, t.mult(learnRate, delta));
 	}
+	/*----------------[ save / load ]----------------*/
+	void save(FILE* file) {
+		for (int j = 0; j < weight.rows * weight.cols; j++) fprintf(file, "%f ", weight[j]);
+		for (int j = 0; j < bias.rows; j++) fprintf(file, "%f ", bias[j]);
+		fprintf(file, "\n");
+	}
+	void load(FILE* file) {
+		for (int j = 0; j < weight.rows * weight.cols; j++) fscanf(file, "%f", &weight[j]);
+		for (int j = 0; j < bias.rows; j++) fscanf(file, "%f", bias[j]);
+	}
 	/*----------------[ ReLU ]----------------*/
 	void relu(Mat<float>& x, Mat<float>& y) {
 		y = x;
@@ -103,20 +113,27 @@ public:
 };
 /*************************************************************************************************
 *							Convolution Layer	卷积层
-*	[]: kernel: 卷积核		padding: 加边框宽度		in/outChannels: 输入/输出通道数
+*	[]: kernel: 卷积核		padding: 加边框宽度		in/outChannelNum: 输入/输出通道数
+*	[]:
+		Height_out = (Height_in - Height_kernel + 2 * padding) / (stride + 1)
+		Width_out = (Width_in - Width_kernel + 2 * padding) / (stride + 1)
 *	[正向]: 卷积操作
 *************************************************************************************************/
 class ConvLayer {
-	Mat<float> kernel;
-	int padding;
+	Tensor<float> kernel, output;
+	int inChannelNum, outChannelNum, padding, stride;
 	/*----------------[ init ]----------------*/
-	ConvLayer(int inChannels, int outChannels,int kernelSize,int _padding) {
-		kernel.rands(kernelSize, kernelSize, -1, 1);
-		padding = _padding;
+	ConvLayer(int _inChannelNum, int _outChannelNum,int kernelSize,int _padding,int _stride)
+		: inChannelNum(_inChannelNum), outChannelNum(_outChannelNum), padding(_padding), stride(_stride)
+	{
+		int kernelNum = inChannelNum * outChannelNum;
+		kernel.rands(kernelSize, kernelSize, kernelNum);
 	}
 	/*----------------[ forward ]----------------*/
-	void forward() {
-
+	void forward(Tensor<float>& input) {
+		int rows_out = (input.dim[0] - kernel.dim[0] + 2 * padding) / (stride + 1);
+		int cols_out = (input.dim[1] - kernel.dim[1] + 2 * padding) / (stride + 1);
+		output.zero(rows_out, cols_out, outChannelNum);
 	}
 	/*----------------[ backward ]----------------*/
 };
@@ -125,27 +142,55 @@ class ConvLayer {
 *	[分类]:	[1] AvePool 平均采样层    [2] MaxPool 最大采样层
 *************************************************************************************************/
 class PoolLayer {
+	Tensor<float> output;
+	int kernelSize, padding, stride, poolType = 0;
+	enum { A, M };
 	/*----------------[ init ]----------------*/
-	PoolLayer(int size) {
+	PoolLayer(int _kernelSize, int _padding, int _stride, int _poolType)
+		:kernelSize(_kernelSize), padding(_padding), stride(_stride), poolType(_poolType)
+	{}
+	/*----------------[ forward ]----------------*/
+	void forward(Tensor<float>& input) {
+		output.zero(input.dim[0], input.dim[1], input.dim[2]);
+		switch (poolType) {
+		case A: avePool(input, output); break;
+		case M: maxPool(input, output); break;
+		}
+	}
+	/*----------------[ backward ]----------------*/
+	/*----------------[ save / load ]----------------*/
+	void save(FILE* file) {
+		fprintf(file, "\n");
+	}
+	void load(FILE* file) {
+	}
+	/*----------------[ avePool 平均采样层 ]----------------*/
+	void avePool(Tensor<float>& input, Tensor<float>& output) {
+
+	}
+	/*----------------[ maxPool 平均采样层 ]----------------*/
+	void maxPool(Tensor<float>& input, Tensor<float>& output) {
 
 	}
 };
 /*************************************************************************************************
-*							NeuralNetworks  神经网络
+*							Some Classical NeuralNetworks  经典神经网络
+*	[1] BackPropagation NeuralNetworks
+*	[2] LeNet_NeuralNetworks
 *************************************************************************************************/
 #include <vector>
-class NeuralNetworks {
+class BackPropagation_NeuralNetworks {
 public:
 	std::vector<NeuralLayer*> layer;
 	Mat<float> preIntput;
-	float learnRate = 0.1;
+	float learnRate = 0.01;
 	/*----------------[ set Layer ]----------------*/
 	void addLayer(int inputSize, int outputSize) {
 		layer.push_back(new NeuralLayer(inputSize, outputSize));
 	}
 	void setLayer(int index, int inputSize, int outputSize) {
 		if (index >= layer.size())exit(1);
-		free(layer[index]);
+		delete layer[index];
 		layer[index] = new NeuralLayer(inputSize, outputSize);
 	}
 	/*----------------[ forward ]----------------*/
@@ -165,34 +210,29 @@ public:
 		}
 		layer[0]->backward(preIntput, error, learnRate);
 	}
-	/*----------------[ save ]----------------*/
+	/*----------------[ save/load ]----------------*/
 	void save(const char* saveFile) {
 		FILE* file = fopen(saveFile, "w+");
 		for (int i = 0; i < layer.size(); i++) {
-			for (int j = 0; j < layer[i]->weight.rows * layer[i]->weight.cols; j++)
-				fprintf(file, "%f ", layer[i]->weight[j]);
-			for (int j = 0; j < layer[i]->bias.rows; j++)
-				fprintf(file, "%f\n", layer[i]->bias[j]);
+			layer[i]->save(file);
 		}fclose(file);
 	}
-	/*----------------[ load ]----------------*/
 	void load(const char* loadFile) {
 		FILE* file = fopen(loadFile, "r+");
 		for (int i = 0; i < layer.size(); i++) {
-			for (int j = 0; j < layer[i]->weight.rows * layer[i]->weight.cols; j++)
-				fscanf(file, "%f", &layer[i]->weight[j]);
-			for (int j = 0; j < layer[i]->bias.rows; j++)
-				fscanf(file, "%f", &layer[i]->bias[j]);
+			layer[i]->load(file);
 		}fclose(file);
 	}
 };
-class Layer {
-public:
-	union {
-		NeuralLayer n;
-		ConvLayer c;
-		PoolLayer p;
-	}u;
-	enum { Neural, Conv, Pool };
+class LeNet_NeuralNetworks {
+	NeuralLayer FullConnect_1{ 400,120 }, FullConnect_2{ 120,84 }, FullConnect_3{ 84,10 };
+	ConvLayer Conv_1, Conv_2;
+	PoolLayer MaxPool_1, MaxConv_2;
+	/*----------------[ forward ]----------------*/
+	void forward(Mat<float>& input, Mat<float>& output) {
+
+	}
+	/*----------------[ backward ]----------------*/
+	/*----------------[ save/load ]----------------*/
 };
 #endif
