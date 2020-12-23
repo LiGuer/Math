@@ -64,9 +64,10 @@ public:
 	/*----------------[ forward ]----------------
 	*	y = σ(W x + b)
 	*-------------------------------------------*/
-	void forward(Mat<float>& input) {
+	Mat<float>* forward(Mat<float>& input) {
 		linearOut.mult(weight, input);
 		sigmoid(linearOut, output);
+		return &output;
 	}
 	/*----------------[ backward ]----------------
 	[1] ∂E/∂wL = δL·y_L-1'
@@ -90,13 +91,13 @@ public:
 	}
 	/*----------------[ save / load ]----------------*/
 	void save(FILE* file) {
-		for (int j = 0; j < weight.rows * weight.cols; j++) fprintf(file, "%f ", weight[j]);
-		for (int j = 0; j < bias.rows; j++) fprintf(file, "%f ", bias[j]);
+		for (int i = 0; i < weight.rows * weight.cols; i++) fprintf(file, "%f ", weight[i]);
+		for (int i = 0; i < bias.rows; i++) fprintf(file, "%f ", bias[i]);
 		fprintf(file, "\n");
 	}
 	void load(FILE* file) {
-		for (int j = 0; j < weight.rows * weight.cols; j++) fscanf(file, "%f", &weight[j]);
-		for (int j = 0; j < bias.rows; j++) fscanf(file, "%f", bias[j]);
+		for (int i= 0; i < weight.rows * weight.cols; i++) fscanf(file, "%f", &weight[i]);
+		for (int i = 0; i < bias.rows; i++) fscanf(file, "%f", bias[i]);
 	}
 	/*----------------[ ReLU ]----------------*/
 	void relu(Mat<float>& x, Mat<float>& y) {
@@ -120,6 +121,7 @@ public:
 *	[正向]: 卷积操作
 *************************************************************************************************/
 class ConvLayer {
+public:
 	Tensor<float> kernel, output;
 	int inChannelNum, outChannelNum, padding, stride;
 	/*----------------[ init ]----------------*/
@@ -130,18 +132,31 @@ class ConvLayer {
 		kernel.rands(kernelSize, kernelSize, kernelNum);
 	}
 	/*----------------[ forward ]----------------*/
-	void forward(Tensor<float>& input) {
+	Tensor<float>* forward(Tensor<float>& input) {
 		int rows_out = (input.dim[0] - kernel.dim[0] + 2 * padding) / (stride + 1);
 		int cols_out = (input.dim[1] - kernel.dim[1] + 2 * padding) / (stride + 1);
 		output.zero(rows_out, cols_out, outChannelNum);
+		for (int index = 0; index < output.dim.product(); index++) {	// for each element of output
+
+		}
+		return &output;
 	}
 	/*----------------[ backward ]----------------*/
+	/*----------------[ save / load ]----------------*/
+	void save(FILE* file) {
+		for (int i = 0; i < kernel.dim.product(); i++) fprintf(file, "%f ", kernel[i]);
+		fprintf(file, "\n");
+	}
+	void load(FILE* file) {
+		for (int i = 0; i < kernel.dim.product(); i++) fscanf(file, "%f", kernel[i]);
+	}
 };
 /*************************************************************************************************
 *							Pool Layer	采样层
 *	[分类]:	[1] AvePool 平均采样层    [2] MaxPool 最大采样层
 *************************************************************************************************/
 class PoolLayer {
+public:
 	Tensor<float> output;
 	int kernelSize, padding, stride, poolType = 0;
 	enum { A, M };
@@ -150,33 +165,35 @@ class PoolLayer {
 		:kernelSize(_kernelSize), padding(_padding), stride(_stride), poolType(_poolType)
 	{}
 	/*----------------[ forward ]----------------*/
-	void forward(Tensor<float>& input) {
-		output.zero(input.dim[0], input.dim[1], input.dim[2]);
+	Tensor<float>* forward(Tensor<float>& input) {
+		int rows_out = (input.dim[0] - kernelSize + 2 * padding) / (stride + 1);//##
+		int cols_out = (input.dim[1] - kernelSize + 2 * padding) / (stride + 1);//##
+		output.zero(rows_out, cols_out, input.dim[2]);
 		switch (poolType) {
 		case A: avePool(input, output); break;
 		case M: maxPool(input, output); break;
 		}
+		return &output;
 	}
 	/*----------------[ backward ]----------------*/
-	/*----------------[ save / load ]----------------*/
-	void save(FILE* file) {
-		fprintf(file, "\n");
-	}
-	void load(FILE* file) {
-	}
 	/*----------------[ avePool 平均采样层 ]----------------*/
 	void avePool(Tensor<float>& input, Tensor<float>& output) {
+		for (int index = 0; index < output.dim.product(); index++) {
 
+		}
 	}
 	/*----------------[ maxPool 平均采样层 ]----------------*/
 	void maxPool(Tensor<float>& input, Tensor<float>& output) {
+		for (int index = 0; index < output.dim.product(); index++) {
 
+		}
+		output.mult(1.0 / (kernelSize * kernelSize), output);
 	}
 };
 /*************************************************************************************************
 *							Some Classical NeuralNetworks  经典神经网络
 *	[1] BackPropagation NeuralNetworks
-*	[2] LeNet_NeuralNetworks
+*	[2] LeNet NeuralNetworks
 *************************************************************************************************/
 #include <vector>
 class BackPropagation_NeuralNetworks {
@@ -195,10 +212,11 @@ public:
 	}
 	/*----------------[ forward ]----------------*/
 	void forward(Mat<float>& input, Mat<float>& output) {
-		layer[0]->forward(input);
+		Mat<float>* y;
+		y = layer[0]->forward(input);
 		for (int i = 1; i < layer.size(); i++)
-			layer[i]->forward(layer[i - 1]->output);
-		output = layer.back()->output;
+			y = layer[i]->forward(*y);
+		output = *y;
 		preIntput = input;
 	}
 	/*----------------[ backward ]----------------*/
@@ -229,10 +247,39 @@ class LeNet_NeuralNetworks {
 	ConvLayer Conv_1, Conv_2;
 	PoolLayer MaxPool_1, MaxConv_2;
 	/*----------------[ forward ]----------------*/
-	void forward(Mat<float>& input, Mat<float>& output) {
-
+	void forward(Tensor<float>& input, Mat<float>& output) {
+		Tensor<float>* y;
+		y = Conv_1.forward(input);
+		y = MaxPool_1.forward(*y);
+		y = Conv_2.forward(*y);
+		y = MaxConv_2.forward(*y);
+		Tensor<float> t = *y;
+		Mat<float> t2(t.dim.product(), 1); t2.data = t.data; t.data = NULL;
+		Mat<float>* maty = &t2;
+		maty = FullConnect_1.forward(*maty);
+		maty = FullConnect_2.forward(*maty);
+		maty = FullConnect_3.forward(*maty);
+		output = *maty;
 	}
 	/*----------------[ backward ]----------------*/
 	/*----------------[ save/load ]----------------*/
+	void save(const char* saveFile) {
+		FILE* file = fopen(saveFile, "w+");
+		Conv_1.save(file);
+		Conv_2.save(file);
+		FullConnect_1.save(file);
+		FullConnect_2.save(file);
+		FullConnect_3.save(file);
+		fclose(file);
+	}
+	void load(const char* loadFile) {
+		FILE* file = fopen(loadFile, "r+");
+		Conv_1.load(file);
+		Conv_2.load(file);
+		FullConnect_1.load(file);
+		FullConnect_2.load(file);
+		FullConnect_3.load(file);
+		fclose(file);
+	}
 };
 #endif

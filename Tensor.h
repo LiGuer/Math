@@ -29,6 +29,7 @@ public:
 	/*---------------- 构造析构函数 ----------------*/
 	Tensor() { ; }
 	Tensor(int dimNum, int* dimLength) { zero(dimNum, dimLength); }
+	Tensor(int x0, int y0, int z0) { zero(x0, y0, z0); }
 	Tensor(Tensor& a) { *this = a; }
 	~Tensor() { free(data); }
 	/*---------------- 基础函数 ----------------*/
@@ -90,6 +91,14 @@ public:
 		int N = 1;
 		for (int i = 0; i < dim.rows; i++)N *= a.dim.data[i];
 		memcpy(data, a.data, sizeof(T) * N);
+		return *this;
+	}
+	/*----------------数乘 [ mult × ]----------------*/
+	Tensor& mult(const double a, const Tensor& b) {
+		Tensor ansTemp(b.dim.rows, b.dim.data);
+		for (int i = 0; i < b.dim.product(); i++)
+			ansTemp.data[i] = a * b.data[i];
+		eatMat(ansTemp);
 		return *this;
 	}
 };
