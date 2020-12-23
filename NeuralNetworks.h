@@ -136,8 +136,26 @@ public:
 		int rows_out = (input.dim[0] - kernel.dim[0] + 2 * padding) / (stride + 1);
 		int cols_out = (input.dim[1] - kernel.dim[1] + 2 * padding) / (stride + 1);
 		output.zero(rows_out, cols_out, outChannelNum);
-		for (int index = 0; index < output.dim.product(); index++) {	// for each element of output
-
+		// for each element of output
+		for (int z = 0; z < output.dim[2]; z++) {
+			for (int y = 0; y < output.dim[1]; y++) {
+				for (int x = 0; x < output.dim[0]; x++) {
+					// for each element of kernel
+					for (int kz = 0; kz < kernel.dim[2]; kz++) {
+						for (int ky = 0; ky < kernel.dim[1]; ky++) {
+							for (int kx = 0; kx < kernel.dim[0]; kx++) {
+								float t;
+								if (-padding + x * stride + kx <0 || -padding + x * stride + kx >input.dim[0]
+									|| -padding + y * stride + ky < 0 || -padding + y * stride + ky>input.dim[1])
+									t = 0;
+								else t = input(-padding + x * stride + kx, -padding + y * stride + ky, z)
+									* kernel(kx, ky, kz);
+								output(x, y, z) += t;
+							}
+						}
+					}
+				}
+			}
 		}
 		return &output;
 	}
@@ -169,26 +187,31 @@ public:
 		int rows_out = (input.dim[0] - kernelSize + 2 * padding) / (stride + 1);//##
 		int cols_out = (input.dim[1] - kernelSize + 2 * padding) / (stride + 1);//##
 		output.zero(rows_out, cols_out, input.dim[2]);
-		switch (poolType) {
-		case A: avePool(input, output); break;
-		case M: maxPool(input, output); break;
+		// for each element of output
+		for (int z = 0; z < output.dim[2]; z++) {
+			for (int y = 0; y < output.dim[1]; y++) {
+				for (int x = 0; x < output.dim[0]; x++) {
+					// for each element of kernel
+					for (int ky = 0; ky < kernelSize; ky++) {
+						for (int kx = 0; kx < kernelSize; kx++) {
+							float t;
+							if (-padding + x * stride + kx <0 || -padding + x * stride + kx >input.dim[0]
+								|| -padding + y * stride + ky < 0 || -padding + y * stride + ky>input.dim[1])
+								t = 0;
+							else t = input(-padding + x * stride + kx, -padding + y * stride + ky, z);
+							switch (poolType) {
+							case A: output(x, y, z) += t; break;
+							case M: output(x, y, z) = t > output(x, y, z) ? t : output(x, y, z); break;
+							}
+						}
+					}
+				}
+			}
 		}
+		if (poolType == A)output.mult(1.0 / (kernelSize * kernelSize), output);
 		return &output;
 	}
 	/*----------------[ backward ]----------------*/
-	/*----------------[ avePool 平均采样层 ]----------------*/
-	void avePool(Tensor<float>& input, Tensor<float>& output) {
-		for (int index = 0; index < output.dim.product(); index++) {
-
-		}
-	}
-	/*----------------[ maxPool 平均采样层 ]----------------*/
-	void maxPool(Tensor<float>& input, Tensor<float>& output) {
-		for (int index = 0; index < output.dim.product(); index++) {
-
-		}
-		output.mult(1.0 / (kernelSize * kernelSize), output);
-	}
 };
 /*************************************************************************************************
 *							Some Classical NeuralNetworks  经典神经网络
@@ -243,16 +266,16 @@ public:
 	}
 };
 class LeNet_NeuralNetworks {
-	NeuralLayer FullConnect_1{ 400,120 }, FullConnect_2{ 120,84 }, FullConnect_3{ 84,10 };
-	ConvLayer Conv_1, Conv_2;
-	PoolLayer MaxPool_1, MaxConv_2;
+	ConvLayer Conv_1{ 1,16,5,2,1 }, Conv_2{ 16,32,5,2,1 };
+	PoolLayer MaxPool_1{ 2,0,1,MaxPool_1.M }, MaxPool_2{ 2,0,1,MaxPool_2.M };
+	NeuralLayer FullConnect_1{ 32 * 5 * 5,120 }, FullConnect_2{ 120,84 }, FullConnect_3{ 84,10 };
 	/*----------------[ forward ]----------------*/
 	void forward(Tensor<float>& input, Mat<float>& output) {
 		Tensor<float>* y;
 		y = Conv_1.forward(input);
 		y = MaxPool_1.forward(*y);
 		y = Conv_2.forward(*y);
-		y = MaxConv_2.forward(*y);
+		y = MaxPool_2.forward(*y);
 		Tensor<float> t = *y;
 		Mat<float> t2(t.dim.product(), 1); t2.data = t.data; t.data = NULL;
 		Mat<float>* maty = &t2;

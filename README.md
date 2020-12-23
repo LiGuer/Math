@@ -2,6 +2,7 @@
 LiGu's Basic Algorithm Library.  
 * <Mat.h>                   矩阵类  
 * <ComputationalGeometry.h> 计算几何类  
+* <NeuralNetworks.h>        神经网络类
 * <BasicMachineLearning.h>  基础机器学习类
 *   
 * <Tensor.h>                张量类  
