@@ -14,6 +14,18 @@ limitations under the License.
 #define NEURAL_NETWORKS_H
 #include "Mat.h"
 #include "Tensor.h"
+/*################################################################################################
+核心类:
+class NeuralLayer(int inputSize, int outputSize)	//神经网络层
+class ConvLayer(int _inChannelNum, int _outChannelNum,int kernelSize,int _padding,int _stride)	//卷积层
+class PoolLayer(int _kernelSize, int _padding, int _stride, int _poolType)						//下采样层
+--------------------------------------------------------------------------------------------------
+经典结构:
+class BackPropagation_NeuralNetworks()				//反向传播神经网络 : 1986.Rumelhart,McClelland
+class LeNet_NeuralNetworks()						//LeNet卷积神经网络 : 1998.Yann LeCun
+class Inception()									//Inception模块: 2014.Google
+################################################################################################*/
+
 /*************************************************************************************************
 *							NeuralLayer	神经网络层
 *	[公式]:
@@ -219,10 +231,44 @@ public:
 	}
 	/*----------------[ backward ]----------------*/
 };
+/*################################################################################################
+
+*						Some Classical NeuralNetworks  经典神经网络结构
+
+################################################################################################*/
+
 /*************************************************************************************************
-*							Some Classical NeuralNetworks  经典神经网络
-*	[1] BackPropagation NeuralNetworks
-*	[2] LeNet NeuralNetworks
+*							Inception  Inception模块
+*	[Author]: 2014.Google
+*************************************************************************************************/
+class Inception {
+	/*
+	    def __init__(self, in_planes, n1x1, n3x3red, n3x3, n5x5red, n5x5, pool_planes):
+        super().__init__()
+        # ======1x1 conv branch======
+        self.b1 = BasicConv2d(in_planes, n1x1, kernel_size=1)
+        # ======1x1 conv -> 3x3 conv branch======
+        self.b2_1x1_a = BasicConv2d(in_planes, n3x3red, kernel_size=1)
+        self.b2_3x3_b = BasicConv2d(n3x3red, n3x3, kernel_size=3, padding=1)
+        # ======1x1 conv -> 3x3 conv -> 3x3 conv branch======
+        self.b3_1x1_a = BasicConv2d(in_planes, n5x5red, kernel_size=1)
+        self.b3_3x3_b = BasicConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.b3_3x3_c = BasicConv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        # ======x3 pool -> 1x1 conv branch======
+        self.b4_pool = nn.MaxPool2d(3, stride=1, padding=1)
+        self.b4_1x1 = BasicConv2d(in_planes, pool_planes, kernel_size=1)
+
+    def forward(self, x):
+        y1 = self.b1(x)
+        y2 = self.b2_3x3_b(self.b2_1x1_a(x))
+        y3 = self.b3_3x3_c(self.b3_3x3_b(self.b3_1x1_a(x)))
+        y4 = self.b4_1x1(self.b4_pool(x))
+        return torch.cat([y1, y2, y3, y4], 1)
+	*/
+};
+/*************************************************************************************************
+*							Back Propagation NeuralNetworks  反向传播神经网络
+*	[Author]: 1986.Rumelhart,McClelland
 *************************************************************************************************/
 #include <vector>
 class BackPropagation_NeuralNetworks {
@@ -263,16 +309,19 @@ public:
 		fclose(file);
 	}
 };
-
+/*************************************************************************************************
+*							LeNet NeuralNetworks  LeNet卷积神经网络
+*	[Author]: 1998.Yann LeCun
+*************************************************************************************************/
 class LeNet_NeuralNetworks {
 public:
 	ConvLayer Conv_1{ 1,16,5,2,1 }, Conv_2{ 16,32,5,2,1 };
 	PoolLayer MaxPool_1{ 2,0,2,MaxPool_1.M }, MaxPool_2{ 2,0,2,MaxPool_2.M };
 	NeuralLayer FullConnect_1{ 32 * 7 * 7,128 }, FullConnect_2{ 128,64 }, FullConnect_3{ 64,10 };
-	/*----------------[ forward ]----------------*/
 	LeNet_NeuralNetworks() {
 		FullConnect_1.ActivFuncType = FullConnect_2.ActivFuncType = FullConnect_3.ActivFuncType = 0;
 	}
+	/*----------------[ forward ]----------------*/
 	void forward(Tensor<float>& input, Mat<float>& output) {
 		Tensor<float>* y;
 		y = Conv_1(input);

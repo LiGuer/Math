@@ -72,3 +72,15 @@ Mat<double>* Delaunay(Mat<double> point[], int n, int& TrianglesNum);           
 /*----------------[ 3D 三维 ]----------------*/
 Mat<double>* getSphereFibonacciPoint(int& n);                                   //球面均匀点分布
 ```
+
+## <NeuralNetworks.h> 神经网络类
+```
+/*----------------[ 核心类 ]----------------*/
+class NeuralLayer(int inputSize, int outputSize)    //神经网络层
+class ConvLayer(int _inChannelNum, int _outChannelNum,int kernelSize,int _padding,int _stride)  //卷积层
+class PoolLayer(int _kernelSize, int _padding, int _stride, int _poolType)      //下采样层
+/*----------------[ 经典结构 ]----------------*/
+class BackPropagation_NeuralNetworks()              //反向传播神经网络 : 1986.Rumelhart,McClelland
+class LeNet_NeuralNetworks()                        //LeNet卷积神经网络 : 1998.Yann LeCun
+class Inception()                                   //Inception模块: 2014.Google
+```
