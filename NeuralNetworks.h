@@ -64,6 +64,7 @@ public:
 	/*----------------[ forward ]----------------
 	*	y = σ(W x + b)
 	*-------------------------------------------*/
+	Mat<float>* operator()(Mat<float>& input) { return forward(input); }
 	Mat<float>* forward(Mat<float>& input) {
 		linearOut.mult(weight, input);
 		sigmoid(linearOut, output);
@@ -128,27 +129,27 @@ public:
 	ConvLayer(int _inChannelNum, int _outChannelNum,int kernelSize,int _padding,int _stride)
 		: inChannelNum(_inChannelNum), outChannelNum(_outChannelNum), padding(_padding), stride(_stride)
 	{
-		int kernelNum = inChannelNum * outChannelNum;
-		kernel.rands(kernelSize, kernelSize, kernelNum);
+		kernel.rands(kernelSize, kernelSize, inChannelNum * outChannelNum, -1, 1);
 	}
 	/*----------------[ forward ]----------------*/
+	Tensor<float>* operator()(Tensor<float>& input) { return forward(input); }
 	Tensor<float>* forward(Tensor<float>& input) {
-		int rows_out = (input.dim[0] - kernel.dim[0] + 2 * padding) / (stride + 1);
-		int cols_out = (input.dim[1] - kernel.dim[1] + 2 * padding) / (stride + 1);
+		int rows_out = (input.dim[0] - kernel.dim[0] + 2 * padding) / stride + 1;
+		int cols_out = (input.dim[1] - kernel.dim[1] + 2 * padding) / stride + 1;
 		output.zero(rows_out, cols_out, outChannelNum);
 		// for each element of output
 		for (int z = 0; z < output.dim[2]; z++) {
 			for (int y = 0; y < output.dim[1]; y++) {
 				for (int x = 0; x < output.dim[0]; x++) {
 					// for each element of kernel
-					for (int kz = 0; kz < kernel.dim[2]; kz++) {
+					for (int kz = z * inChannelNum; kz < (z + 1) * inChannelNum; kz++) {
 						for (int ky = 0; ky < kernel.dim[1]; ky++) {
 							for (int kx = 0; kx < kernel.dim[0]; kx++) {
 								float t;
 								if (-padding + x * stride + kx <0 || -padding + x * stride + kx >input.dim[0]
 									|| -padding + y * stride + ky < 0 || -padding + y * stride + ky>input.dim[1])
 									t = 0;
-								else t = input(-padding + x * stride + kx, -padding + y * stride + ky, z)
+								else t = input(-padding + x * stride + kx, -padding + y * stride + ky, kz % inChannelNum)
 									* kernel(kx, ky, kz);
 								output(x, y, z) += t;
 							}
@@ -166,7 +167,7 @@ public:
 		fprintf(file, "\n");
 	}
 	void load(FILE* file) {
-		for (int i = 0; i < kernel.dim.product(); i++) fscanf(file, "%f", kernel[i]);
+		for (int i = 0; i < kernel.dim.product(); i++) fscanf(file, "%f", &kernel[i]);
 	}
 };
 /*************************************************************************************************
@@ -183,9 +184,10 @@ public:
 		:kernelSize(_kernelSize), padding(_padding), stride(_stride), poolType(_poolType)
 	{}
 	/*----------------[ forward ]----------------*/
+	Tensor<float>* operator()(Tensor<float>& input) { return forward(input); }
 	Tensor<float>* forward(Tensor<float>& input) {
-		int rows_out = (input.dim[0] - kernelSize + 2 * padding) / (stride + 1);//##
-		int cols_out = (input.dim[1] - kernelSize + 2 * padding) / (stride + 1);//##
+		int rows_out = (input.dim[0] - kernelSize + 2 * padding) / stride + 1;
+		int cols_out = (input.dim[1] - kernelSize + 2 * padding) / stride + 1;
 		output.zero(rows_out, cols_out, input.dim[2]);
 		// for each element of output
 		for (int z = 0; z < output.dim[2]; z++) {
@@ -225,9 +227,7 @@ public:
 	Mat<float> preIntput;
 	float learnRate = 0.01;
 	/*----------------[ set Layer ]----------------*/
-	void addLayer(int inputSize, int outputSize) {
-		layer.push_back(new NeuralLayer(inputSize, outputSize));
-	}
+	void addLayer(int inputSize, int outputSize) { layer.push_back(new NeuralLayer(inputSize, outputSize)); }
 	void setLayer(int index, int inputSize, int outputSize) {
 		if (index >= layer.size())exit(1);
 		delete layer[index];
@@ -235,53 +235,49 @@ public:
 	}
 	/*----------------[ forward ]----------------*/
 	void forward(Mat<float>& input, Mat<float>& output) {
-		Mat<float>* y;
-		y = layer[0]->forward(input);
-		for (int i = 1; i < layer.size(); i++)
-			y = layer[i]->forward(*y);
-		output = *y;
-		preIntput = input;
+		Mat<float>* y = layer[0]->forward(input);
+		for (int i = 1; i < layer.size(); i++) y = layer[i]->forward(*y);
+		output = *y; preIntput = input;
 	}
 	/*----------------[ backward ]----------------*/
 	void backward(Mat<float>& target) {
 		Mat<float> error;
 		error.add(target, layer.back()->output.negative(error));
-		for (int i = layer.size() - 1; i >= 1; i--) {
+		for (int i = layer.size() - 1; i >= 1; i--)
 			layer[i]->backward(layer[i - 1]->output, error, learnRate);
-		}
 		layer[0]->backward(preIntput, error, learnRate);
 	}
 	/*----------------[ save/load ]----------------*/
 	void save(const char* saveFile) {
 		FILE* file = fopen(saveFile, "w+");
-		for (int i = 0; i < layer.size(); i++) {
-			layer[i]->save(file);
-		}fclose(file);
+		for (int i = 0; i < layer.size(); i++) layer[i]->save(file);
+		fclose(file);
 	}
 	void load(const char* loadFile) {
 		FILE* file = fopen(loadFile, "r+");
-		for (int i = 0; i < layer.size(); i++) {
-			layer[i]->load(file);
-		}fclose(file);
+		for (int i = 0; i < layer.size(); i++) layer[i]->load(file);
+		fclose(file);
 	}
 };
+
 class LeNet_NeuralNetworks {
+public:
 	ConvLayer Conv_1{ 1,16,5,2,1 }, Conv_2{ 16,32,5,2,1 };
-	PoolLayer MaxPool_1{ 2,0,1,MaxPool_1.M }, MaxPool_2{ 2,0,1,MaxPool_2.M };
-	NeuralLayer FullConnect_1{ 32 * 5 * 5,120 }, FullConnect_2{ 120,84 }, FullConnect_3{ 84,10 };
+	PoolLayer MaxPool_1{ 2,0,2,MaxPool_1.M }, MaxPool_2{ 2,0,2,MaxPool_2.M };
+	NeuralLayer FullConnect_1{ 32 * 7 * 7,128 }, FullConnect_2{ 128,64 }, FullConnect_3{ 64,10 };
 	/*----------------[ forward ]----------------*/
 	void forward(Tensor<float>& input, Mat<float>& output) {
 		Tensor<float>* y;
-		y = Conv_1.forward(input);
-		y = MaxPool_1.forward(*y);
-		y = Conv_2.forward(*y);
-		y = MaxPool_2.forward(*y);
+		y = Conv_1(input);
+		y = MaxPool_1(*y);
+		y = Conv_2(*y);
+		y = MaxPool_2(*y);
 		Tensor<float> t = *y;
 		Mat<float> t2(t.dim.product(), 1); t2.data = t.data; t.data = NULL;
 		Mat<float>* maty = &t2;
-		maty = FullConnect_1.forward(*maty);
-		maty = FullConnect_2.forward(*maty);
-		maty = FullConnect_3.forward(*maty);
+		maty = FullConnect_1(*maty);
+		maty = FullConnect_2(*maty);
+		maty = FullConnect_3(*maty);
 		output = *maty;
 	}
 	/*----------------[ backward ]----------------*/

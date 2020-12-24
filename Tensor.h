@@ -54,13 +54,13 @@ public:
 		return *this;
 	}
 	/*---------------- Ëæ»úÔª ----------------*/
-	Mat& rands(int dimNum, int* dimLength) {
+	Tensor& rands(int dimNum, int* dimLength, T st, T ed) {
 		zero(dimNum, dimLength);
 		for (int i = 0; i < dim.product(); i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
 	}
-	Mat& rands(int x0, int y0, int z0) {
+	Tensor& rands(int x0, int y0, int z0, T st, T ed) {
 		zero(x0, y0, z0);
 		for (int i = 0; i < dim.product(); i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
@@ -94,7 +94,7 @@ public:
 		return *this;
 	}
 	/*----------------Êý³Ë [ mult ¡Á ]----------------*/
-	Tensor& mult(const double a, const Tensor& b) {
+	Tensor& mult(const double a, Tensor& b) {
 		Tensor ansTemp(b.dim.rows, b.dim.data);
 		for (int i = 0; i < b.dim.product(); i++)
 			ansTemp.data[i] = a * b.data[i];

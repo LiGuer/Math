@@ -52,8 +52,7 @@ public:
 	/*---------------- 零元 ----------------*/
 	Mat& zero(const int _rows, const int _cols) {
 		if (data != NULL)free(data);
-		data = (T*)malloc(sizeof(T) * _rows * _cols);
-		memset(data, 0, sizeof(T) * _rows * _cols);
+		data = (T*)calloc(_rows * _cols, sizeof(T));
 		rows = _rows;	cols = _cols;
 		return *this;
 	}
@@ -225,16 +224,14 @@ Mat& normalization()						//归一化 [ normalization ]
 	}
 	/*----------------求和 [ sum Σ ]----------------*/
 	void sum() {
-		T ans;
-		memset(&T, 0, sizeof(T));
-		for (int i = 0; i < rows * cols; i++)ans += data[i];
+		T ans = data[0];
+		for (int i = 1; i < rows * cols; i++)ans += data[i];
 		return ans;
 	}
 	/*----------------求积 [ product Π ]----------------*/
 	T product() {
-		T ans;
-		memset(&T, 0, sizeof(T));
-		for (int i = 0; i < rows * cols; i++)ans *= data[i];
+		T ans = data[0];
+		for (int i = 1; i < rows * cols; i++)ans *= data[i];
 		return ans;
 	}
 	/*----------------范数 [ norm ||x|| ]----------------
