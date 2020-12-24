@@ -20,7 +20,7 @@ limitations under the License.
 		[正向]: y = σ( Σwi·xi + b )
 				(矩阵式): y = σ(W x + b)
 				xi: 输入  y: 输出    Σwi·xi + b: 线性拟合
-				σ(): 激活函数, 使线性拟合非线性化, eg. relu(x)
+				σ(): 激活函数, 使线性拟合非线性化, eg. relu(x), Sigmoid(x)
 		[误差]: E_total = Σ(target_i - output_i)²
 		[反向]: 
 			[设]: linear Output: zi = Σwi·xi + b;  yi = σ(zi)
@@ -56,6 +56,7 @@ class NeuralLayer {
 public:
 	Mat<float> weight, bias;
 	Mat<float> output, linearOut, delta;
+	int ActivFuncType = 1;
 	/*----------------[ init ]----------------*/
 	NeuralLayer(int inputSize, int outputSize) {
 		weight.rands(outputSize, inputSize, -1, 1);
@@ -67,8 +68,11 @@ public:
 	Mat<float>* operator()(Mat<float>& input) { return forward(input); }
 	Mat<float>* forward(Mat<float>& input) {
 		linearOut.mult(weight, input);
-		relu(linearOut, output);
-		return &output;
+		switch (ActivFuncType) {
+		case 0:output = linearOut; break;
+		case 1:sigmoid(linearOut, output); break;
+		case 2:relu(linearOut, output); break;
+		}return &output;
 	}
 	/*----------------[ backward ]----------------
 	[1] ∂E/∂wL = δL·y_L-1'
@@ -266,6 +270,9 @@ public:
 	PoolLayer MaxPool_1{ 2,0,2,MaxPool_1.M }, MaxPool_2{ 2,0,2,MaxPool_2.M };
 	NeuralLayer FullConnect_1{ 32 * 7 * 7,128 }, FullConnect_2{ 128,64 }, FullConnect_3{ 64,10 };
 	/*----------------[ forward ]----------------*/
+	LeNet_NeuralNetworks() {
+		FullConnect_1.ActivFuncType = FullConnect_2.ActivFuncType = FullConnect_3.ActivFuncType = 0;
+	}
 	void forward(Tensor<float>& input, Mat<float>& output) {
 		Tensor<float>* y;
 		y = Conv_1(input);
