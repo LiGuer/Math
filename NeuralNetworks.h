@@ -67,7 +67,7 @@ public:
 	Mat<float>* operator()(Mat<float>& input) { return forward(input); }
 	Mat<float>* forward(Mat<float>& input) {
 		linearOut.mult(weight, input);
-		sigmoid(linearOut, output);
+		relu(linearOut, output);
 		return &output;
 	}
 	/*----------------[ backward ]----------------
@@ -98,7 +98,7 @@ public:
 	}
 	void load(FILE* file) {
 		for (int i= 0; i < weight.rows * weight.cols; i++) fscanf(file, "%f", &weight[i]);
-		for (int i = 0; i < bias.rows; i++) fscanf(file, "%f", bias[i]);
+		for (int i = 0; i < bias.rows; i++) fscanf(file, "%f", &bias[i]);
 	}
 	/*----------------[ ReLU ]----------------*/
 	void relu(Mat<float>& x, Mat<float>& y) {
@@ -146,15 +146,15 @@ public:
 						for (int ky = 0; ky < kernel.dim[1]; ky++) {
 							for (int kx = 0; kx < kernel.dim[0]; kx++) {
 								float t;
-								if (-padding + x * stride + kx <0 || -padding + x * stride + kx >input.dim[0]
-									|| -padding + y * stride + ky < 0 || -padding + y * stride + ky>input.dim[1])
-									t = 0;
-								else t = input(-padding + x * stride + kx, -padding + y * stride + ky, kz % inChannelNum)
-									* kernel(kx, ky, kz);
+								// get the corresponding element of input
+								int xt = -padding + x * stride + kx, yt = -padding + y * stride + ky;
+								if (xt < 0 || xt >= input.dim[0] || yt < 0 || yt >= input.dim[1])t = 0;
+								else t = input(xt, yt, kz % inChannelNum) * kernel(kx, ky, kz);
 								output(x, y, z) += t;
 							}
 						}
 					}
+					output(x, y, z) = output(x, y, z) > 0 ? output(x, y, z) : 0;	// 激活函数
 				}
 			}
 		}
@@ -197,10 +197,10 @@ public:
 					for (int ky = 0; ky < kernelSize; ky++) {
 						for (int kx = 0; kx < kernelSize; kx++) {
 							float t;
-							if (-padding + x * stride + kx <0 || -padding + x * stride + kx >input.dim[0]
-								|| -padding + y * stride + ky < 0 || -padding + y * stride + ky>input.dim[1])
-								t = 0;
-							else t = input(-padding + x * stride + kx, -padding + y * stride + ky, z);
+							// get the corresponding element of input
+							int xt = -padding + x * stride + kx, yt = -padding + y * stride + ky;
+							if (xt < 0 || xt >= input.dim[0] || yt < 0 || yt >= input.dim[1])t = 0;
+							else t = input(xt, yt, z);
 							switch (poolType) {
 							case A: output(x, y, z) += t; break;
 							case M: output(x, y, z) = t > output(x, y, z) ? t : output(x, y, z); break;
