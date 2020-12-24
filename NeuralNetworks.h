@@ -70,7 +70,9 @@ public:
 	Mat<float> output, linearOut, delta;
 	int ActivFuncType = 1;
 	/*----------------[ init ]----------------*/
-	NeuralLayer(int inputSize, int outputSize) {
+	NeuralLayer() { ; }
+	NeuralLayer(int inputSize, int outputSize) { init(inputSize, outputSize); }
+	void init(int inputSize, int outputSize) {
 		weight.rands(outputSize, inputSize, -1, 1);
 		bias.rands(outputSize, 1, -1, 1);
 	}
@@ -142,9 +144,12 @@ public:
 	Tensor<float> kernel, output;
 	int inChannelNum, outChannelNum, padding, stride;
 	/*----------------[ init ]----------------*/
-	ConvLayer(int _inChannelNum, int _outChannelNum,int kernelSize,int _padding,int _stride)
-		: inChannelNum(_inChannelNum), outChannelNum(_outChannelNum), padding(_padding), stride(_stride)
-	{
+	ConvLayer() { ; }
+	ConvLayer(int _inChannelNum, int _outChannelNum, int kernelSize, int _padding, int _stride) {
+		init(_inChannelNum, _outChannelNum, kernelSize, _padding, _stride);
+	}
+	void init(int _inChannelNum, int _outChannelNum, int kernelSize, int _padding, int _stride) {
+		inChannelNum = _inChannelNum, outChannelNum = _outChannelNum, padding = _padding, stride = _stride;
 		kernel.rands(kernelSize, kernelSize, inChannelNum * outChannelNum, -1, 1);
 	}
 	/*----------------[ forward ]----------------*/
@@ -196,9 +201,13 @@ public:
 	int kernelSize, padding, stride, poolType = 0;
 	enum { A, M };
 	/*----------------[ init ]----------------*/
-	PoolLayer(int _kernelSize, int _padding, int _stride, int _poolType)
-		:kernelSize(_kernelSize), padding(_padding), stride(_stride), poolType(_poolType)
-	{}
+	PoolLayer() { ; }
+	PoolLayer(int _kernelSize, int _padding, int _stride, int _poolType) {
+		init(_kernelSize, _padding, _stride, _poolType);
+	}
+	void init(int _kernelSize, int _padding, int _stride, int _poolType) {
+		kernelSize = _kernelSize, padding = _padding, stride = _stride, poolType = _poolType;
+	}
 	/*----------------[ forward ]----------------*/
 	Tensor<float>* operator()(Tensor<float>& input) { return forward(input); }
 	Tensor<float>* forward(Tensor<float>& input) {
@@ -237,35 +246,6 @@ public:
 
 ################################################################################################*/
 
-/*************************************************************************************************
-*							Inception  Inception模块
-*	[Author]: 2014.Google
-*************************************************************************************************/
-class Inception {
-	/*
-	    def __init__(self, in_planes, n1x1, n3x3red, n3x3, n5x5red, n5x5, pool_planes):
-        super().__init__()
-        # ======1x1 conv branch======
-        self.b1 = BasicConv2d(in_planes, n1x1, kernel_size=1)
-        # ======1x1 conv -> 3x3 conv branch======
-        self.b2_1x1_a = BasicConv2d(in_planes, n3x3red, kernel_size=1)
-        self.b2_3x3_b = BasicConv2d(n3x3red, n3x3, kernel_size=3, padding=1)
-        # ======1x1 conv -> 3x3 conv -> 3x3 conv branch======
-        self.b3_1x1_a = BasicConv2d(in_planes, n5x5red, kernel_size=1)
-        self.b3_3x3_b = BasicConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
-        self.b3_3x3_c = BasicConv2d(n5x5, n5x5, kernel_size=3, padding=1)
-        # ======x3 pool -> 1x1 conv branch======
-        self.b4_pool = nn.MaxPool2d(3, stride=1, padding=1)
-        self.b4_1x1 = BasicConv2d(in_planes, pool_planes, kernel_size=1)
-
-    def forward(self, x):
-        y1 = self.b1(x)
-        y2 = self.b2_3x3_b(self.b2_1x1_a(x))
-        y3 = self.b3_3x3_c(self.b3_3x3_b(self.b3_1x1_a(x)))
-        y4 = self.b4_1x1(self.b4_pool(x))
-        return torch.cat([y1, y2, y3, y4], 1)
-	*/
-};
 /*************************************************************************************************
 *							Back Propagation NeuralNetworks  反向传播神经网络
 *	[Author]: 1986.Rumelhart,McClelland
@@ -355,6 +335,53 @@ public:
 		FullConnect_2.load(file);
 		FullConnect_3.load(file);
 		fclose(file);
+	}
+};
+/*************************************************************************************************
+*							Inception  模块
+*	[Author]: 2014.Google
+*************************************************************************************************/
+class Inception {
+	ConvLayer b1, b2_1x1_a, b2_3x3_b, b3_1x1_a, b3_3x3_b, b3_3x3_c, b4_1x1;
+	PoolLayer b4_pool;
+	Tensor<float> output;
+	Inception(int inChannelNum, int n1x1, int n3x3red, int n3x3, int n5x5red, int n5x5, int poolChannelNum) {
+		// ======1x1 conv branch======
+		b1.init(inChannelNum, n1x1, 1, 0, 1);
+		// ======1x1 conv -> 3x3 conv branch======
+		b2_1x1_a.init(inChannelNum, n3x3red, 1, 0, 1);
+		b2_3x3_b.init(n3x3red, n3x3, 3, 1, 1);
+		// ======1x1 conv -> 3x3 conv -> 3x3 conv branch======
+		b3_1x1_a.init(inChannelNum, n5x5red, 1, 0, 1);
+		b3_3x3_b.init(n5x5red, n5x5, 3, 1, 1);
+		b3_3x3_c.init(n5x5, n5x5, 3, 1, 1);
+		// ======x3 pool -> 1x1 conv branch======
+		b4_pool.init(3, 0, 3, b4_pool.M);
+		b4_1x1.init(inChannelNum, poolChannelNum, 1, 0, 1);
+	};
+	/*----------------[ forward ]----------------*/
+	Tensor<float>* operator()(Tensor<float>& input) { return forward(input); }
+	Tensor<float>* forward(Tensor<float>& input) {
+		Tensor<float>* y1 = b1(input);
+		Tensor<float>* y2 = b2_3x3_b(*b2_1x1_a(input));
+		Tensor<float>* y3 = b3_3x3_c(*b3_3x3_b(*b3_1x1_a(input)));
+		Tensor<float>* y4 = b4_1x1(*b4_pool(input));
+		Tensor<float>* t[]{ y1, y2, y3, y4 };
+		output.merge(t, 4, 1);
+		return &output;
+	}
+	/*----------------[ save/load ]----------------*/
+	void save(FILE* file) {
+		b1.save(file);
+		b2_1x1_a.save(file); b2_3x3_b.save(file);
+		b3_1x1_a.save(file); b3_3x3_b.save(file); b3_3x3_c.save(file);
+		b4_1x1.save(file);
+	}
+	void load(FILE* file) {
+		b1.load(file);
+		b2_1x1_a.load(file); b2_3x3_b.load(file);
+		b3_1x1_a.load(file); b3_3x3_b.load(file); b3_3x3_c.load(file);
+		b4_1x1.load(file);
 	}
 };
 #endif
