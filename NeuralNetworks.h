@@ -24,7 +24,7 @@ class PoolLayer(int _kernelSize, int _padding, int _stride, int _poolType)						
 class BackPropagation_NeuralNetworks()				//反向传播神经网络 : 1986.Rumelhart,McClelland
 class LeNet_NeuralNetworks()						//LeNet卷积神经网络 : 1998.Yann LeCun
 class Inception()									//Inception模块 : 2014.Google
-class GoogLeNet_NeuralNetworks()					//GoogLeNet卷积神经网络 :  2014.Google
+class GoogLeNet_NeuralNetworks()					//GoogLeNet卷积神经网络 : 2014.Google
 ################################################################################################*/
 
 /*************************************************************************************************

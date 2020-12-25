@@ -101,4 +101,31 @@ public:
 		eatMat(ansTemp);
 		return *this;
 	}
+	/*----------------何并 [ merge ]----------------
+	*	比 dimIndex 阶数低级的，作为元素块，整体进行内存复制
+		比 dimIndex 阶数高级的，作为复制次数
+	-----------------------------------------------*/
+	Tensor& merge(Tensor* a[], const int N, int dimIndex) {
+		// new memory
+		int length = 0;
+		for (int i = 0; i < N; i++)length += a[i]->dim[dimIndex];
+		Mat<int> dimSize = a[0]->dim;
+		dimSize[dimIndex] = length;
+		Tensor ansTemp(dimSize.rows, dimSize.data);
+		// merge
+		int elementBlockSize = 1, copyTimes = 1;
+		for (int i = 0; i < dimIndex; i++)elementBlockSize *= dim[i];
+		for (int i = dimIndex + 1; i < dim.rows; i++)copyTimes *= dim[i];
+		int pos = 0;
+		Mat<int> inputPosMem(N, 1);
+		while (copyTimes--) {
+			for (int i = 0; i < N; i++) {
+				int t = elementBlockSize * a[i]->dim[dimIndex];
+				memcpy((&data + pos), &(a[i]->data) + inputPosMem[i], t * sizeof(T));
+				pos += t; inputPosMem[i] += t;
+			}
+		}
+		eatMat(ansTemp);
+		return *this;
+	}
 };
