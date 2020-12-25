@@ -23,7 +23,8 @@ class PoolLayer(int _kernelSize, int _padding, int _stride, int _poolType)						
 经典结构:
 class BackPropagation_NeuralNetworks()				//反向传播神经网络 : 1986.Rumelhart,McClelland
 class LeNet_NeuralNetworks()						//LeNet卷积神经网络 : 1998.Yann LeCun
-class Inception()									//Inception模块: 2014.Google
+class Inception()									//Inception模块 : 2014.Google
+class GoogLeNet_NeuralNetworks()					//GoogLeNet卷积神经网络 :  2014.Google
 ################################################################################################*/
 
 /*************************************************************************************************
@@ -342,10 +343,16 @@ public:
 *	[Author]: 2014.Google
 *************************************************************************************************/
 class Inception {
+public:
 	ConvLayer b1, b2_1x1_a, b2_3x3_b, b3_1x1_a, b3_3x3_b, b3_3x3_c, b4_1x1;
 	PoolLayer b4_pool;
 	Tensor<float> output;
+	/*----------------[ init ]----------------*/
+	Inception() { ; }
 	Inception(int inChannelNum, int n1x1, int n3x3red, int n3x3, int n5x5red, int n5x5, int poolChannelNum) {
+		init(inChannelNum, n1x1, n3x3red, n3x3, n5x5red, n5x5, poolChannelNum);
+	}
+	void init(int inChannelNum, int n1x1, int n3x3red, int n3x3, int n5x5red, int n5x5, int poolChannelNum) {
 		// ======1x1 conv branch======
 		b1.init(inChannelNum, n1x1, 1, 0, 1);
 		// ======1x1 conv -> 3x3 conv branch======
@@ -382,6 +389,67 @@ class Inception {
 		b2_1x1_a.load(file); b2_3x3_b.load(file);
 		b3_1x1_a.load(file); b3_3x3_b.load(file); b3_3x3_c.load(file);
 		b4_1x1.load(file);
+	}
+};
+/*************************************************************************************************
+*							GoogLeNet  卷积神经网络
+*	[Author]:  2014.Google
+*************************************************************************************************/
+class GoogLeNet_NeuralNetworks {
+public:
+	Inception a3, b3, a4, b4, c4, d4, e4, a5, b5;
+	ConvLayer pre_layers;
+	PoolLayer maxpool, avgpool;
+	NeuralLayer linear;
+	GoogLeNet_NeuralNetworks() {
+		pre_layers.init(1, 64, 5, 1, 2);
+		a3.init(64, 64, 96, 128, 16, 32, 32);
+		b3.init(256, 128, 128, 192, 32, 96, 64);
+		maxpool.init(3,  2, 1, avgpool.M);
+		a4.init(480, 192, 96, 208, 16, 48, 64);
+		b4.init(512, 160, 112, 224, 24, 64, 64);
+		c4.init(512, 128, 128, 256, 24, 64, 64);
+		d4.init(512, 112, 144, 288, 32, 64, 64);
+		e4.init(528, 256, 160, 320, 32, 128, 128);
+		a5.init(832, 256, 160, 320, 32, 128, 128);
+		b5.init(832, 384, 192, 384, 48, 128, 128);
+		avgpool.init(8, 8, 0, avgpool.A);
+		linear.init(1024 * 5 * 5, 7);
+	}
+	/*----------------[ forward ]----------------*/
+	void forward(Tensor<float>& input, Mat<float>& output) {
+		Tensor<float>* y;
+		y = pre_layers(input);
+		y = b3(*a3(*y));
+		y = maxpool(*y);
+		y = e4(*d4(*c4(*b4(*a4(*y)))));
+		y = maxpool(*y);
+		y = b5(*a5(*y));
+		y = avgpool(*y);
+		Tensor<float> t = *y;
+		Mat<float> t2(t.dim.product(), 1); t2.data = t.data; t.data = NULL;
+		Mat<float>* maty = &t2;
+		maty = linear(*maty);
+		output = *maty;
+	}
+	/*----------------[ save/load ]----------------*/
+	void save(const char* saveFile) {
+		FILE* file = fopen(saveFile, "w+");
+		pre_layers.save(file);
+		a3.save(file); b3.save(file);
+		a4.save(file); b4.save(file); c4.save(file); d4.save(file); e4.save(file);
+		a5.save(file); b5.save(file);
+		linear.save(file);
+		fclose(file);
+	}
+	void load(const char* loadFile) {
+		FILE* file = fopen(loadFile, "r+");
+		pre_layers.load(file);
+		a3.load(file); b3.load(file);
+		a4.load(file); b4.load(file); c4.load(file); d4.load(file); e4.load(file);
+		a5.load(file); b5.load(file);
+		linear.load(file);
+		fclose(file);
 	}
 };
 #endif
