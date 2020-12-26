@@ -1,5 +1,58 @@
 #include "Mat.h"
-/*----------------[ 波动方程 ]----------------
+/*--------------------------------[ Runge Kutta 方法 ]--------------------------------
+*	[公式]:           ->   ->       ->      ->
+		对于初值问题: y' = f(t, y)	y(t0) = y0
+		y[n+1] = y[n] + h/6·(k1 + 2·k2 + 2·k3 + k4)
+		k1 = f(tn , yn)		//时间段开始时的斜率
+		k2 = f(tn + h/2 , yn + h/2·k1)	//时间段中点斜率,通过欧拉法采用k1决定y在tn+h/2值
+		k3 = f(tn + h/2 , yn + h/2·k2)	//时间段中点斜率,采用k2决定y值
+		k4 = f(tn + h , yn + h·k3)		//时间段终点的斜率
+*	[目的]: 解常微分方程组
+		[ y1'(t) = f1(y1 , ... , yn , t)          ->   ->
+		| y2'(t) = f2(y1 , ... , yn , t)    =>    y' = f(t , y)
+		| ...
+		[ yn'(t) = fn(y1 , ... , yn , t)
+*	[性质]:
+		* RK4法是四阶方法，每步误差是h⁵阶，总积累误差为h⁴阶
+**-----------------------------------------------------------------------------------*/
+void RungeKutta(Mat<double>& y, double dt, double t0, int enpoch, Mat<double>& (*f)(double t, Mat<double>& y)) {
+	Mat<double> v, temp;
+	double t = t0;
+	while (enpoch--) {
+		// k1, k2, k3 ,k4
+		Mat<double> k1 = f(t, y)
+			, k2 = f(t + dt / 2, v.add(y, v.mult(dt / 2, k1)))
+			, k3 = f(t + dt / 2, v.add(y, v.mult(dt / 2, k2)))
+			, k4 = f(t + dt, v.add(y, v.mult(dt, k3)));
+		// y[n+1] = y[n] + h/6·(k1 + 2·k2 + 2·k3 + k4)
+		temp.add(temp.add(k1, k4), v.mult(2, v.add(k2, k3)));
+		y.add(y, temp.mult(dt / 6, temp));
+	};
+}
+/* //example
+// x , y , (x') , (y')
+// [ x' = (x')
+// | y' = (y')
+// | (x')' = - G M x / (x² + y²)^(3/2)
+// [ (y')' = - G M y / (x² + y²)^(3/2)
+Mat<double>& function(double t, Mat<double>& y) {
+	static Mat<double> output(y.rows, 1);
+	static double GM = 1;
+	output[0] = y[2]; output[1] = y[3];
+	double temp = -GM / pow(y[0] * y[0] + y[1] * y[1], 3 / 2);
+	output[2] = temp * y[0]; output[3] = temp * y[1];
+	return output;
+}
+int main() {
+	Mat<double> y(4, 1);
+	y[0] = 1; y[1] = 0; y[2] = 0; y[3] = 0.7;
+	for (int i = 0; i < 1000; i++) {
+		RungeKutta(y, 0.01, 0, 1, function);
+		for (int k = 0; k < 4; k++)printf("%f ", y[k]); printf("\n");
+	}
+}*/
+
+/*--------------------------------[ 波动方程 ]--------------------------------
 *	[方程]: a ▽²u = ∂²u/∂t²
 			// ∂²u/∂t², 即.加速度
 			其中 ▽² ≡ ∂²/∂x² + ∂²/∂y² + ∂²/∂z² + ...
@@ -22,7 +75,7 @@
 		对于t = 1 * Δt时刻, 有
 		u(r,t=Δt) = u(r,t=0) + ∂u(r,t=0)/∂t·Δt + a▽²u·Δt²
 	[*] 暂时只二维
-**--------------------------------------*/
+**--------------------------------------------------------------------------*/
 void WaveEquation(Mat<double>& Map, Mat<double>& veloc, void (*setBoundaryEquations) (Mat<double>& x, int time),
 	double alpha, double deltaTime, double deltaX, double deltaY, int EndTimes) {
 	Mat<double> MapNow(Map), MapPrev(Map);
