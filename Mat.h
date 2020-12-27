@@ -93,6 +93,7 @@ Mat& negative(Mat& ans)                     //负 [ negative ]
 Mat& transposi(Mat& ans)                    //转置 [ trans ]
 void sum(int dim, Mat& ans)                 //元素求和 [ sum ]
 T norm()                                    //范数 [ norm ]
+Mat& normalization()						//归一化 [ normalization ]
 T comi(int i0, int j0)                      //余子式 [ comi ]
 Mat& inv(Mat& ans)                          //取逆 [ inv ]
 T abs()                                     //行列式 [ abs ]
@@ -100,7 +101,6 @@ Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
 void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
 Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
 void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
-Mat& normalization()						//归一化 [ normalization ]
 -------------------------------------------------------------------------------
 *	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
 		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
@@ -144,6 +144,10 @@ Mat& normalization()						//归一化 [ normalization ]
 		if (a.data == NULL)error();
 		zero(a.rows, a.cols);
 		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
+		return *this;
+	}
+	Mat& getData(T* a) {
+		memcpy(data, a, sizeof(T) * rows * cols);
 		return *this;
 	}
 	/*----------------加法 [ add + ]----------------*/
@@ -238,6 +242,15 @@ Mat& normalization()						//归一化 [ normalization ]
 	*	||a|| = sqrt(a·a)
 	**-------------------------------------------*/
 	T norm() { return sqrt(dot(*this, *this)); }
+	/*----------------归一化 [ normalization ]----------------
+	*	[定义]: 使得|| x || = 1
+	**------------------------------------------------------*/
+	Mat& normalization() {
+		T t = norm();
+		if (t == 0)return *this;
+		for (int i = 0; i < rows * cols; i++)data[i] /= t;
+		return *this;
+	}
 	/*----------------余子式 [ comi ]----------------
 	*	Mij: A 去掉第i行，第j列
 	**-----------------------------------------------*/
@@ -471,18 +484,6 @@ Mat& normalization()						//归一化 [ normalization ]
 				else U(i, j) = A(i, j);
 			}
 		}
-	}
-	/*----------------归一化 [ normalization ]----------------
-	*	[定义]: 使得|| x || = 1
-	**---------------------------------------------*/
-	Mat& normalization() {
-		T sum;
-		memset(&sum, 0, sizeof(T));
-		for (int i = 0; i < rows * cols; i++)sum += data[i] * data[i];
-		sum = sqrt(sum);
-		if (sum == 0)error();
-		for (int i = 0; i < rows * cols; i++)data[i] /= sum;
-;		return *this;
 	}
 /******************************************************************************
 *                    特殊操作

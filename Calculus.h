@@ -16,17 +16,17 @@
 		* RK4法是四阶方法，每步误差是h⁵阶，总积累误差为h⁴阶
 **-----------------------------------------------------------------------------------*/
 void RungeKutta(Mat<double>& y, double dt, double t0, int enpoch, Mat<double>& (*f)(double t, Mat<double>& y)) {
-	Mat<double> v, temp;
+	Mat<double> tmp, k, k1, k2, k3, k4;
 	double t = t0;
 	while (enpoch--) {
 		// k1, k2, k3 ,k4
-		Mat<double> k1 = f(t, y)
-			, k2 = f(t + dt / 2, v.add(y, v.mult(dt / 2, k1)))
-			, k3 = f(t + dt / 2, v.add(y, v.mult(dt / 2, k2)))
-			, k4 = f(t + dt, v.add(y, v.mult(dt, k3)));
+		k1 = f(t, y);
+		k2 = f(t + dt / 2, tmp.add(y, tmp.mult(dt / 2, k1)));
+		k3 = f(t + dt / 2, tmp.add(y, tmp.mult(dt / 2, k2)));
+		k4 = f(t + dt, tmp.add(y, tmp.mult(dt, k3)));
 		// y[n+1] = y[n] + h/6·(k1 + 2·k2 + 2·k3 + k4)
-		temp.add(temp.add(k1, k4), v.mult(2, v.add(k2, k3)));
-		y.add(y, temp.mult(dt / 6, temp));
+		k.add(k.add(k1, k4), tmp.mult(2, tmp.add(k2, k3)));
+		y.add(y, k.mult(dt / 6, k));
 	};
 }
 /* //example
@@ -51,6 +51,12 @@ int main() {
 		for (int k = 0; k < 4; k++)printf("%f ", y[k]); printf("\n");
 	}
 }*/
+/*	//example - Lorenz Attractor
+	// x y z
+	// [ x' = a(y - x)
+	// | y' = x(b - z) - y
+	// [ z' = x y - c z 
+*/
 
 /*--------------------------------[ 波动方程 ]--------------------------------
 *	[方程]: a ▽²u = ∂²u/∂t²
