@@ -101,6 +101,7 @@ Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
 void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
 Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
 void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
+Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 -------------------------------------------------------------------------------
 *	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
 		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
@@ -357,7 +358,7 @@ void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
 	void eig(T esp, Mat& eigvec, Mat& eigvalue) {
 		if (rows != cols)return;
 		//[1] init
-		eigvalue.assign(*this);
+		eigvalue = (*this);
 		eigvec.E(rows);
 		int n = rows;
 		Mat<double> R, RT;
@@ -484,6 +485,22 @@ void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
 				else U(i, j) = A(i, j);
 			}
 		}
+	}
+	/*----------------构造对角矩阵 [ diag ]----------------*/
+	Mat& diag(Mat& ans) {
+		Mat ansTemp;
+		if (rows == cols) {
+			ansTemp.zero(rows, 1);
+			for (int i = 0; i < rows; i++)ansTemp[i] = data[i * rows + i];
+		}
+		else if (rows == 1 || cols == 1) {
+			int n = rows > cols ? rows : cols;
+			ansTemp.zero(n, n);
+			for (int i = 0; i < n; i++)ansTemp(i, i) = data[i];
+		}
+		else error();
+		ans.eatMat(ansTemp);
+		return ans;
 	}
 /******************************************************************************
 *                    特殊操作
