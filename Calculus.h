@@ -1,4 +1,5 @@
 #include "Mat.h"
+#include "Tensor.h"
 /*--------------------------------[ Runge Kutta 方法 ]--------------------------------
 *	[公式]:           ->   ->       ->      ->
 		对于初值问题: y' = f(t, y)	y(t0) = y0
@@ -55,11 +56,41 @@ int main() {
 	// x y z
 	// [ x' = a(y - x)
 	// | y' = x(b - z) - y
-	// [ z' = x y - c z 
-*/
-
+	// [ z' = x y - c z */
+/*--------------------------------[ Poisson's方程 ]--------------------------------
+*	[定义]: Δφ = f
+		流形属于Euclidean空间时, 写成 ▽²φ = f
+		三维直角坐标系中 (∂²/∂x² + ∂²/∂y² + ∂²/∂z²) φ(x,y,z) = f(x,y,z)
+		当f ≡ 0, 得到 Laplace's方程
+	[解法]:  Green's函数  φ(r) = - ∫∫∫ f(rt) / 4π|r-rt| d³rt    ,r rt为矢量
+**--------------------------------------------------------------------------*/
+Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta, double (*f) (Mat<double>& x)) {
+	// init
+	Mat<double> tmp;
+	tmp.add(ed, st.negative(tmp));
+	Mat<int> dim(st.rows);
+	for (int i = 0; i < st.rows; i++) dim[i] = (int)(tmp[i] / delta);
+	Tensor<double>* Map = new Tensor<double>(dim.rows, dim.data);
+	// compute Green's function
+	Mat<double> r = st;
+	const double pi = 3.141592653589;
+	for (int i = 0; i < Map.dim.product(); i++) {
+		double t = 0;
+		Mat<double> rt = st;
+		for (int j = 0; j < Map.dim.product(); j++) {
+			for (int k = 0; k < rt.rows; k++)
+				{rt[k] += delta[k]; if(rt[k]>=ed[k])rt[k]=st[k]; else break;}
+			t += f(rt) / tmp.add(r, rt.negative(tmp)).norm();
+		}
+		Map[i] = t / (4 * pi);
+		// update r
+		for (int k = 0; k < rt.rows; k++)
+			{r[k] += delta[k]; if(r[k]>=ed[k])r[k]=st[k]; else break;}
+	}
+	return Map;
+}
 /*--------------------------------[ 波动方程 ]--------------------------------
-*	[方程]: a ▽²u = ∂²u/∂t²
+*	[定义]: a ▽²u = ∂²u/∂t²
 			// ∂²u/∂t², 即.加速度
 			其中 ▽² ≡ ∂²/∂x² + ∂²/∂y² + ∂²/∂z² + ...
 		边界条件:
@@ -110,7 +141,7 @@ void WaveEquation(Mat<double>& Map, Mat<double>& veloc, void (*setBoundaryEquati
 	Map = MapNow;
 }
 /*--------------------------------[ 扩散方程 ]--------------------------------
-*	[方程]: a ▽²u = ∂u/∂t
+*	[定义]: a ▽²u = ∂u/∂t
 	[算法]: 有限差分法
 		u(t+1,...) = u(t,r)
 				+ Δt·a{[u(x+1,...) - 2·u(x,...) + u(x-1,...)]/Δx² + ...}
