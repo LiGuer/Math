@@ -91,7 +91,8 @@ Mat& dot(const Mat& a, const Mat& b)        //点乘 [ dot ]
 Mat& crossProduct(Mat& a, Mat& b)			//叉乘 [ crossProduct ]
 Mat& negative(Mat& ans)                     //负 [ negative ]
 Mat& transposi(Mat& ans)                    //转置 [ trans ]
-void sum(int dim, Mat& ans)                 //元素求和 [ sum ]
+void sum(int dim, Mat& ans)                 //求和 [ sum ]
+Mat& sumCol(Mat& ans) 						//求和至一列 [ sum ]
 T norm()                                    //范数 [ norm ]
 Mat& normalization()						//归一化 [ normalization ]
 T comi(int i0, int j0)                      //余子式 [ comi ]
@@ -154,15 +155,15 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	/*----------------加法 [ add + ]----------------*/
 	Mat& add(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols)error();
-		Mat ansTemp(a);
-		for (int i = 0; i < a.rows * a.cols; i++)ansTemp[i] += b[i];
-		eatMat(ansTemp);
+		Mat ansTmp(a);
+		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] += b[i];
+		eatMat(ansTmp);
 		return *this;
 	}
 	/*----------------乘法 [ mult × ]----------------*/
 	Mat& mult(const Mat& a, const Mat& b) {
 		if (a.cols != b.rows) error();
-		Mat ansTemp(a.rows, b.cols);
+		Mat ansTmp(a.rows, b.cols);
 		for (int i = 0; i < a.rows; i++) {
 			for (int j = 0; j < b.cols; j++) {
 				T sum;
@@ -172,18 +173,18 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 					T bV = b.data[k * b.cols + j];
 					sum += aV * bV;
 				}
-				ansTemp.data[i * ansTemp.cols + j] = sum;
+				ansTmp.data[i * ansTmp.cols + j] = sum;
 			}
 		}
-		eatMat(ansTemp);
+		eatMat(ansTmp);
 		return *this;
 	}
 	/*----------------数乘 [ mult × ]----------------*/
 	Mat& mult(const double a, const Mat& b) {
-		Mat ansTemp(b.rows, b.cols);
+		Mat ansTmp(b.rows, b.cols);
 		for (int i = 0; i < b.rows * b.cols; i++)
-			ansTemp.data[i] = a * b.data[i];
-		eatMat(ansTemp);
+			ansTmp.data[i] = a * b.data[i];
+		eatMat(ansTmp);
 		return *this;
 	}
 	/*----------------点乘 [ dot · ]----------------
@@ -203,34 +204,42 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	**------------------------------------------------*/
 	Mat& crossProduct(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
-		Mat ansTemp(a.rows, a.cols);
-		ansTemp[0] = a[1] * b[2] - a[2] * b[1];
-		ansTemp[1] = a[2] * b[0] - a[0] * b[2];
-		ansTemp[2] = a[0] * b[1] - a[1] * b[0];
-		eatMat(ansTemp);
+		Mat ansTmp(a.rows, a.cols);
+		ansTmp[0] = a[1] * b[2] - a[2] * b[1];
+		ansTmp[1] = a[2] * b[0] - a[0] * b[2];
+		ansTmp[2] = a[0] * b[1] - a[1] * b[0];
+		eatMat(ansTmp);
 		return *this;
 	}
 	/*----------------负 [ negative - ]----------------*/
 	Mat& negative(Mat& ans) {
-		Mat ansTemp(*this);
+		Mat ansTmp(*this);
 		for (int i = 0; i < rows * cols; i++)
-			ansTemp[i] = -ansTemp[i];
-		ans.eatMat(ansTemp);
+			ansTmp[i] = -ansTmp[i];
+		ans.eatMat(ansTmp);
 		return ans;
 	}
 	/*----------------转置 [ transposi T ]----------------*/
 	Mat& transposi(Mat& ans) {
-		Mat ansTemp(cols, rows);
+		Mat ansTmp(cols, rows);
 		for (int i = 0; i < rows; i++) 
 			for (int j = 0; j < cols; j++) 
-				ansTemp.data[j * rows + i] = data[i * cols + j];
-		ans.eatMat(ansTemp);
+				ansTmp.data[j * rows + i] = data[i * cols + j];
+		ans.eatMat(ansTmp);
 		return ans;
 	}
 	/*----------------求和 [ sum Σ ]----------------*/
-	void sum() {
+	T sum() {
 		T ans = data[0];
 		for (int i = 1; i < rows * cols; i++)ans += data[i];
+		return ans;
+	}
+	Mat& sumCol(Mat& ans) {
+		Mat ansTmp(rows, 1);
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++)
+				ansTmp[i] += (*this)(i, j);
+		ans.eatMat(ansTmp);
 		return ans;
 	}
 	/*----------------求积 [ product Π ]----------------*/
@@ -256,14 +265,14 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	*	Mij: A 去掉第i行，第j列
 	**-----------------------------------------------*/
 	T comi(int i0, int j0) {
-		Mat temp(rows - 1, cols - 1);
+		Mat tmp(rows - 1, cols - 1);
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				if (i == i0 || j == j0)continue;
-				temp(i < i0 ? i : i - 1, j < j0 ? j : j - 1) = data[i * cols + j];
+				tmp(i < i0 ? i : i - 1, j < j0 ? j : j - 1) = data[i * cols + j];
 			}
 		}
-		return temp.abs();
+		return tmp.abs();
 	}
 	/*----------------取逆 [ inv x~¹ ]----------------
 	*	[定义]: A A~¹ = E
@@ -271,7 +280,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	**------------------------------------------*/
 	Mat& inv(Mat& ans) {
 		if (rows != cols)error();
-		Mat temp(rows, cols);
+		Mat tmp(rows, cols);
 		int n = rows;
 		// LUP分解
 		Mat L, U; Mat<int> P;
@@ -292,9 +301,9 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 				x[i] /= U(i, i);
 			}
 			//合并至结果
-			for (int i = 0; i < rows; i++)temp(i, k) = x[i];
+			for (int i = 0; i < rows; i++)tmp(i, k) = x[i];
 		}
-		ans.eatMat(temp);
+		ans.eatMat(tmp);
 		return ans;
 	}
 	/*----------------行列式 [ abs |x| ]----------------
@@ -488,18 +497,18 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	}
 	/*----------------构造对角矩阵 [ diag ]----------------*/
 	Mat& diag(Mat& ans) {
-		Mat ansTemp;
+		Mat ansTmp;
 		if (rows == cols) {
-			ansTemp.zero(rows, 1);
-			for (int i = 0; i < rows; i++)ansTemp[i] = data[i * rows + i];
+			ansTmp.zero(rows, 1);
+			for (int i = 0; i < rows; i++)ansTmp[i] = data[i * rows + i];
 		}
 		else if (rows == 1 || cols == 1) {
 			int n = rows > cols ? rows : cols;
-			ansTemp.zero(n, n);
-			for (int i = 0; i < n; i++)ansTemp(i, i) = data[i];
+			ansTmp.zero(n, n);
+			for (int i = 0; i < n; i++)ansTmp(i, i) = data[i];
 		}
 		else error();
-		ans.eatMat(ansTemp);
+		ans.eatMat(ansTmp);
 		return ans;
 	}
 /******************************************************************************
@@ -513,11 +522,11 @@ Mat& setCol(int _col, Mat& a)
 	/*----------------水平向拼接 [ horizStack ]----------------*/
 	Mat& horizStack(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
-		Mat ansTemp(a.rows, a.cols + b.cols);
-		for (int i = 0; i < ansTemp.row; i++)
-			for (int j = 0; j < ansTemp.cols; j++)
-				ansTemp.data[i * cols + j] = j < a.cols ? a(i, j) : b(i, j - a.cols);
-		eatMat(ansTemp);
+		Mat ansTmp(a.rows, a.cols + b.cols);
+		for (int i = 0; i < ansTmp.row; i++)
+			for (int j = 0; j < ansTmp.cols; j++)
+				ansTmp.data[i * cols + j] = j < a.cols ? a(i, j) : b(i, j - a.cols);
+		eatMat(ansTmp);
 		return *this;
 	}
 	/*----------------交换数据 [ swap ]----------------*/

@@ -13,7 +13,7 @@ limitations under the License.
 #include <math.h>
 #include <complex.h>
 #include "Mat.h"
-/*--------------------------------[ Mandelbrot 曼德布洛特集 ]--------------------------------
+/*--------------------------------[ Mandelbrot集 ]--------------------------------
 *	[定义]: Zn+1 = Zn² + C
 			所有能使Zn+1不发散的复数点C, 所构成的集合,即 Mandelbrot Set
 			(不发散,不一定收敛,有可能在几个不同点来回跳)
@@ -41,7 +41,7 @@ int isMandelbrotSet(double complex C, double complex Z0, int iterateTimes) {
 	}
 	return 0;							//属于,输出0; 不属于,输出判断出的当次迭代数
 }
-/*--------------------------------[ Julia 茱莉亚集 ]--------------------------------
+/*--------------------------------[ Julia集 ]--------------------------------
 *	[定义]: Zn+1 = Zn² + C
 			对于某复数值C,所有能使Zn+1不发散的Z0的集合,即 Julia Set
 			类似于. Mandelbrot 曼德布洛特集

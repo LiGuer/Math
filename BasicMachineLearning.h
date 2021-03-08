@@ -10,7 +10,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+#ifndef BASIC_MACHINE_LEARNING_H
+#define BASIC_MACHINE_LEARNING_H
+
 #include "Mat.h"
+#include <float.h>
+#include <algorithm>
 /*--------------------------------[ K Mean 聚类 ]--------------------------------
 *	* 对N维分布的数据点，可以将其聚类在 K 个关键簇内
 *	*[流程]:
@@ -24,10 +29,10 @@ limitations under the License.
 			[8] 迭代重新开始
 		[9] 一轮无更正时，迭代结束
 **------------------------------------------------------------------------*/
-void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& Cluster_Cur) {
+void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum) {
 	int Dimension = x.rows, N = x.cols;
 	Center.zero(Dimension, K);
-	Cluster.zero(K, N); Cluster_Cur.zero(K, 1);
+	Cluster.zero(K, N); ClusterKthNum.zero(K, 1);
 	//[1] 随机选择 K 个簇心点 
 	for (int i = 0; i < K; i++) {
 		int index = rand() % N;
@@ -36,7 +41,7 @@ void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<i
 	//[2]
 	while (true) {
 		//[3]
-		Cluster.clean(); Cluster_Cur.clean();
+		Cluster.clean(); ClusterKthNum.clean();
 		//[4] 计算每个xi到Center_j的距离
 		for (int i = 0; i < N; i++) {
 			Mat<double> d(1, K);
@@ -45,15 +50,15 @@ void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<i
 					d[j] += (x(dim, i) - Center(dim, j)) * (x(dim, i) - Center(dim, j));
 			//[5]
 			int index; d.min(index);
-			Cluster(index, Cluster_Cur[index]++) = i;
+			Cluster(index, ClusterKthNum[index]++) = i;
 		}
 		//[6] 对每个簇,计算其质心 Center'
 		Mat<double> CenterTemp(Dimension, K);
 		for (int i = 0; i < K; i++) {
 			for (int dim = 0; dim < Dimension; dim++) {
-				for (int j = 0; j < Cluster_Cur[i]; j++)
+				for (int j = 0; j < ClusterKthNum[i]; j++)
 					CenterTemp(dim, i) += x(dim, Cluster(i, j));
-				CenterTemp(dim, i) /= Cluster_Cur[i];
+				CenterTemp(dim, i) /= ClusterKthNum[i];
 			}
 		}
 		//[7] 更正簇心
@@ -91,43 +96,35 @@ void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<i
 void PrincipalComponentsAnalysis(Mat<double>& x, Mat<double>& y, int yDim) {
 	//[1] 数据中心化
 	Mat<double> mean;
-	x.sum(0, mean);
-	mean.mult(1.0 / x.cols, mean);		//得到均值
-	Mat<double> x2(x.rows, x.cols);
-	for (int i = 0; i < x.rows; i++) {
-		for (int j = 0; j < x.cols; j++) {
-			x2[i * x.cols + j] = -mean[i];
-		}
-	}
-	x2.add(x, x2);
+	mean.mult(1.0 / x.cols, x.sumCol(mean));		//得到均值
+	Mat<double> x2(x);
+	for (int i = 0; i < x.rows; i++)
+		for (int j = 0; j < x.cols; j++)
+			x2(i, j) -= mean[i];
 	//[2] 计算协方差矩阵
 	Mat<double> Cov;
-	x2.transposi(Cov);			//XT
-	Cov.mult(x2, Cov);		//X*XT
+	Cov.mult(x2, x2.transposi(Cov));		//X*XT
 	//[3] 对协方差特征值分解
 	Mat<double> eigVec, eigValue;
 	Cov.eig(1e-5, eigVec, eigValue);
 	//[4] 取最大的d'个特征值所对应的特征向量{w1,w2,...,wd'},投影矩阵 W = [w1,w2,...,wd']T
 	// sort
 	Mat<double> eigValueTemp(1, eigValue.cols), W(eigVec.rows, yDim);
-	for (int i = 0; i < eigValue.cols; i++)eigValueTemp[i] = eigValue[i * i];
+	for (int i = 0; i < eigValue.cols; i++)eigValueTemp[i] = eigValue(i, i);
 	std::sort(eigValueTemp.data, eigValueTemp.data + eigValueTemp.cols);
 	// W
 	for (int i = 0; i < yDim; i++) {
 		double value = eigValueTemp[eigValueTemp.cols - 1 - i];
 		for (int j = 0; j < eigValue.cols; j++) {
-			if (eigValue[j * eigValue.cols + j] == value) {
-				for (int k = 0; k < eigVec.rows; k++) {
-					W[k * W.cols + i] = eigVec[k * eigVec.cols + j];
-				}
-				eigValue[j * eigVec.cols + j] = -DBL_MAX;
+			if (eigValue(j, j) == value) {
+				for (int k = 0; k < eigVec.rows; k++) W(k, i) = eigVec(k, j);
+				eigValue(j, j) = -DBL_MAX;
 				break;
 			}
 		}
 	}
-	W.transposi(W);
 	//[5]
-	y.mult(W, x);
+	y.mult(W.transposi(y), x);
 }
 /*--------------------------------[ QLearning ]--------------------------------
 *	[定义]:Q(s,a) = (1 + lr)·Q(s,a) + lr·( R + g·max Q(s',:) )
@@ -253,3 +250,156 @@ public:
 		return action;
 	}
 };
+
+/*--------------------------------[ Apriori ]--------------------------------
+*[概念]:
+	* 频繁项集: 经常出现在一块的物品的集合.
+	* 关联规则: 两种物品之间可能存在很强的关系.
+	* 支持度P(AB): 数据集中包含该项集的记录所占的比例.
+		P(AB) ≌ num(AB) / num(all)
+	* 置信度P(A→B) = P(B|A) = P(AB) / P(A)
+*[目的]: 根据频繁项集，寻找数据集中变量之间的关联规则.
+*[输入/输出]:
+	* 输入: [1]初始频繁项集  [2]最小支持度
+	* 输出: [1]关联项集  [2]关联项集支持度
+*[定理]:
+	* 项集频繁，则其子集频繁. <=> 项集不频繁，则其超集不频繁.
+	* 若规则X→Y−X低于置信度阈值，则对于X子集X',规则X'→Y−X'也低于置信度阈值
+*[性质]:
+	* 频繁项集生成的方法:
+		[1] Fk = Fk-1 × F1
+		[2] Fk = Fk-1 × Fk-1
+	* 频繁项集每一项各不相同， 每一项内部排列有序.
+*[过程]:
+	[1] 频繁项集生成,对于K项的集合
+		[2] 频繁项集子集生成. 生成K项所有可以组合的集合. eg.[frozenset({2, 3}), frozenset({3, 5})] -> [frozenset({2, 3, 5})]
+		[3] 过滤小于支持度P(AB)的集合.
+	[4] 关联规则生成
+
+**------------------------------------------------------------------------*/
+//[2] 生成K项所有可以组合的集合.
+void Apriori_GenCandidate(std::vector<Mat<int>>& frozenSet, int K, std::vector<Mat<int>>& newfrozenSet) {
+	newfrozenSet.clear();
+	Mat<int> tmp(1, K);
+	for (int i = 0; i < frozenSet.size(); i++) {
+		for (int j = i + 1; j < frozenSet.size(); j++) {
+			bool flag = true;
+			for (int k = 0; k < K - 2; k++) {
+				tmp[k] = frozenSet[i][k];
+				if (frozenSet[i][k] != frozenSet[j][k]) { flag = false; break; }
+			}
+			if (flag) {
+				tmp[K - 2] = frozenSet[i][K - 2];
+				tmp[K - 1] = frozenSet[j][K - 2];
+				//频繁项集每一项内排列有序
+				std::sort(tmp.data, tmp.data + tmp.cols);
+				//频繁项集每一项各不相同
+				bool flag2 = true;
+				for (int k = 0; k < newfrozenSet.size(); k++)
+					if (tmp == newfrozenSet[k]) { flag2 = false; break; }
+				if(flag2) newfrozenSet.push_back(tmp);
+			}
+		}
+	}
+}
+//[3] 过滤小于支持度的集合.
+void Apriori_Filter(std::vector<Mat<int>>& dataSet, std::vector<Mat<int>>& frozenSet, int minSupport, std::vector<double>& frozenSet_Support) {
+	//[3.1]计算支持度P(AB) ≌ num(AB) / num(all)
+	frozenSet_Support.clear();
+	Mat<double> frozenSet_Count(1, frozenSet.size());
+	for (int i = 0; i < frozenSet.size(); i++){
+		for (int j = 0; j < dataSet.size(); j++) {
+			// if frozenSet[i] is dataSet[j]'s subset
+			int cur = 0;
+			for (int k = 0; k < dataSet[j].cols; k++)
+				if (frozenSet[i][cur] == dataSet[j][k]) cur++;
+			if (cur == frozenSet[i].cols) frozenSet_Count[j]++;
+		}
+	}
+	frozenSet_Count.mult(1.0 / dataSet.size(), frozenSet_Count);
+	//[3.2]删除小于支持度的集合.
+	for (int i = 0; i < frozenSet.size(); i++) {
+		if (frozenSet_Count[i] < minSupport) { frozenSet.erase(frozenSet.begin() + i); i--; continue; }
+		frozenSet_Support.push_back(frozenSet_Count[i]);
+	}
+}
+// 对关系规则进行评估 获得满足最小可信度的关联规则
+void Apriori_RulesFromConseqence(std::vector<Mat<int>>& frozenSet, std::vector<double>& frozenSet_Support, int st, int ed, std::vector<Mat<int>>& OneElementSet, double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence) {
+	if (ed - st > OneElementSet[0].cols) {
+		// 组合得到 B 集
+		std::vector<Mat<int>> BSet;
+		if (frozenSet[st].cols != 2)Apriori_GenCandidate(OneElementSet, OneElementSet[0].cols + 1, BSet);
+		else BSet = OneElementSet;
+		// 关系评估
+		Mat<int> A(1, frozenSet[st].cols - BSet[0].cols);
+		for (int i = st; i <= ed; i++) {
+			for (int j = 0; j < BSet.size(); j++) {
+				// 计算可信度P(A→B) = P(B|A) = P(AB) / P(A)
+				int B_cur = 0;
+				for (int k = 0; k < frozenSet[i].cols; k++) {
+					if (BSet[j][B_cur] == frozenSet[i][k])B_cur++;
+					else A[k - B_cur] = frozenSet[i][k];
+				}
+				int A_index = -1;
+				for (int k = 0; k < frozenSet.size(); k++)if (frozenSet[k] == A) { A_index = k; break; }
+				double confidence = frozenSet_Support[i] / frozenSet_Support[A_index];
+				// 保存满足可信度的关联规则
+				if (confidence >= minConfidence) {
+					RuleSet_A.push_back(A);
+					RuleSet_B.push_back(BSet[j]);
+					RuleSet_confidence.push_back(confidence);
+				}
+			}
+		}
+		if (BSet.size() > 1) Apriori_RulesFromConseqence(frozenSet, frozenSet_Support, st, ed, BSet, minConfidence, RuleSet_A, RuleSet_B, RuleSet_confidence);
+	}
+}
+//[4]关联规则生成
+void Apriori_GenRules(std::vector<Mat<int>>& frozenSet, std::vector<double>& frozenSet_Support, double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence) {
+	int K_St = 0, K_Ed = 0;
+	std::vector<Mat<int>> OneElementSet_tmp;
+	Mat<int> tmp(1);
+	for (int k = 2; ; k++) {
+		OneElementSet_tmp.clear();
+		for (int i = K_St; i < frozenSet.size() && frozenSet[i].cols == k; i++) {
+			for (int j = 0; j < frozenSet[i].cols; j++) {
+				tmp[0] = frozenSet[i][j];
+				bool flag = true;
+				for (int k = 0; k < OneElementSet_tmp.size(); k++)
+					if (tmp[0] == OneElementSet_tmp[k][0]) { flag = false; break; }
+				if (flag)OneElementSet_tmp.push_back(tmp);
+			} K_Ed = i;
+		}
+		Apriori_RulesFromConseqence(frozenSet, frozenSet_Support, K_St, K_Ed, OneElementSet_tmp, minConfidence, RuleSet_A, RuleSet_B, RuleSet_confidence);
+		K_St = K_Ed + 1;
+	}
+}
+//Main
+void Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence) {
+	std::vector<Mat<int>> frozenSet, frozenSet_K;
+	std::vector<double> frozenSet_Support, frozenSet_K_Support;
+	//[2] 初始一个元素的频繁项集，Frozen Set[{ 1 }, { 2 }, { 3 }, { 4 }, { 5 }]
+	Mat<int> tmp(1, 1);
+	for (int i = 0; i < dataSet.size(); i++) {
+		for (int item = 0; item < dataSet[i].cols; item++) {
+			tmp[0] = dataSet[i][item];
+			frozenSet_K.push_back(tmp);
+		}
+	}
+	// [1] ,若仍有满足支持度的集合则继续做关联分析
+	for (int k = 2; frozenSet_K.size() > 0; k++) {
+		//[2]
+		std::vector<Mat<int>> tmp;
+		Apriori_GenCandidate(frozenSet_K, k, tmp);
+		frozenSet_K = tmp;
+		//[3]
+		Apriori_Filter(dataSet, frozenSet_K, minSupport, frozenSet_K_Support);
+		for (int i = 0; i < frozenSet_K.size(); i++) {
+			frozenSet.push_back(frozenSet_K[i]);
+			frozenSet_Support.push_back(frozenSet_K_Support[i]);
+		}
+	}
+	//[4]
+	Apriori_GenRules(frozenSet, frozenSet_Support, minConfidence, RuleSet_A, RuleSet_B, RuleSet_confidence);
+}
+#endif

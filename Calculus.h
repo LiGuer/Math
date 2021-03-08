@@ -63,6 +63,9 @@ int main() {
 		三维直角坐标系中 (∂²/∂x² + ∂²/∂y² + ∂²/∂z²) φ(x,y,z) = f(x,y,z)
 		当f ≡ 0, 得到 Laplace's方程
 	[解法]:  Green's函数  φ(r) = - ∫∫∫ f(rt) / 4π|r-rt| d³rt    ,r rt为矢量
+	[唯一性定理]:
+		对于各种边界条件，Poisson's方程可能有许多种解，但每个解的梯度相同. 
+		静电场情况下, 意味着在边界条件下的满足Poisson's方程的势函数，所解得的电场唯一确定.
 **--------------------------------------------------------------------------*/
 Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta, double (*f) (Mat<double>& x)) {
 	// init
@@ -74,15 +77,15 @@ Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta,
 	// compute Green's function
 	Mat<double> r = st;
 	const double pi = 3.141592653589;
-	for (int i = 0; i < Map.dim.product(); i++) {
+	for (int i = 0; i < Map->dim.product(); i++) {
 		double t = 0;
 		Mat<double> rt = st;
-		for (int j = 0; j < Map.dim.product(); j++) {
+		for (int j = 0; j < Map->dim.product(); j++) {
 			for (int k = 0; k < rt.rows; k++)
 				{rt[k] += delta[k]; if(rt[k]>=ed[k])rt[k]=st[k]; else break;}
 			t += f(rt) / tmp.add(r, rt.negative(tmp)).norm();
 		}
-		Map[i] = t / (4 * pi);
+		(*Map)[i] = 1 / (4 * pi) * delta.product() * t;
 		// update r
 		for (int k = 0; k < rt.rows; k++)
 			{r[k] += delta[k]; if(r[k]>=ed[k])r[k]=st[k]; else break;}

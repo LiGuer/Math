@@ -143,7 +143,9 @@ public:
 class ConvLayer {
 public:
 	Tensor<float> kernel, output;
+	Mat<float> bias;
 	int inChannelNum, outChannelNum, padding, stride;
+	bool biasSwitch = false;
 	/*----------------[ init ]----------------*/
 	ConvLayer() { ; }
 	ConvLayer(int _inChannelNum, int _outChannelNum, int kernelSize, int _padding, int _stride) {
@@ -152,6 +154,7 @@ public:
 	void init(int _inChannelNum, int _outChannelNum, int kernelSize, int _padding, int _stride) {
 		inChannelNum = _inChannelNum, outChannelNum = _outChannelNum, padding = _padding, stride = _stride;
 		kernel.rands(kernelSize, kernelSize, inChannelNum * outChannelNum, -1, 1);
+		bias.zero(outChannelNum , 1);
 	}
 	/*----------------[ forward ]----------------*/
 	Tensor<float>* operator()(Tensor<float>& input) { return forward(input); }
@@ -176,6 +179,7 @@ public:
 							}
 						}
 					}
+					if (biasSwitch)output(x, y, z) += bias[z];
 					output(x, y, z) = output(x, y, z) > 0 ? output(x, y, z) : 0;	// 激活函数
 				}
 			}
@@ -186,10 +190,12 @@ public:
 	/*----------------[ save / load ]----------------*/
 	void save(FILE* file) {
 		for (int i = 0; i < kernel.dim.product(); i++) fprintf(file, "%f ", kernel[i]);
+		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fprintf(file, "%f ", bias[i]);
 		fprintf(file, "\n");
 	}
 	void load(FILE* file) {
 		for (int i = 0; i < kernel.dim.product(); i++) fscanf(file, "%f", &kernel[i]);
+		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fscanf(file, "%f ", &bias[i]);
 	}
 };
 /*************************************************************************************************
