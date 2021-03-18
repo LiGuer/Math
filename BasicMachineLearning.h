@@ -29,7 +29,7 @@ limitations under the License.
 			[8] 迭代重新开始
 		[9] 一轮无更正时，迭代结束
 **------------------------------------------------------------------------*/
-void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum) {
+void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax = 0x7FFFFFFF) {
 	int Dimension = x.rows, N = x.cols;
 	Center.zero(Dimension, K);
 	Cluster.zero(K, N); ClusterKthNum.zero(K, 1);
@@ -39,7 +39,8 @@ void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<i
 		for (int dim = 0; dim < Dimension; dim++)Center(dim, i) = x(dim, index);
 	}
 	//[2]
-	while (true) {
+	int times = 0;
+	while (times++ < TimeMax) {
 		//[3]
 		Cluster.clean(); ClusterKthNum.clean();
 		//[4] 计算每个xi到Center_j的距离

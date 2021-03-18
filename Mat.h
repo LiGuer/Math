@@ -511,6 +511,25 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		ans.eatMat(ansTmp);
 		return ans;
 	}
+	/*----------------卷积 [ conv ]----------------*/
+	Mat<double>& conv(Mat& a, Mat& b, int padding = 0, int stride = 1) {
+		Mat ansTmp((a.rows - b.rows + 2 * padding) / stride + 1, (a.cols - b.cols + 2 * padding) / stride + 1);
+		// for each element of output
+		for (int y = 0; y < ansTmp.cols; y++) {
+			for (int x = 0; x < ansTmp.rows; x++) {
+				// for each element of b
+				for (int ky = 0; ky < b.cols; ky++) {
+					for (int kx = 0; kx < b.rows; kx++) {
+						// get the corresponding element of a
+						int xt = -padding + x * stride + kx, yt = -padding + y * stride + ky;
+						ansTmp(x, y) += (xt < 0 || xt >= a.rows || yt < 0 || yt >= a.cols) ? 0 : a(xt, yt) * b(kx, ky);
+					}
+				}
+			}
+		}
+		eatMat(ansTmp);
+		return *this;
+	}
 /******************************************************************************
 *                    特殊操作
 -------------------------------------------------------------------------------
@@ -544,6 +563,16 @@ Mat& setCol(int _col, Mat& a)
 	Mat& setCol(int _col, Mat& a) {
 		for (int i = 0; i < rows; i++)data[i * cols + _col] = a[i];
 		return a;
+	}
+	/*----------------复制拓展 [ repeatCol  ]----------------*/
+	Mat& repeatCol(int repeatNum, Mat& ans) {
+		if (cols != 1)error();
+		Mat ansTmp(row, repeatNum);
+		for (int i = 0; i < row; i++)
+			for (int j = 0; j < repeatNum; j++)
+				ansTmp(i, j) = data[i];
+		ans.eatMat(ansTmp);
+		return ans;
 	}
 };
 #endif
