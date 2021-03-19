@@ -11,19 +11,19 @@ namespace DigitalImageProcessing {
 	/*--------------------------------[ 图像输入/输出 ]--------------------------------*/
 	Mat<double>* Input(const char* inputImgUrl, Mat<double>* data) {
 		cv::Mat input = cv::imread(inputImgUrl, cv::IMREAD_COLOR);
-		for (int i = 0; i < 3; i++) data[i].zero(input.rows, input.cols);
-		int cur = 0;
-		for (cv::MatIterator_<cv::Vec3b> it = input.begin<cv::Vec3b>(), end = input.end<cv::Vec3b>(); it != end; it++) {
-			for (int i = 0; i < 3; i++)  data[i][cur] = (double)(*it)[i];
-			cur++;
+		for (int k = 0; k < 3; k++) data[k].zero(input.rows, input.cols);
+
+		for (int i = 0; i < input.rows * input.cols; i++) {
+			cv::MatIterator_<cv::Vec3b> it = input.begin<cv::Vec3b>() + i;
+			for (int k = 0; k < 3; k++)  data[2 - k][i] = (double)(*it)[k] / 255;
 		}
 		return data;
 	}
 	void Output(const char* outputImgUrl, Mat<double>* data) {
 		unsigned char* output = (unsigned char*)calloc(data[0].cols * data[0].rows * 3, sizeof(unsigned char));
 		for (int i = 0; i < data[0].rows * data[0].cols; i++)
-				for (int k = 0; k < 3; k++)
-					output[i] = (data[k])[i] * 255;
+			for (int k = 0; k < 3; k++)
+				output[i * 3 + k] = (data[k])[i] * 255;
 		FILE* fp = fopen(outputImgUrl, "wb");
 		fprintf(fp, "P6\n%d %d\n255\n", data[0].cols, data[0].rows);	// 写图片格式、宽高、最大像素值
 		fwrite(output, 1, data[0].cols * data[0].rows * 3, fp);	// 写RGB数据
