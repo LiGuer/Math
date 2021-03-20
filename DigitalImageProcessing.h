@@ -62,9 +62,22 @@ namespace DigitalImageProcessing {
 		output.add(output, tmp.mult(Bk / (Rk + Gk + Bk), input[2]));
 		return output;
 	}
+	/*--------------------------------[ 反相 ]--------------------------------*/
+	Mat<double>& Invert(Mat<double>& input, Mat<double>& output) {
+		output.mult(1, input.negative(output)); return output;
+	}
+	Mat<double>* Invert(Mat<double>* input, Mat<double>* output) {
+		for (int k = 0; k < 3; k++)  Invert(input[k], output[k]); return output;
+	}
+	/*--------------------------------[ 二值化 ]--------------------------------*/
+	Mat<double>& Binarization(Mat<double>& input, Mat<double>& output, double threshold = 0.5) {
+		output.zero(input.rows, input.cols);
+		for (int i = 0; i < input.rows * input.cols; i++)
+			output[i] = input[i] > threshold ? 1 : 0;
+		return output;
+	}
 	/*--------------------------------[ 边缘检测 ]--------------------------------*/
 	Mat<double>& EdgeDetection(Mat<double>& input, Mat<double>& output) {
-		output.zero(input.rows, input.cols);
 		Mat<double> SobelKernel(3, 3);
 		{
 			double t[] = {
@@ -76,14 +89,15 @@ namespace DigitalImageProcessing {
 		Mat<double> output_x, output_y;
 		output_x.conv(input, SobelKernel, 1);
 		output_y.conv(input, SobelKernel.transposi(output_y), 1);
+		output.zero(input.rows, input.cols);
 		for (int i = 0; i < input.rows * input.cols; i++)
 				output[i] = sqrt(output_x[i] * output_x[i] + output_y[i] * output_y[i]);
 		return output;
 	}
 	/*--------------------------------[ 颜色聚类 ]--------------------------------*/
-	Mat<double>* ColorCluster(Mat<double>* input, int K = 3, int TimesMax = 100) {
+	Mat<double>* ColorCluster(Mat<double>* input, Mat<double>* output, int K = 3, int TimesMax = 100) {
 		// Process input & output
-		Mat<double> data(3, input[0].rows * input[0].cols), output[3];
+		Mat<double> data(3, input[0].rows * input[0].cols);
 		for (int k = 0; k < 3; k++)
 			for (int i = 0; i < input[0].rows; i++)
 				for (int j = 0; j < input[0].cols; j++)
