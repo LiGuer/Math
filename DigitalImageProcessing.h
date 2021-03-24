@@ -140,8 +140,8 @@ namespace DigitalImageProcessing {
 	Mat<int>& Histograms(Mat<double>* input, Mat<double>& output) {
 		output.zero(255, 3);
 		for (int k = 0; k < 3; k++)
-			for (int i = 0; i < input.rows; i++)
-				for (int j = 0; j < input.cols; j++)
+			for (int i = 0; i < input->rows; i++)
+				for (int j = 0; j < input->cols; j++)
 					output((unsigned char)(input[k](i, j) * 255), k)++;
 	}
 	/*--------------------------------[ ∑¥œ‡ ]--------------------------------
@@ -155,4 +155,17 @@ namespace DigitalImageProcessing {
 		for (int k = 0; k < 3; k++)  Invert(input[k], output[k]); return output;
 	}
 }
+/*//Example
+int main() {
+	Mat<double> img[3];
+	DigitalImageProcessing::Input("IMG01.jpg", img);
+	Mat<double> colorclusterImg[3];
+	DigitalImageProcessing::ColorCluster(img, colorclusterImg, 3, 20);
+	Mat<double> grayImg;
+	DigitalImageProcessing::Gray(colorclusterImg, grayImg);
+	Mat<double> edgedetectionImg;
+	DigitalImageProcessing::EdgeDetection(grayImg, edgedetectionImg);
+	DigitalImageProcessing::Output("img.ppm", edgedetectionImg);
+}
+*/
 #endif
