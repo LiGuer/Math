@@ -35,7 +35,8 @@ public:
 		for (int i = 0; i < dataList.rows; i++) {
 			for (int j = 0; dataListModel[j] != '\0'; j++) {
 				model[1] = dataListModel[j];
-				if (dataListModel[j] == 's') {
+				if (dataListModel[j] == ' ')continue;
+				else if (dataListModel[j] == 's') {
 					dataList(i, j).s = (char*)malloc(50 * sizeof(char));
 					fscanf(fin, model, dataList(i, j).s);
 				}

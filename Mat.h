@@ -26,7 +26,7 @@ public:
 /******************************************************************************
 *                    核心数据
 ******************************************************************************/
-	T* data = NULL;
+	T* data = NULL;													//数据堆叠方向: 先横再纵.
 	int rows = 0, cols = 0;
 /******************************************************************************
 *                    基础函数
@@ -36,12 +36,12 @@ public:
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
 	Mat(const int _rows) { E(_rows); }
 	Mat(const Mat& a) { *this = a; }
-	~Mat() { free(data); }
+	~Mat() { delete data; }
 	/*---------------- 基础函数 ----------------*/
-	void clean() {memset(data, 0, sizeof(T) * rows * cols);}		//清零 
+	void clean() { memset(data, 0, sizeof(T) * rows * cols); }		//清零 
 	void error() { exit(-1);}
 	void eatMat(Mat& a) {											//吃掉另一个矩阵的数据 (指针操作)
-		if (data != NULL)free(data); 
+		if (data != NULL) delete data;
 		data = a.data; a.data = NULL;
 		rows = a.rows; cols = a.cols; a.rows = a.cols = 0;
 	}
@@ -51,7 +51,7 @@ public:
 ******************************************************************************/
 	/*---------------- 零元 ----------------*/
 	Mat& zero(const int _rows, const int _cols) {
-		if (data != NULL)free(data);
+		if (data != NULL) delete data;
 		data = (T*)calloc(_rows * _cols, sizeof(T));
 		rows = _rows;	cols = _cols;
 		return *this;
@@ -107,7 +107,9 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 *	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
 		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
 ******************************************************************************/
-	/*---------------- "[]"取元素 ----------------*/
+	/*---------------- "[]" "()"取元素 ----------------
+	* 索引方向: 先纵再横.
+	---------------------------------------------*/
 	T& operator[](int i) { return data[i]; }
 	T& operator()(int i, int j) { return data[i * cols + j]; }
 	T& operator()(int i) { return data[i]; }
@@ -567,12 +569,20 @@ Mat& setCol(int _col, Mat& a)
 	/*----------------复制拓展 [ repeatCol  ]----------------*/
 	Mat& repeatCol(int repeatNum, Mat& ans) {
 		if (cols != 1)error();
-		Mat ansTmp(row, repeatNum);
-		for (int i = 0; i < row; i++)
+		Mat ansTmp(rows, repeatNum);
+		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < repeatNum; j++)
 				ansTmp(i, j) = data[i];
 		ans.eatMat(ansTmp);
 		return ans;
+	}
+	/*----------------剪切 [ Cut  ]----------------*/
+	Mat& cut(int rowSt, int rowEd, int colSt, int colEd, Mat& ans) {
+		Mat ansTmp(rowEd - rowSt + 1, colEd - colSt + 1);
+		for (int i = rowSt; i <= rowEd; i++)
+			for (int j = colSt; j <= colEd; j++)
+				ansTmp(i - rowSt, j - colSt) = (*this)(i, j);
+		ans.eatMat(ansTmp); return ans;
 	}
 };
 #endif

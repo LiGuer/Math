@@ -1,5 +1,8 @@
+#ifndef CALCULUS_H
+#define CALCULUS_H
 #include "Mat.h"
 #include "Tensor.h"
+namespace Calculus {
 /*--------------------------------[ Runge Kutta 方法 ]--------------------------------
 *	[公式]:           ->   ->       ->      ->
 		对于初值问题: y' = f(t, y)	y(t0) = y0
@@ -149,3 +152,5 @@ void WaveEquation(Mat<double>& Map, Mat<double>& veloc, void (*setBoundaryEquati
 		u(t+1,...) = u(t,r)
 				+ Δt·a{[u(x+1,...) - 2·u(x,...) + u(x-1,...)]/Δx² + ...}
 **--------------------------------------------------------------------------*/
+}
+#endif
