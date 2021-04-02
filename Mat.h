@@ -146,7 +146,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	/*----------------赋矩阵 [ = ]----------------*/ //不能赋值自己
 	Mat& operator=(const Mat& a) {
 		if (a.data == NULL)error();
-		zero(a.rows, a.cols);
+		if (rows != a.rows || cols != a.cols) zero(a.rows, a.cols);
 		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
 		return *this;
 	}
