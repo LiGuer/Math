@@ -198,6 +198,12 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		for (int i = 0; i < rows; i++)ans += a[i] * b[i];
 		return ans;
 	}
+	T dot(Mat& a) {
+		T ans;
+		memset(&ans, 0, sizeof(T));
+		for (int i = 0; i < rows; i++)ans += data[i] * a[i];
+		return ans;
+	}
 	/*----------------叉乘 [ crossProduct × ]----------------
 	//####################### 暂时只三维
 	*	𝑎 × 𝑏 ⃑ = | 𝑥		𝑦	 𝑧  |
