@@ -51,9 +51,12 @@ public:
 ******************************************************************************/
 	/*---------------- 零元 ----------------*/
 	Mat& zero(const int _rows, const int _cols) {
-		if (data != NULL) delete data;
-		data = (T*)calloc(_rows * _cols, sizeof(T));
-		rows = _rows;	cols = _cols;
+		if (_rows != rows || _cols != cols) {
+			if (data != NULL) delete data;
+			data = (T*)calloc(_rows * _cols, sizeof(T));
+			rows = _rows; cols = _cols;
+		}
+		else memset(data, 0, sizeof(T) * rows * cols);
 		return *this;
 	}
 	/*---------------- 单位元 ----------------*/
@@ -146,7 +149,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	/*----------------赋矩阵 [ = ]----------------*/ //不能赋值自己
 	Mat& operator=(const Mat& a) {
 		if (a.data == NULL)error();
-		if (rows != a.rows || cols != a.cols) zero(a.rows, a.cols);
+		zero(a.rows, a.cols);
 		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
 		return *this;
 	}
@@ -193,15 +196,17 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	*	a·b = Σ ai·bi = aT * b
 	**------------------------------------------------*/
 	T dot(Mat& a, Mat& b) {
+		if (a.rows != b.rows && a.cols != b.cols) error();
 		T ans;
 		memset(&ans, 0, sizeof(T));
-		for (int i = 0; i < rows; i++)ans += a[i] * b[i];
+		for (int i = 0; i < a.rows * a.cols; i++)ans += a[i] * b[i];
 		return ans;
 	}
 	T dot(Mat& a) {
+		if (a.rows != rows && a.cols != cols) error();
 		T ans;
 		memset(&ans, 0, sizeof(T));
-		for (int i = 0; i < rows; i++)ans += data[i] * a[i];
+		for (int i = 0; i < rows * cols; i++)ans += data[i] * a[i];
 		return ans;
 	}
 	/*----------------叉乘 [ crossProduct × ]----------------

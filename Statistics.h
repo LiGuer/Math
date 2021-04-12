@@ -1,55 +1,34 @@
-﻿#ifndef STATISTICS_H
+﻿/*
+Copyright 2020,2021 LiGuer. All Rights Reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+	http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
+#ifndef STATISTICS_H
 #define STATISTICS_H
 #include "Mat.h"
 #include <vector>
 #include <algorithm>
+#define PI 3.141592653589
+
 namespace Statistics {
-	/*--------------------------------[ 平均值 ]--------------------------------*/
-	Mat<double>& Mean(Mat<double>& x, Mat<double>& ans) { ans.mult(1.0 / x.cols, x.sumCol(ans)); return ans; }
-	/*--------------------------------[ 方差 ]--------------------------------*/
-	Mat<double>& Variance(Mat<double>& x, Mat<double>& ans) {
-		//s² = Σ(x_i - x_mean) / (n-1)
-		Mat<double> x_mean;
-		x_mean.repeatCol(x.cols, Mean(x, x_mean));
-		ans.add(x, x_mean.negative(ans));
-		ans.mult(1.0 / (x.cols - 1), ans.sumCol(ans));
-		return ans;
-	}
-	/*--------------------------------[ 直方图 ]--------------------------------*/
-	Mat<double>& Histogram(Mat<double>& x, double delta, Mat<double>& Histogram_x, Mat<double>& Histogram_Frequency) {
-		double min = x.min();
-		double max = x.max();
-		Histogram_x.zero(x.rows, (max - min) / delta);
-		Histogram_Frequency.zero(x.rows, (max - min) / delta);
-		for (int i = 0; i < (max - min) / delta; i++)
-			Histogram_x[i] = (max - min) / delta + i * delta;
-		for (int i = 0; i < x.rows; i++)
-			for (int j = 0; j < x.cols; j++)
-				Histogram_Frequency(i, (x(i, j) - min) / delta)++;
-		return Histogram_Frequency;
-	}
-	/*--------------------------------[ BoxPlot 箱形图 ]--------------------------------
-	*[目的]: 数据 => 中位数、上/下四分位数  => 上边缘、下边缘
-	**------------------------------------------------------------------------*/
-	void BoxPlot(Mat<double>& input, Mat<double>& Median, Mat<double>& Quartile_min, Mat<double>& Quartile_max, Mat<double>& Threshold_min, Mat<double>& Threshold_max, std::vector<int>* OutlierIndex) {
-		// 中位数、上/下四分位数
-		Median.zero(input.rows, 1); Quartile_min.zero(input.rows, 1); Quartile_max.zero(input.rows, 1);
-		Mat<double> inputTmp(input);
-		for (int i = 0; i < input.rows; i++) {
-			std::sort(inputTmp.data + inputTmp.cols * i, inputTmp.data + inputTmp.cols * (i + 1));
-			Median[i] = (inputTmp(i, inputTmp.cols / 2) + inputTmp(i, (int)(inputTmp.cols / 2 + 0.5))) / 2;
-			Quartile_min[i] = (inputTmp(i, 1.0 / 4 * inputTmp.cols) + inputTmp(i, (int)(1.0 / 4 * inputTmp.cols + 0.5))) / 2;
-			Quartile_max[i] = (inputTmp(i, 3.0 / 4 * inputTmp.cols) + inputTmp(i, (int)(3.0 / 4 * inputTmp.cols + 0.5))) / 2;
-		}
-		// 上边缘、下边缘
-		Mat<double> delta, tmp;
-		delta.add(Quartile_max, Quartile_min.negative(tmp));
-		Threshold_min.add(Quartile_min, tmp.mult(-1.5, delta));
-		Threshold_max.add(Quartile_max, tmp.mult(+1.5, delta));
-		for (int i = 0; i < input.rows; i++)
-			for (int j = 0; j < input.cols; j++)
-				if (input(i, j) < Threshold_min[i] || input(i, j) > Threshold_max[i])
-					OutlierIndex[i].push_back(j);
-	}
+	/*--------------------------------[ 基础参数 ]--------------------------------*/
+	double Mean(Mat<double>& x);														//平均值
+	Mat<double>& Mean(Mat<double>& x, Mat<double>& ans);								//平均值
+	double Variance(Mat<double>& x, double mean = NULL);								//方差
+	Mat<double>& Variance(Mat<double>& x, Mat<double>& ans, Mat<double> mean = NULL);	//方差
+	/*--------------------------------[ 概率分布、检验 ]--------------------------------*/
+	Mat<double>& NormalDistribution(double mean, double variance, double min, double max, double delta, Mat<double>& output);	//正态分布
+	bool SkewnessKurtosisTest(Mat<double>& x, double SignificanceLevel);															//正态分布-偏度峰度检验
+	double X2Test(Mat<double>& x, double delta, int N, double (*F)(double));
+	/*--------------------------------[ 统计图表 ]--------------------------------*/
+	Mat<int>& Histogram(Mat<double>& x, int N, Mat<int>& frequency, double overFlow = NULL, double underFlow = NULL);		//直方图
+	void BoxPlot(Mat<double>& input, Mat<double>& MedianQuartileThreshold, std::vector<int>* OutlierIndex);						//箱形图
 }
 #endif
