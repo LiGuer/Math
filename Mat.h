@@ -81,23 +81,24 @@ public:
 T& operator[](int i)                        // "[]"取元素
 T& operator()(int i, int j)                 // "()"取元素
 T& operator()(int i)
-T max()                                     // max/min
-T max(int& index)
-T min()
-T min(int& index)
-bool operator==(const Mat& b);				//判断相等 [ == ]
-Mat& operator=(const Mat& a)                //赋矩阵 [ = ]  //不能赋值自己
-Mat& add(Mat& a, Mat& b)                    //加法 [ add ]
-Mat& mult(const Mat& a, const Mat& b)       //乘法 [ mult ]
-Mat& mult(const double a, const Mat& b)     //数乘 [ mult ]
-Mat& dot(const Mat& a, const Mat& b)        //点乘 [ dot ]
+T max() / max(int& index)					//最值[max/min]
+T min() / min(int& index)
+bool ==(Mat& b);							//判断相等 [ == ]
+Mat& =(Mat& a)								//赋矩阵 [ = ]  //不能赋值自己
+Mat& add(Mat& a, Mat& b)                    //加 [ add ]
+Mat& +=(Mat& a)								//加 [ += ]
+Mat& mult(Mat& a, Mat& b)					//乘 [ mult ]
+Mat& *=(Mat& a)								//乘 [ *= ]
+Mat& mult(double a, Mat& b)					//数乘 [ mult ]
+Mat& *=(double a)							//数乘 [ *= ]
+T dot(Mat& a, Mat& b) / dot(Mat& a)			//点乘 [ dot ]
 Mat& crossProduct(Mat& a, Mat& b)			//叉乘 [ crossProduct ]
 Mat& negative(Mat& ans)                     //负 [ negative ]
-Mat& transposi(Mat& ans)                    //转置 [ trans ]
+Mat& transposi(Mat& ans)                    //转置 [ transposi ]
 void sum(int dim, Mat& ans)                 //求和 [ sum ]
 Mat& sumCol(Mat& ans) 						//求和至一列 [ sum ]
 T norm()                                    //范数 [ norm ]
-Mat& normalization()						//归一化 [ normalization ]
+Mat& normalized()							//归一化 [ normalized ]
 T comi(int i0, int j0)                      //余子式 [ comi ]
 Mat& inv(Mat& ans)                          //取逆 [ inv ]
 T abs()                                     //行列式 [ abs ]
@@ -165,6 +166,11 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		eatMat(ansTmp);
 		return *this;
 	}
+	Mat& operator+=(Mat& a) {
+		if (a.rows != rows || a.cols != cols)error();
+		for (int i = 0; i < a.rows * a.cols; i++)data[i] += a[i];
+		return *this;
+	}
 	/*----------------乘法 [ mult × ]----------------*/
 	Mat& mult(const Mat& a, const Mat& b) {
 		if (a.cols != b.rows) error();
@@ -173,24 +179,34 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 			for (int j = 0; j < b.cols; j++) {
 				T sum;
 				memset(&sum, 0, sizeof(sum));
-				for (int k = 0; k < a.cols; k++) {
-					T aV = a.data[i * a.cols + k];
-					T bV = b.data[k * b.cols + j];
-					sum += aV * bV;
-				}
-				ansTmp.data[i * ansTmp.cols + j] = sum;
+				for (int k = 0; k < a.cols; k++) sum += a(i, k) * b(k, j);
+				ansTmp(i, j) = sum;
 			}
 		}
-		eatMat(ansTmp);
-		return *this;
+		eatMat(ansTmp); return *this;
+	}
+	Mat& operator*=(const Mat& a) {
+		if (cols != a.rows) error();
+		Mat ansTmp(rows, a.cols);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < a.cols; j++) {
+				T sum;
+				memset(&sum, 0, sizeof(sum));
+				for (int k = 0; k < cols; k++) sum += (*this)(i, k) * a(k, j);
+				ansTmp(i, j) = sum;
+			}
+		}
+		eatMat(ansTmp); return *this;
 	}
 	/*----------------数乘 [ mult × ]----------------*/
 	Mat& mult(const double a, const Mat& b) {
 		Mat ansTmp(b.rows, b.cols);
-		for (int i = 0; i < b.rows * b.cols; i++)
-			ansTmp.data[i] = a * b.data[i];
+		for (int i = 0; i < b.rows * b.cols; i++) ansTmp.data[i] = a * b.data[i];
 		eatMat(ansTmp);
 		return *this;
+	}
+	Mat& operator*=(const double a) {
+		for (int i = 0; i < b.rows * b.cols; i++) data[i] *= a; return *this;
 	}
 	/*----------------点乘 [ dot · ]----------------
 	*	a·b = Σ ai·bi = aT * b
@@ -265,10 +281,10 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	*	||a|| = sqrt(a·a)
 	**-------------------------------------------*/
 	T norm() { return sqrt(dot(*this, *this)); }
-	/*----------------归一化 [ normalization ]----------------
+	/*----------------归一化 [ normalized ]----------------
 	*	[定义]: 使得|| x || = 1
 	**------------------------------------------------------*/
-	Mat& normalization() {
+	Mat& normalized() {
 		T t = norm();
 		if (t == 0)return *this;
 		for (int i = 0; i < rows * cols; i++)data[i] /= t;
@@ -571,6 +587,11 @@ Mat& setCol(int _col, Mat& a)
 	Mat& getCol(int _col, Mat& a) {
 		a.zero(rows, 1);
 		for (int i = 0; i < rows; i++) a[i] = data[i * cols + _col];
+		return a;
+	}
+	Mat& getRow(int _row, Mat& a) {
+		a.zero(1, cols);
+		for (int i = 0; i < cols; i++) a[i] = data[_row * cols + i];
 		return a;
 	}
 	Mat& setCol(int _col, Mat& a) {
