@@ -172,7 +172,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		return *this;
 	}
 	/*----------------乘法 [ mult × ]----------------*/
-	Mat& mult(const Mat& a, const Mat& b) {
+	Mat& mult(Mat& a, Mat& b) {
 		if (a.cols != b.rows) error();
 		Mat ansTmp(a.rows, b.cols);
 		for (int i = 0; i < a.rows; i++) {
@@ -206,7 +206,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		return *this;
 	}
 	Mat& operator*=(const double a) {
-		for (int i = 0; i < b.rows * b.cols; i++) data[i] *= a; return *this;
+		for (int i = 0; i < rows * cols; i++) data[i] *= a; return *this;
 	}
 	/*----------------点乘 [ dot · ]----------------
 	*	a·b = Σ ai·bi = aT * b
