@@ -179,6 +179,19 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		for (int i = 0; i < a.rows * a.cols; i++)data[i] += a[i];
 		return *this;
 	}
+	/*----------------减法 [ sub - ]----------------*/
+	Mat& sub(Mat& a, Mat& b) {
+		if (a.rows != b.rows || a.cols != b.cols)error();
+		Mat ansTmp(a);
+		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] -= b[i];
+		eatMat(ansTmp);
+		return *this;
+	}
+	Mat& operator-=(Mat& a) {
+		if (a.rows != rows || a.cols != cols)error();
+		for (int i = 0; i < a.rows * a.cols; i++)data[i] -= a[i];
+		return *this;
+	}
 	/*----------------乘法 [ mult × ]----------------*/
 	Mat& mult(Mat& a, Mat& b) {
 		if (a.cols != b.rows) error();
@@ -220,7 +233,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	*	a·b = Σ ai·bi = aT * b
 	**------------------------------------------------*/
 	T dot(Mat& a, Mat& b) {
-		if (a.rows != b.rows && a.cols != b.cols) error();
+		if (a.rows != b.rows || a.cols != b.cols) error();
 		T ans;
 		memset(&ans, 0, sizeof(T));
 		for (int i = 0; i < a.rows * a.cols; i++)ans += a[i] * b[i];
@@ -246,6 +259,20 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		ansTmp[1] = a[2] * b[0] - a[0] * b[2];
 		ansTmp[2] = a[0] * b[1] - a[1] * b[0];
 		eatMat(ansTmp);
+		return *this;
+	}
+	/*----------------元素乘 [ elementProduct × ]----------------
+	**------------------------------------------------*/
+	Mat& elementProduct(Mat& a, Mat& b) {
+		if (a.rows != b.rows || a.cols != b.cols) error();
+		Mat ansTmp(a.rows, a.cols);
+		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] = a[i] * b[i];
+		eatMat(ansTmp);
+		return* this;
+	}
+	Mat& elementProduct(Mat& a) {
+		if (rows != a.rows || cols != a.cols) error();
+		for (int i = 0; i < rows * cols; i++)data[i] *= a[i];
 		return *this;
 	}
 	/*----------------负 [ negative - ]----------------*/
