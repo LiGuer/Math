@@ -9,7 +9,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
 Reference.
 [1]Introduction Algorithms.THOMAS H.CORMEN,CHARLES E.LEISERSON,RONALD L.RIVEST,CLIFFORD STEIN
 ==============================================================================*/
@@ -23,14 +22,14 @@ template<class T>
 class Mat
 {
 public:
-/******************************************************************************
-*                    核心数据
-******************************************************************************/
+	/******************************************************************************
+	*                    核心数据
+	******************************************************************************/
 	T* data = NULL;													//数据堆叠方向: 先横再纵.
 	int rows = 0, cols = 0;
-/******************************************************************************
-*                    基础函数
-******************************************************************************/
+	/******************************************************************************
+	*                    基础函数
+	******************************************************************************/
 	/*---------------- 构造析构函数 ----------------*/
 	Mat() { ; }
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
@@ -39,16 +38,16 @@ public:
 	~Mat() { delete data; }
 	/*---------------- 基础函数 ----------------*/
 	void clean() { memset(data, 0, sizeof(T) * rows * cols); }		//清零 
-	void error() { exit(-1);}
+	void error() { exit(-1); }
 	void eatMat(Mat& a) {											//吃掉另一个矩阵的数据 (指针操作)
 		if (data != NULL) delete data;
 		data = a.data; a.data = NULL;
 		rows = a.rows; cols = a.cols; a.rows = a.cols = 0;
 	}
-/******************************************************************************
-*                    基础矩阵
-*	[1] 零元 zero		[2] 单位元 E		[3] 随机元 rands
-******************************************************************************/
+	/******************************************************************************
+	*                    基础矩阵
+	*	[1] 零元 zero		[2] 单位元 E		[3] 随机元 rands
+	******************************************************************************/
 	/*---------------- 零元 ----------------*/
 	Mat& zero(const int _rows, const int _cols) {
 		if (_rows != rows || _cols != cols) {
@@ -63,55 +62,52 @@ public:
 	/*---------------- 单位元 ----------------*/
 	Mat& E(const int _rows) {
 		zero(_rows, _rows);
-		for (int i = 0; i < rows; i++) {
-			data[i * cols + i] = 1;
-		}
+		for (int i = 0; i < rows; i++) data[i * cols + i] = 1;
 		return *this;
 	}
 	/*---------------- 随机元 ----------------*/
-	Mat& rands(const int _rows, const int _cols,T st,T ed) {
+	Mat& rands(const int _rows, const int _cols, T st, T ed) {
 		zero(_rows, _cols);
-		for (int i = 0; i < rows * cols; i++) {
+		for (int i = 0; i < rows * cols; i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
-		}
 		return *this;
 	}
-/******************************************************************************
-*                    基础运算
--------------------------------------------------------------------------------
-T& operator[](int i)                        // "[]"取元素
-T& operator()(int i, int j)                 // "()"取元素
-T& operator()(int i)
-T max() / max(int& index)					//最值[max/min]
-T min() / min(int& index)
-bool ==(Mat& b);							//判断相等 [ == ]
-Mat& =(Mat& a)								//赋矩阵 [ = ]  //不能赋值自己
-Mat& add(Mat& a, Mat& b)                    //加 [ add ]
-Mat& +=(Mat& a)								//加 [ += ]
-Mat& mult(Mat& a, Mat& b)					//乘 [ mult ]
-Mat& *=(Mat& a)								//乘 [ *= ]
-Mat& mult(double a, Mat& b)					//数乘 [ mult ]
-Mat& *=(double a)							//数乘 [ *= ]
-T dot(Mat& a, Mat& b) / dot(Mat& a)			//点乘 [ dot ]
-Mat& crossProduct(Mat& a, Mat& b)			//叉乘 [ crossProduct ]
-Mat& negative(Mat& ans)                     //负 [ negative ]
-Mat& transposi(Mat& ans)                    //转置 [ transposi ]
-void sum(int dim, Mat& ans)                 //求和 [ sum ]
-Mat& sumCol(Mat& ans) 						//求和至一列 [ sum ]
-T norm()                                    //范数 [ norm ]
-Mat& normalized()							//归一化 [ normalized ]
-T comi(int i0, int j0)                      //余子式 [ comi ]
-Mat& inv(Mat& ans)                          //取逆 [ inv ]
-T abs()                                     //行列式 [ abs ]
-Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
-void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
-Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
-void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
-Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
--------------------------------------------------------------------------------
-*	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a)); 
-		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
-******************************************************************************/
+	/******************************************************************************
+	*                    基础运算
+	-------------------------------------------------------------------------------
+	T& operator[](int i)                        // "[]"取元素
+	T& operator()(int i, int j)                 // "()"取元素
+	T& operator()(int i)
+	T max() / max(int& index)					//最值[max/min]
+	T min() / min(int& index)
+	bool ==(Mat& b);							//判断相等 [ == ]
+	Mat& =(Mat& a)								//赋矩阵 [ = ]  //不能赋值自己
+	Mat& add(Mat& a, Mat& b)                    //加 [ add ]
+	Mat& +=(Mat& a)								//加 [ += ]
+	Mat& mult(Mat& a, Mat& b)					//乘 [ mult ]
+	Mat& *=(Mat& a)								//乘 [ *= ]
+	Mat& mult(double a, Mat& b)					//数乘 [ mult ]
+	Mat& *=(double a)							//数乘 [ *= ]
+	T dot(Mat& a, Mat& b) / dot(Mat& a)			//点乘 [ dot ]
+	Mat& crossProduct(Mat& a, Mat& b)			//叉乘 [ crossProduct ]
+	Mat& negative(Mat& ans)                     //负 [ negative ]
+	Mat& transposi(Mat& ans)                    //转置 [ transposi ]
+	void sum(int dim, Mat& ans)                 //求和 [ sum ]
+	Mat& sumCol(Mat& ans) 						//求和至一列 [ sum ]
+	T norm()                                    //范数 [ norm ]
+	Mat& normalized()							//归一化 [ normalized ]
+	T comi(int i0, int j0)                      //余子式 [ comi ]
+	Mat& inv(Mat& ans)                          //取逆 [ inv ]
+	T abs()                                     //行列式 [ abs ]
+	Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
+	void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
+	Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
+	void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
+	Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
+	-------------------------------------------------------------------------------
+	*	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a));
+			不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
+	******************************************************************************/
 	/*---------------- "[]" "()"取元素 ----------------
 	* 索引方向: 先纵再横.
 	---------------------------------------------*/
@@ -169,10 +165,9 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	/*----------------加法 [ add + ]----------------*/
 	Mat& add(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols)error();
-		Mat ansTmp(a);
+		Mat ansTmp = a;
 		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] += b[i];
-		eatMat(ansTmp);
-		return *this;
+		eatMat(ansTmp); return *this;
 	}
 	Mat& operator+=(Mat& a) {
 		if (a.rows != rows || a.cols != cols)error();
@@ -182,10 +177,9 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	/*----------------减法 [ sub - ]----------------*/
 	Mat& sub(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols)error();
-		Mat ansTmp(a);
+		Mat ansTmp = a;
 		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] -= b[i];
-		eatMat(ansTmp);
-		return *this;
+		eatMat(ansTmp); return *this;
 	}
 	Mat& operator-=(Mat& a) {
 		if (a.rows != rows || a.cols != cols)error();
@@ -196,27 +190,18 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	Mat& mult(Mat& a, Mat& b) {
 		if (a.cols != b.rows) error();
 		Mat ansTmp(a.rows, b.cols);
-		for (int i = 0; i < a.rows; i++) {
-			for (int j = 0; j < b.cols; j++) {
-				T sum;
-				memset(&sum, 0, sizeof(sum));
-				for (int k = 0; k < a.cols; k++) sum += a(i, k) * b(k, j);
-				ansTmp(i, j) = sum;
-			}
-		}
+		for (int i = 0; i < a.rows; i++)
+			for (int j = 0; j < b.cols; j++) 
+				for (int k = 0; k < a.cols; k++) 
+					ansTmp(i, j) += a(i, k) * b(k, j);
 		eatMat(ansTmp); return *this;
 	}
 	Mat& operator*=(const Mat& a) {
 		if (cols != a.rows) error();
 		Mat ansTmp(rows, a.cols);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < a.cols; j++) {
-				T sum;
-				memset(&sum, 0, sizeof(sum));
-				for (int k = 0; k < cols; k++) sum += (*this)(i, k) * a(k, j);
-				ansTmp(i, j) = sum;
-			}
-		}
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < a.cols; j++) 
+				for (int k = 0; k < cols; k++) ansTmp(i, j) += (*this)(i, k) * a(k, j);
 		eatMat(ansTmp); return *this;
 	}
 	/*----------------数乘 [ mult × ]----------------*/
@@ -268,7 +253,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		Mat ansTmp(a.rows, a.cols);
 		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] = a[i] * b[i];
 		eatMat(ansTmp);
-		return* this;
+		return*this;
 	}
 	Mat& elementProduct(Mat& a) {
 		if (rows != a.rows || cols != a.cols) error();
@@ -277,17 +262,15 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	}
 	/*----------------负 [ negative - ]----------------*/
 	Mat& negative(Mat& ans) {
-		Mat ansTmp(*this);
-		for (int i = 0; i < rows * cols; i++)
-			ansTmp[i] = -ansTmp[i];
-		ans.eatMat(ansTmp);
-		return ans;
+		Mat ansTmp = *this;
+		for (int i = 0; i < rows * cols; i++) ansTmp[i] = -ansTmp[i];
+		ans.eatMat(ansTmp); return ans;
 	}
 	/*----------------转置 [ transposi T ]----------------*/
 	Mat& transposi(Mat& ans) {
 		Mat ansTmp(cols, rows);
-		for (int i = 0; i < rows; i++) 
-			for (int j = 0; j < cols; j++) 
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++)
 				ansTmp.data[j * rows + i] = data[i * cols + j];
 		ans.eatMat(ansTmp);
 		return ans;
@@ -387,14 +370,14 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	*	[定义]: 伴随矩阵A* 由(i,j)代数余子式Aij构成
 				 [ A00  ... ]
 			A* = | A01  Aij |
-			     [ A02  ... ]
+				 [ A02  ... ]
 	*	[性质]: A* A = |A|
 	**---------------------------------------------*/
 	Mat& adjugate(Mat& ans) {
 		ans.zero(rows, cols);
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
-				ans(i, j) = ((i + j) % 2 == 0 ? 1 : -1)* comi(i, j);
+				ans(i, j) = ((i + j) % 2 == 0 ? 1 : -1) * comi(i, j);
 	}
 	/*----------------特征值特征向量 [ eig ]----------------
 	*	[定义]: 特征方程: AX = λX
@@ -479,11 +462,11 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 			[2] LUP-Solve
 				[3] Solve y:
 					for i = 1 to n
-								  j=1toi-1   
+								  j=1toi-1
 						yi = b[Pi] - Σ   Lij yj
 				[4] Solve x:
 					for i = n to 1
-								j=i+1toN   
+								j=i+1toN
 						x = ( yi - Σ  uij xj ) / uii
 	**--------------------------------------------*/
 	Mat& solveEquations(Mat& b, Mat& x) {
@@ -512,7 +495,6 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 			[1] 从其他方程中减去第1方程的倍数，以把那些方程第1变量消去。
 			[2] 从第3及以后方程中减去第2方程倍数，以把这些方程的第1,2变量都消去。
 			[3] 重复过程，直至变为上三角矩阵U，单位下三角L是由消去变量所用行的乘数组成
-
 			* 主元pivot: LPU分解中所除元素称为主元，它们处于矩阵U的对角线上。
 			* 选主元: 采用置换避免除0，避免除数很小(数值会不稳定)的操作
 			* 把第1行与第k行互换 <=> 置换矩阵Q左乘A--QA
@@ -594,14 +576,14 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		eatMat(ansTmp);
 		return *this;
 	}
-/******************************************************************************
-*                    特殊操作
--------------------------------------------------------------------------------
-Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack ]
-void swap(Mat& a)                           //交换数据 [ swap ]
-Mat& getCol(int _col, Mat& a)               //读/写一列 [ getCol/setCol ]
-Mat& setCol(int _col, Mat& a)
-******************************************************************************/
+	/******************************************************************************
+	*                    特殊操作
+	-------------------------------------------------------------------------------
+	Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack ]
+	void swap(Mat& a)                           //交换数据 [ swap ]
+	Mat& getCol(int _col, Mat& a)               //读/写一列 [ getCol/setCol ]
+	Mat& setCol(int _col, Mat& a)
+	******************************************************************************/
 	/*----------------水平向拼接 [ horizStack ]----------------*/
 	Mat& horizStack(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
@@ -614,7 +596,7 @@ Mat& setCol(int _col, Mat& a)
 	}
 	/*----------------交换数据 [ swap ]----------------*/
 	void swap(Mat& a) {
-		T* tptr = a.data;a.data = data;data = tptr;
+		T* tptr = a.data; a.data = data; data = tptr;
 		int t = a.rows; a.rows = rows; rows = t;
 		t = a.cols; a.cols = cols; cols = t;
 	}
