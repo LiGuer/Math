@@ -59,6 +59,7 @@ public:
 		else memset(data, 0, sizeof(T) * rows * cols);
 		return *this;
 	}
+	Mat& zero() { memset(data, 0, sizeof(T) * rows * cols); return *this; }
 	/*---------------- 单位元 ----------------*/
 	Mat& E(const int _rows) {
 		zero(_rows, _rows);
@@ -156,6 +157,13 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	}
 	Mat& getData(T* a) {
 		memcpy(data, a, sizeof(T) * rows * cols);
+		return *this;
+	}
+	Mat& getData(T x, T y, T z) {
+		if (rows != 3 || cols != 1)error();
+		data[0] = x;
+		data[1] = y;
+		data[2] = z;
 		return *this;
 	}
 	/*----------------加法 [ add + ]----------------*/
