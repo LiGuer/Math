@@ -279,7 +279,7 @@ public:
 	/*----------------[ backward ]----------------*/
 	void backward(Mat<float>& target) {
 		Mat<float> error;
-		error.add(target, layer.back()->output.negative(error));
+		error.sub(target, layer.back()->output);
 		for (int i = layer.size() - 1; i >= 1; i--)
 			layer[i]->backward(layer[i - 1]->output, error, learnRate);
 		layer[0]->backward(preIntput, error, learnRate);

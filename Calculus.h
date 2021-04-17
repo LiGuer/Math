@@ -73,7 +73,7 @@ int main() {
 Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta, double (*f) (Mat<double>& x)) {
 	// init
 	Mat<double> tmp;
-	tmp.add(ed, st.negative(tmp));
+	tmp.sub(ed, st);
 	Mat<int> dim(st.rows);
 	for (int i = 0; i < st.rows; i++) dim[i] = (int)(tmp[i] / delta);
 	Tensor<double>* Map = new Tensor<double>(dim.rows, dim.data);
@@ -86,7 +86,7 @@ Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta,
 		for (int j = 0; j < Map->dim.product(); j++) {
 			for (int k = 0; k < rt.rows; k++)
 				{rt[k] += delta[k]; if(rt[k]>=ed[k])rt[k]=st[k]; else break;}
-			t += f(rt) / tmp.add(r, rt.negative(tmp)).norm();
+			t += f(rt) / tmp.sub(r, rt).norm();
 		}
 		(*Map)[i] = 1 / (4 * pi) * delta.product() * t;
 		// update r

@@ -260,7 +260,7 @@ void BasicMachineLearning::MahalanobisDist(Mat<double>& x, Mat<double>& mahalano
 	Mat<double> xt;
 	for (int i = 0; i < x.cols; i++) {
 		x.getCol(i, xt);
-		diff.add(xt, mean.negative(diff));
+		diff.sub(xt, mean);
 		tmp.mult(tmp.mult(diff.transposi(tmp), covMat), diff);
 		mahalanobisDistance[i] = tmp[0];
 	}

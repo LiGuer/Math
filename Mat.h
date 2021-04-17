@@ -161,6 +161,12 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		memcpy(data, a, sizeof(T) * size());
 		return *this;
 	}
+	Mat& getData(T x, T y) {
+		if (rows != 2 || cols != 1)error();
+		data[0] = x;
+		data[1] = y;
+		return *this;
+	}
 	Mat& getData(T x, T y, T z) {
 		if (rows != 3 || cols != 1)error();
 		data[0] = x;
@@ -248,6 +254,14 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		ansTmp[1] = a[2] * b[0] - a[0] * b[2];
 		ansTmp[2] = a[0] * b[1] - a[1] * b[0];
 		eatMat(ansTmp); return *this;
+	}
+	Mat& crossProduct_(Mat& a, Mat& b) {
+		if (a.rows != b.rows)error();
+		alloc(a.rows, a.cols);
+		data[0] = a[1] * b[2] - a[2] * b[1];
+		data[1] = a[2] * b[0] - a[0] * b[2];
+		data[2] = a[0] * b[1] - a[1] * b[0];
+		return *this;
 	}
 	/*----------------元素乘 [ elementProduct × ]----------------
 	**------------------------------------------------*/
@@ -355,8 +369,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 			//合并至结果
 			for (int i = 0; i < rows; i++)tmp(i, k) = x[i];
 		}
-		ans.eatMat(tmp);
-		return ans;
+		ans.eatMat(tmp); return ans;
 	}
 	/*----------------行列式 [ abs |x| ]----------------
 	*	|A| = Σiorj aij·Aij
@@ -377,13 +390,13 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 			A* = | A01  Aij |
 				 [ A02  ... ]
 	*	[性质]: A* A = |A|
-	* 不支持自己给自己
 	**---------------------------------------------*/
 	Mat& adjugate(Mat& ans) {
-		ans.alloc(rows, cols);
+		Mat ansTmp(rows, cols);
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
-				ans(i, j) = ((i + j) % 2 == 0 ? 1 : -1) * comi(i, j);
+				ansTmp(i, j) = ((i + j) % 2 == 0 ? 1 : -1) * comi(i, j);
+		ans.eatMat(ansTmp); return ans;
 	}
 	/*----------------特征值特征向量 [ eig ]----------------
 	*	[定义]: 特征方程: AX = λX
@@ -560,8 +573,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 			for (int i = 0; i < n; i++)ansTmp(i, i) = data[i];
 		}
 		else error();
-		ans.eatMat(ansTmp);
-		return ans;
+		ans.eatMat(ansTmp); return ans;
 	}
 	/*----------------卷积 [ conv ]----------------*/
 	Mat<double>& conv(Mat& a, Mat& b, int padding = 0, int stride = 1) {
