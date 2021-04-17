@@ -243,11 +243,11 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	**------------------------------------------------*/
 	Mat& crossProduct(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
-		alloc(a.rows, a.cols);
-		data[0] = a[1] * b[2] - a[2] * b[1];
-		data[1] = a[2] * b[0] - a[0] * b[2];
-		data[2] = a[0] * b[1] - a[1] * b[0];
-		return *this;
+		Mat ansTmp(a.rows, a.cols);
+		ansTmp[0] = a[1] * b[2] - a[2] * b[1];
+		ansTmp[1] = a[2] * b[0] - a[0] * b[2];
+		ansTmp[2] = a[0] * b[1] - a[1] * b[0];
+		eatMat(ansTmp); return *this;
 	}
 	/*----------------元素乘 [ elementProduct × ]----------------
 	**------------------------------------------------*/
@@ -377,6 +377,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 			A* = | A01  Aij |
 				 [ A02  ... ]
 	*	[性质]: A* A = |A|
+	* 不支持自己给自己
 	**---------------------------------------------*/
 	Mat& adjugate(Mat& ans) {
 		ans.alloc(rows, cols);
