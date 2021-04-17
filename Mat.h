@@ -243,20 +243,18 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	**------------------------------------------------*/
 	Mat& crossProduct(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
-		Mat ansTmp(a.rows, a.cols);
-		ansTmp[0] = a[1] * b[2] - a[2] * b[1];
-		ansTmp[1] = a[2] * b[0] - a[0] * b[2];
-		ansTmp[2] = a[0] * b[1] - a[1] * b[0];
-		eatMat(ansTmp);
+		alloc(a.rows, a.cols);
+		data[0] = a[1] * b[2] - a[2] * b[1];
+		data[1] = a[2] * b[0] - a[0] * b[2];
+		data[2] = a[0] * b[1] - a[1] * b[0];
 		return *this;
 	}
 	/*----------------元素乘 [ elementProduct × ]----------------
 	**------------------------------------------------*/
 	Mat& elementMult(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols) error();
-		Mat ansTmp(a.rows, a.cols);
-		for (int i = 0; i < a.size(); i++)ansTmp[i] = a[i] * b[i];
-		eatMat(ansTmp);
+		alloc(a.rows, a.cols);
+		for (int i = 0; i < size(); i++)data[i] = a[i] * b[i];
 		return*this;
 	}
 	Mat& elementMult(Mat& a) {
@@ -266,18 +264,17 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	}
 	/*----------------负 [ negative - ]----------------*/
 	Mat& negative(Mat& ans) {
-		Mat ansTmp = *this;
-		for (int i = 0; i < size(); i++) ansTmp[i] = -ansTmp[i];
-		ans.eatMat(ansTmp); return ans;
+		ans.alloc(rows, cols);
+		for (int i = 0; i < size(); i++) ans[i] = -data[i];
+		return ans;
 	}
 	/*----------------转置 [ transposi T ]----------------*/
 	Mat& transposi(Mat& ans) {
 		Mat ansTmp(cols, rows);
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
-				ansTmp.data[j * rows + i] = data[i * cols + j];
-		ans.eatMat(ansTmp);
-		return ans;
+				ansTmp(j, i) = data(i, j);
+		ans.eatMat(ansTmp); return ans;
 	}
 	/*----------------求和 [ sum Σ ]----------------*/
 	T sum() {
@@ -295,8 +292,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
 				ansTmp[i] += (*this)(i, j);
-		ans.eatMat(ansTmp);
-		return ans;
+		ans.eatMat(ansTmp); return ans;
 	}
 	/*----------------求积 [ product Π ]----------------*/
 	T product() {
@@ -582,8 +578,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 				}
 			}
 		}
-		eatMat(ansTmp);
-		return *this;
+		eatMat(ansTmp); return *this;
 	}
 /******************************************************************************
 *                    特殊操作
@@ -600,8 +595,7 @@ Mat& setCol(int _col, Mat& a)
 		for (int i = 0; i < ansTmp.row; i++)
 			for (int j = 0; j < ansTmp.cols; j++)
 				ansTmp.data[i * cols + j] = j < a.cols ? a(i, j) : b(i, j - a.cols);
-		eatMat(ansTmp);
-		return *this;
+		eatMat(ansTmp); return *this;
 	}
 	/*----------------交换数据 [ swap ]----------------*/
 	void swap(Mat& a) {
@@ -631,8 +625,7 @@ Mat& setCol(int _col, Mat& a)
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < repeatNum; j++)
 				ansTmp(i, j) = data[i];
-		ans.eatMat(ansTmp);
-		return ans;
+		ans.eatMat(ansTmp); return ans;
 	}
 	/*----------------剪切 [ Cut  ]----------------*/
 	Mat& cut(int rowSt, int rowEd, int colSt, int colEd, Mat& ans) {
