@@ -37,28 +37,33 @@ public:
 	Mat(const Mat& a) { *this = a; }
 	~Mat() { delete data; }
 	/*---------------- 基础函数 ----------------*/
-	void clean() { memset(data, 0, sizeof(T) * rows * cols); }		//清零 
-	void error() { exit(-1); }
+	void clean() { memset(data, 0, sizeof(T) * size()); }		//清零 
+	static void error() { exit(-1); }
 	void eatMat(Mat& a) {											//吃掉另一个矩阵的数据 (指针操作)
 		if (data != NULL) delete data;
 		data = a.data; a.data = NULL;
 		rows = a.rows; cols = a.cols; a.rows = a.cols = 0;
 	}
+	inline int size() const { return rows * cols; }
 /******************************************************************************
 *                    基础矩阵
-*	[1] 零元 zero		[2] 单位元 E		[3] 随机元 rands
+*	[0] 分配空间	[1] 零元 zero		[2] 单位元 E		[3] 随机元 rands
 ******************************************************************************/
-	/*---------------- 零元 ----------------*/
-	Mat& zero(const int _rows, const int _cols) {
+	/*---------------- 分配空间 ----------------*/
+	Mat& alloc(const int _rows, const int _cols) {
 		if (_rows != rows || _cols != cols) {
 			if (data != NULL) delete data;
-			data = (T*)calloc(_rows * _cols, sizeof(T));
+			data = (T*)malloc(_rows * _cols * sizeof(T));
 			rows = _rows; cols = _cols;
-		}
-		else memset(data, 0, sizeof(T) * rows * cols);
+		} return *this;
+	}
+	/*---------------- 零元 ----------------*/
+	Mat& zero(const int _rows, const int _cols) {
+		alloc(_rows, _cols);
+		memset(data, 0, sizeof(T) * size());
 		return *this;
 	}
-	Mat& zero() { memset(data, 0, sizeof(T) * rows * cols); return *this; }
+	Mat& zero() { memset(data, 0, sizeof(T) * size()); return *this; }
 	/*---------------- 单位元 ----------------*/
 	Mat& E(const int _rows) {
 		zero(_rows, _rows);
@@ -67,8 +72,8 @@ public:
 	}
 	/*---------------- 随机元 ----------------*/
 	Mat& rands(const int _rows, const int _cols, T st, T ed) {
-		zero(_rows, _cols);
-		for (int i = 0; i < rows * cols; i++)
+		alloc(_rows, _cols);
+		for (int i = 0; i < size(); i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
 	}
@@ -107,6 +112,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 -------------------------------------------------------------------------------
 *	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a));
 		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
+* 	加减乘，即使是自己也不会影响，效率也不影响
 ******************************************************************************/
 	/*---------------- "[]" "()"取元素 ----------------
 	* 索引方向: 先纵再横.
@@ -117,42 +123,42 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	/*---------------- max/min ----------------*/
 	T max() const {
 		T maxdata = *data;
-		for (int i = 0; i < rows * cols; i++)maxdata = maxdata >= data[i] ? maxdata : data[i];
+		for (int i = 1; i < size(); i++)maxdata = maxdata >= data[i] ? maxdata : data[i];
 		return maxdata;
 	}
 	T max(int& index) {
 		T maxdata = *data; index = 0;
-		for (int i = 0; i < rows * cols; i++)
+		for (int i = 1; i < size(); i++)
 			if (maxdata < data[i]) { maxdata = data[i]; index = i; }
 		return maxdata;
 	}
 	T min() const {
 		T mindata = *data;
-		for (int i = 0; i < rows * cols; i++)mindata = mindata <= data[i] ? mindata : data[i];
+		for (int i = 1; i < size(); i++)mindata = mindata <= data[i] ? mindata : data[i];
 		return mindata;
 	}
 	T min(int& index) {
 		T mindata = *data; index = 0;
-		for (int i = 0; i < rows * cols; i++)
+		for (int i = 1; i < size(); i++)
 			if (mindata > data[i]) { mindata = data[i]; index = i; }
 		return mindata;
 	}
 	/*----------------判断相等 [ == ]----------------*/
 	bool operator==(const Mat& b) {
 		if (rows != b.rows || cols != b.cols)return false;
-		for (int i = 0; i < rows * cols; i++)
+		for (int i = 0; i < size(); i++)
 			if (data[i] != b.data[i])return false;
 		return true;
 	}
 	/*----------------赋矩阵 [ = ]----------------*/ //不能赋值自己
 	Mat& operator=(const Mat& a) {
 		if (a.data == NULL)error();
-		zero(a.rows, a.cols);
-		memcpy(data, a.data, sizeof(T) * a.rows * a.cols);
+		alloc(a.rows, a.cols);
+		memcpy(data, a.data, sizeof(T) * size());
 		return *this;
 	}
 	Mat& getData(T* a) {
-		memcpy(data, a, sizeof(T) * rows * cols);
+		memcpy(data, a, sizeof(T) * size());
 		return *this;
 	}
 	Mat& getData(T x, T y, T z) {
@@ -163,27 +169,27 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		return *this;
 	}
 	/*----------------加法 [ add + ]----------------*/
-	Mat& add(Mat& a, Mat& b) {
-		if (a.rows != b.rows || a.cols != b.cols)error();
-		Mat ansTmp = a;
-		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] += b[i];
-		eatMat(ansTmp); return *this;
-	}
 	Mat& operator+=(Mat& a) {
 		if (a.rows != rows || a.cols != cols)error();
-		for (int i = 0; i < a.rows * a.cols; i++)data[i] += a[i];
+		for (int i = 0; i < a.size(); i++)data[i] += a[i];
+		return *this;
+	}
+	Mat& add(Mat& a, Mat& b) {
+		if (a.rows != b.rows || a.cols != b.cols)error();
+		alloc(a.rows, a.cols);
+		for (int i = 0; i < a.size(); i++)data[i] = a[i] + b[i];
 		return *this;
 	}
 	/*----------------减法 [ sub - ]----------------*/
-	Mat& sub(Mat& a, Mat& b) {
-		if (a.rows != b.rows || a.cols != b.cols)error();
-		Mat ansTmp = a;
-		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] -= b[i];
-		eatMat(ansTmp); return *this;
-	}
 	Mat& operator-=(Mat& a) {
 		if (a.rows != rows || a.cols != cols)error();
-		for (int i = 0; i < a.rows * a.cols; i++)data[i] -= a[i];
+		for (int i = 0; i < a.size(); i++)data[i] -= a[i];
+		return *this;
+	}
+	Mat& sub(Mat& a, Mat& b) {
+		if (a.rows != b.rows || a.cols != b.cols)error();
+		alloc(a.rows, a.cols);
+		for (int i = 0; i < a.size(); i++)data[i] = a[i] - b[i];
 		return *this;
 	}
 	/*----------------乘法 [ mult × ]----------------*/
@@ -206,30 +212,27 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 		eatMat(ansTmp); return *this;
 	}
 	/*----------------数乘 [ mult × ]----------------*/
-	Mat& mult(const double a, const Mat& b) {
-		Mat ansTmp(b.rows, b.cols);
-		for (int i = 0; i < b.rows * b.cols; i++) ansTmp.data[i] = a * b.data[i];
-		eatMat(ansTmp);
-		return *this;
-	}
 	Mat& operator*=(const double a) {
-		for (int i = 0; i < rows * cols; i++) data[i] *= a; return *this;
+		for (int i = 0; i < size(); i++) data[i] *= a; return *this;
+	}
+	Mat& mult(const double a, Mat& b) {
+		alloc(b.rows, b.cols);
+		for (int i = 0; i < size(); i++) data[i] = a * b[i];
+		return *this;
 	}
 	/*----------------点乘 [ dot · ]----------------
 	*	a·b = Σ ai·bi = aT * b
 	**------------------------------------------------*/
-	T dot(Mat& a, Mat& b) {
+	static T dot(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols) error();
-		T ans;
-		memset(&ans, 0, sizeof(T));
-		for (int i = 0; i < a.rows * a.cols; i++)ans += a[i] * b[i];
+		T ans = a[0] * b[0];
+		for (int i = 1; i < a.size(); i++)ans += a[i] * b[i];
 		return ans;
 	}
 	T dot(Mat& a) {
 		if (a.rows != rows && a.cols != cols) error();
-		T ans;
-		memset(&ans, 0, sizeof(T));
-		for (int i = 0; i < rows * cols; i++)ans += data[i] * a[i];
+		T ans = data[0] * a[0];
+		for (int i = 1; i < size(); i++)ans += data[i] * a[i];
 		return ans;
 	}
 	/*----------------叉乘 [ crossProduct × ]----------------
@@ -249,22 +252,22 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	}
 	/*----------------元素乘 [ elementProduct × ]----------------
 	**------------------------------------------------*/
-	Mat& elementProduct(Mat& a, Mat& b) {
+	Mat& elementMult(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols) error();
 		Mat ansTmp(a.rows, a.cols);
-		for (int i = 0; i < a.rows * a.cols; i++)ansTmp[i] = a[i] * b[i];
+		for (int i = 0; i < a.size(); i++)ansTmp[i] = a[i] * b[i];
 		eatMat(ansTmp);
 		return*this;
 	}
-	Mat& elementProduct(Mat& a) {
+	Mat& elementMult(Mat& a) {
 		if (rows != a.rows || cols != a.cols) error();
-		for (int i = 0; i < rows * cols; i++)data[i] *= a[i];
+		for (int i = 0; i < size(); i++)data[i] *= a[i];
 		return *this;
 	}
 	/*----------------负 [ negative - ]----------------*/
 	Mat& negative(Mat& ans) {
 		Mat ansTmp = *this;
-		for (int i = 0; i < rows * cols; i++) ansTmp[i] = -ansTmp[i];
+		for (int i = 0; i < size(); i++) ansTmp[i] = -ansTmp[i];
 		ans.eatMat(ansTmp); return ans;
 	}
 	/*----------------转置 [ transposi T ]----------------*/
@@ -279,7 +282,12 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	/*----------------求和 [ sum Σ ]----------------*/
 	T sum() {
 		T ans = data[0];
-		for (int i = 1; i < rows * cols; i++)ans += data[i];
+		for (int i = 1; i < size(); i++)ans += data[i];
+		return ans;
+	}
+	static T sum(Mat& a) {
+		T ans = a[0];
+		for (int i = 1; i < size(); i++)ans += a[i];
 		return ans;
 	}
 	Mat& sumCol(Mat& ans) {
@@ -293,7 +301,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	/*----------------求积 [ product Π ]----------------*/
 	T product() {
 		T ans = data[0];
-		for (int i = 1; i < rows * cols; i++)ans *= data[i];
+		for (int i = 1; i < size(); i++)ans *= data[i];
 		return ans;
 	}
 	/*----------------范数 [ norm ||x|| ]----------------
@@ -306,7 +314,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	Mat& normalized() {
 		T t = norm();
 		if (t == 0)return *this;
-		for (int i = 0; i < rows * cols; i++)data[i] /= t;
+		for (int i = 0; i < size(); i++)data[i] /= t;
 		return *this;
 	}
 	/*----------------余子式 [ comi ]----------------
@@ -375,7 +383,7 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	*	[性质]: A* A = |A|
 	**---------------------------------------------*/
 	Mat& adjugate(Mat& ans) {
-		ans.zero(rows, cols);
+		ans.alloc(rows, cols);
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
 				ans(i, j) = ((i + j) % 2 == 0 ? 1 : -1) * comi(i, j);
@@ -546,12 +554,12 @@ Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
 	Mat& diag(Mat& ans) {
 		Mat ansTmp;
 		if (rows == cols) {
-			ansTmp.zero(rows, 1);
+			ansTmp.alloc(rows, 1);
 			for (int i = 0; i < rows; i++)ansTmp[i] = data[i * rows + i];
 		}
 		else if (rows == 1 || cols == 1) {
 			int n = rows > cols ? rows : cols;
-			ansTmp.zero(n, n);
+			ansTmp.alloc(n, n);
 			for (int i = 0; i < n; i++)ansTmp(i, i) = data[i];
 		}
 		else error();
@@ -603,12 +611,12 @@ Mat& setCol(int _col, Mat& a)
 	}
 	/*----------------读/写一列 [ getCol/setCol ]----------------*/
 	Mat& getCol(int _col, Mat& a) {
-		a.zero(rows, 1);
+		a.alloc(rows, 1);
 		for (int i = 0; i < rows; i++) a[i] = data[i * cols + _col];
 		return a;
 	}
 	Mat& getRow(int _row, Mat& a) {
-		a.zero(1, cols);
+		a.alloc(1, cols);
 		for (int i = 0; i < cols; i++) a[i] = data[_row * cols + i];
 		return a;
 	}
