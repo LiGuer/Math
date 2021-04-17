@@ -22,14 +22,14 @@ template<class T>
 class Mat
 {
 public:
-	/******************************************************************************
-	*                    核心数据
-	******************************************************************************/
+/******************************************************************************
+*                    核心数据
+******************************************************************************/
 	T* data = NULL;													//数据堆叠方向: 先横再纵.
 	int rows = 0, cols = 0;
-	/******************************************************************************
-	*                    基础函数
-	******************************************************************************/
+/******************************************************************************
+*                    基础函数
+******************************************************************************/
 	/*---------------- 构造析构函数 ----------------*/
 	Mat() { ; }
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
@@ -44,10 +44,10 @@ public:
 		data = a.data; a.data = NULL;
 		rows = a.rows; cols = a.cols; a.rows = a.cols = 0;
 	}
-	/******************************************************************************
-	*                    基础矩阵
-	*	[1] 零元 zero		[2] 单位元 E		[3] 随机元 rands
-	******************************************************************************/
+/******************************************************************************
+*                    基础矩阵
+*	[1] 零元 zero		[2] 单位元 E		[3] 随机元 rands
+******************************************************************************/
 	/*---------------- 零元 ----------------*/
 	Mat& zero(const int _rows, const int _cols) {
 		if (_rows != rows || _cols != cols) {
@@ -72,42 +72,42 @@ public:
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
 	}
-	/******************************************************************************
-	*                    基础运算
-	-------------------------------------------------------------------------------
-	T& operator[](int i)                        // "[]"取元素
-	T& operator()(int i, int j)                 // "()"取元素
-	T& operator()(int i)
-	T max() / max(int& index)					//最值[max/min]
-	T min() / min(int& index)
-	bool ==(Mat& b);							//判断相等 [ == ]
-	Mat& =(Mat& a)								//赋矩阵 [ = ]  //不能赋值自己
-	Mat& add(Mat& a, Mat& b)                    //加 [ add ]
-	Mat& +=(Mat& a)								//加 [ += ]
-	Mat& mult(Mat& a, Mat& b)					//乘 [ mult ]
-	Mat& *=(Mat& a)								//乘 [ *= ]
-	Mat& mult(double a, Mat& b)					//数乘 [ mult ]
-	Mat& *=(double a)							//数乘 [ *= ]
-	T dot(Mat& a, Mat& b) / dot(Mat& a)			//点乘 [ dot ]
-	Mat& crossProduct(Mat& a, Mat& b)			//叉乘 [ crossProduct ]
-	Mat& negative(Mat& ans)                     //负 [ negative ]
-	Mat& transposi(Mat& ans)                    //转置 [ transposi ]
-	void sum(int dim, Mat& ans)                 //求和 [ sum ]
-	Mat& sumCol(Mat& ans) 						//求和至一列 [ sum ]
-	T norm()                                    //范数 [ norm ]
-	Mat& normalized()							//归一化 [ normalized ]
-	T comi(int i0, int j0)                      //余子式 [ comi ]
-	Mat& inv(Mat& ans)                          //取逆 [ inv ]
-	T abs()                                     //行列式 [ abs ]
-	Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
-	void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
-	Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
-	void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
-	Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
-	-------------------------------------------------------------------------------
-	*	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a));
-			不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
-	******************************************************************************/
+/******************************************************************************
+*                    基础运算
+-------------------------------------------------------------------------------
+T& operator[](int i)                        // "[]"取元素
+T& operator()(int i, int j)                 // "()"取元素
+T& operator()(int i)
+T max() / max(int& index)					//最值[max/min]
+T min() / min(int& index)
+bool ==(Mat& b);							//判断相等 [ == ]
+Mat& =(Mat& a)								//赋矩阵 [ = ]  //不能赋值自己
+Mat& add(Mat& a, Mat& b)                    //加 [ add ]
+Mat& +=(Mat& a)								//加 [ += ]
+Mat& mult(Mat& a, Mat& b)					//乘 [ mult ]
+Mat& *=(Mat& a)								//乘 [ *= ]
+Mat& mult(double a, Mat& b)					//数乘 [ mult ]
+Mat& *=(double a)							//数乘 [ *= ]
+T dot(Mat& a, Mat& b) / dot(Mat& a)			//点乘 [ dot ]
+Mat& crossProduct(Mat& a, Mat& b)			//叉乘 [ crossProduct ]
+Mat& negative(Mat& ans)                     //负 [ negative ]
+Mat& transposi(Mat& ans)                    //转置 [ transposi ]
+void sum(int dim, Mat& ans)                 //求和 [ sum ]
+Mat& sumCol(Mat& ans) 						//求和至一列 [ sum ]
+T norm()                                    //范数 [ norm ]
+Mat& normalized()							//归一化 [ normalized ]
+T comi(int i0, int j0)                      //余子式 [ comi ]
+Mat& inv(Mat& ans)                          //取逆 [ inv ]
+T abs()                                     //行列式 [ abs ]
+Mat& adjugate(Mat& ans)                     //伴随矩阵 [ adjugate ]
+void eig(T esp, Mat& eigvec, Mat& eigvalue) //特征值特征向量 [ eig ]
+Mat& solveEquations(Mat& b, Mat& x)         //解方程组 [ solveEquations ]
+void LUPdecomposition(Mat& U, Mat& L, Mat& P) //LUP分解 [ LUPdecomposition ]
+Mat& diag(Mat& ans)							//构造对角矩阵 [ diag ]
+-------------------------------------------------------------------------------
+*	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a));
+		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
+******************************************************************************/
 	/*---------------- "[]" "()"取元素 ----------------
 	* 索引方向: 先纵再横.
 	---------------------------------------------*/
@@ -201,7 +201,8 @@ public:
 		Mat ansTmp(rows, a.cols);
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < a.cols; j++) 
-				for (int k = 0; k < cols; k++) ansTmp(i, j) += (*this)(i, k) * a(k, j);
+				for (int k = 0; k < cols; k++)
+					ansTmp(i, j) += (*this)(i, k) * a(k, j);
 		eatMat(ansTmp); return *this;
 	}
 	/*----------------数乘 [ mult × ]----------------*/
@@ -576,14 +577,14 @@ public:
 		eatMat(ansTmp);
 		return *this;
 	}
-	/******************************************************************************
-	*                    特殊操作
-	-------------------------------------------------------------------------------
-	Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack ]
-	void swap(Mat& a)                           //交换数据 [ swap ]
-	Mat& getCol(int _col, Mat& a)               //读/写一列 [ getCol/setCol ]
-	Mat& setCol(int _col, Mat& a)
-	******************************************************************************/
+/******************************************************************************
+*                    特殊操作
+-------------------------------------------------------------------------------
+Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [ horizStack ]
+void swap(Mat& a)                           //交换数据 [ swap ]
+Mat& getCol(int _col, Mat& a)               //读/写一列 [ getCol/setCol ]
+Mat& setCol(int _col, Mat& a)
+******************************************************************************/
 	/*----------------水平向拼接 [ horizStack ]----------------*/
 	Mat& horizStack(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
