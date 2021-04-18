@@ -201,7 +201,7 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 			[8] 迭代重新开始
 		[9] 一轮无更正时，迭代结束
 *******************************************************************************/
-void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax = 0x7FFFFFFF) {
+void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax) {
 	int Dimension = x.rows, N = x.cols;
 	Center.zero(Dimension, K);
 	Cluster.zero(K, N); ClusterKthNum.zero(K, 1);
@@ -214,7 +214,7 @@ void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Ma
 	int times = 0;
 	while (times++ < TimeMax) {
 		//[3]
-		Cluster.clean(); ClusterKthNum.clean();
+		Cluster.zero(); ClusterKthNum.zero();
 		//[4] 计算每个xi到Center_j的距离
 		for (int i = 0; i < N; i++) {
 			Mat<double> d(1, K);
