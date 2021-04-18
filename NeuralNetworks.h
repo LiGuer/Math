@@ -127,7 +127,7 @@ public:
 	}
 	/*----------------[ sigmoid ]----------------*/
 	void sigmoid(Mat<float>& x, Mat<float>& y) {
-		y.zero(x.rows, 1);
+		y.alloc(x.rows, 1);
 		for (int i = 0; i < x.rows; i++)
 			y[i] = 1 / (1 + exp(-x[i]));
 	}

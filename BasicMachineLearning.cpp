@@ -250,10 +250,10 @@ void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Ma
 * Mahalanobis Distance
 *******************************************************************************/
 void BasicMachineLearning::MahalanobisDist(Mat<double>& x, Mat<double>& mahalanobisDistance) {
-	mahalanobisDistance.zero(1, x.cols);
+	mahalanobisDistance.alloc(1, x.cols);
 	// mean, diff, cov
 	Mat<double> mean, diff, covMat, tmp;
-	mean.mult(1.0 / x.cols, x.sumCol(mean));
+	mean.mult(1.0 / x.cols, x.sum(mean, 1));
 	covMat.mult(x, x.transposi(covMat));
 	// mahalanobis distance
 	covMat.inv(covMat);
@@ -289,7 +289,7 @@ void BasicMachineLearning::MahalanobisDist(Mat<double>& x, Mat<double>& mahalano
 void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<double>& x, Mat<double>& y, int yDim) {
 	//[1] 数据中心化
 	Mat<double> mean;
-	mean.mult(1.0 / x.cols, x.sumCol(mean));		//得到均值
+	mean.mult(1.0 / x.cols, x.sum(mean, 1));		//得到均值
 	Mat<double> x2(x);
 	for (int i = 0; i < x.rows; i++)
 		for (int j = 0; j < x.cols; j++)

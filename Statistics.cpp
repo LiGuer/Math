@@ -33,7 +33,7 @@ double Statistics::Variance(Mat<double>& x, double mean) {
 	return var / (x.cols * x.rows - 1);
 }
 Mat<double>& Statistics::Variance(Mat<double>& x, Mat<double>& ans, Mat<double> mean) {
-	if (mean == NULL) { mean.zero(x.rows, 1); Mean(x, mean); }
+	if (mean == NULL) { mean.alloc(x.rows, 1); Mean(x, mean); }
 	ans.zero(x.rows, 1);
 	for (int i = 0; i < x.rows; i++) {
 		for (int j = 0; j < x.cols; j++)
@@ -46,7 +46,7 @@ Mat<double>& Statistics::Variance(Mat<double>& x, Mat<double>& ans, Mat<double> 
 *	f(x) = 1 / sqrt(2πσ²)·exp(-(x-μ)² / (2σ²))
 /***************************************************************************/
 Mat<double>& Statistics::NormalDistribution(double mean, double variance, double min, double max, double delta, Mat<double>& output) {
-	output.zero(1, (max - min) / delta + 1);
+	output.alloc(1, (max - min) / delta + 1);
 	double x = min, A = 1.0 / (sqrt(2 * PI * variance));
 	for (int i = 0; i < output.cols; i++) {
 		output[i] = A * exp(-(x - mean) * (x - mean) / (2 * variance));

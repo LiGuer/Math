@@ -1,4 +1,4 @@
-#include "LiGu_GRAPHICS/Mat.h"
+#include "Mat.h"
 #include <math.h>
 Mat<float>& sigmoid(Mat<float>& x)
 {
