@@ -20,7 +20,7 @@ double Statistics::Mean(Mat<double>& x) {
 	return x.sum() / x.cols;
 }
 Mat<double>& Statistics::Mean(Mat<double>& x, Mat<double>& ans) {
-	return ans.mult(1.0 / x.cols, x.sumCol(ans));
+	return ans.mult(1.0 / x.cols, x.sum(ans, 1));
 }
 /***************************************************************************
 *								方差
