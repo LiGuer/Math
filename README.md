@@ -1,7 +1,6 @@
 # LiGu_AlgorithmLib
 LiGu's Basic Algorithm Library.  
-* <Mat.h>                   矩阵类  
-* <ComputationalGeometry.h> 计算几何类  
+* <Mat.h>                   矩阵类
 * <NeuralNetworks.h>        神经网络类
 * <BasicMachineLearning.h>  基础机器学习类
 *   
@@ -89,17 +88,6 @@ Mat& setCol(int _col, Mat& a)
 Mat& getRow(int _row, Mat& a)               //读/写一行 [getRow/setRow]
 Mat& block(int rowSt, int rowEd, int colSt, int colEd, Mat& ans)	//子矩阵 [block]
 Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
-```
-
-## <ComputationalGeometry.h> 计算几何类
-```
-/*----------------[ 2D 二维 ]----------------*/
-void ThreePointsToCircle(Mat<double> Points[], Mat<double>& center, double& R); //平面三点确定圆方程
-bool isInCircle(Mat<double> Points[]);                                          //判断四点共圆
-Mat<double>* ConvexHull(Mat<double> point[], int n, int& ansPointNum);          //凸包
-Mat<double>* Delaunay(Mat<double> point[], int n, int& TrianglesNum);           //Delaunay三角剖分
-/*----------------[ 3D 三维 ]----------------*/
-Mat<double>* getSphereFibonacciPoint(int& n);                                   //球面均匀点分布
 ```
 
 ## <NeuralNetworks.h> 神经网络类

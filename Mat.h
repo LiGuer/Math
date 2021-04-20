@@ -445,12 +445,26 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 	/*----------------行列式 [ abs |x| ]----------------
 	*	|A| = Σiorj aij·Aij
 	*	Aij = (-1)^(i+j)·Mij		// Mij余子式
+	*	1阶: |A| = A00
+		2阶: |A| = A00·A11 - A01·A10
+		3阶: |A| = A00·A11·A22 + A01·A12·A20 + A02·A10·A21
+				 - A02·A11·A20 - A00·A12·A21 - A01·A10·A22
 	**----------------------------------------------*/
 	T abs() {
 		if (rows != cols)error();
+		//加速
 		if (rows == 1)return data[0];
-		T ans;
-		memset(&ans, 0, sizeof(T));
+		if (rows == 2)return (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(0, 1);
+		T ans; memset(&ans, 0, sizeof(T));
+		if (rows == 3) {
+			T t;
+			for (int i = 0; i < 3; i++) {
+				t = 1;
+				for (int j = 0; j < 3; j++) t *= (*this)(j, (j + i) % 3); ans += t;
+				for (int j = 0; j < 3; j++) t *= (*this)(j, (2 - j + i) % 3); ans -= t;
+			} return ans;
+		}
+		//普适
 		for (int i = 0; i < rows; i++)
 			ans += data[i * cols] * (i % 2 == 0 ? 1 : -1) * comi(i, 0);
 		return ans;
