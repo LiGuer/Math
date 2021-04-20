@@ -151,7 +151,7 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 	frozenSet.push_back(frozenSet_K);  frozenSet_Support.push_back(frozenSet_Support_K);	//故意填占 frozenSet[0]位置
 	//[2] 初始一个元素的频繁项集，Frozen Set[{ 1 }, { 2 }, { 3 }, { 4 }, { 5 }]
 	{
-		Mat<int> tmp(1);
+		Mat<int> tmp(1,1);
 		for (int i = 0; i < dataSet.size(); i++) {
 			for (int item = 0; item < dataSet[i].cols; item++) {
 				bool flag = true;
@@ -174,7 +174,7 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 	for (int k = 2; k < frozenSet.size(); k++) {
 		std::vector<Mat<int>> OneElementSet;
 		{
-			Mat<int> tmp(1);
+			Mat<int> tmp(1,1);
 			for (int i = 0; i < frozenSet[k].size(); i++) {
 				for (int j = 0; j < frozenSet[k][i].cols; j++) {
 					bool flag = true;
@@ -204,7 +204,7 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax) {
 	int Dimension = x.rows, N = x.cols;
 	Center.zero(Dimension, K);
-	Cluster.zero(K, N); ClusterKthNum.zero(K, 1);
+	Cluster.zero(K, N); ClusterKthNum.zero(K);
 	//[1] 随机选择 K 个簇心点 
 	for (int i = 0; i < K; i++) {
 		int index = rand() % N;

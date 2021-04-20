@@ -44,7 +44,7 @@ void swap(Mat& a);                          //交换数据 [ swap ]
 	/*---------------- 构造/析构函数 ----------------*/
 	Mat() { ; }
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
-	Mat(const int _rows) { E(_rows); }
+	Mat(const int _rows) { zero(_rows, 1); }
 	Mat(const Mat& a) { *this = a; }
 	~Mat() { delete data; }
 	/*---------------- 报错  ----------------*/
@@ -75,7 +75,7 @@ void swap(Mat& a);                          //交换数据 [ swap ]
 	[4]rands	随机元 
 ******************************************************************************/
 	/*---------------- 分配空间 ----------------*/
-	Mat& alloc(const int _rows, const int _cols) {
+	Mat& alloc(const int _rows, const int _cols = 1) {
 		if (_rows != rows || _cols != cols) {
 			if (data != NULL) delete data;
 			data = (T*)malloc(_rows * _cols * sizeof(T));
@@ -84,7 +84,7 @@ void swap(Mat& a);                          //交换数据 [ swap ]
 	}
 	/*---------------- 零元/清零 ----------------*/
 	inline Mat& zero() { memset(data, 0, sizeof(T) * size()); return *this; }
-	Mat& zero(const int _rows, const int _cols) {
+	Mat& zero(const int _rows, const int _cols = 1) {
 		alloc(_rows, _cols); zero();  return *this;
 	}
 	/*---------------- 单位元 ----------------*/
@@ -94,7 +94,7 @@ void swap(Mat& a);                          //交换数据 [ swap ]
 		return *this;
 	}
 	/*---------------- 全1元 ----------------*/
-	Mat& ones(const int _rows, const int _cols) {
+	Mat& ones(const int _rows, const int _cols = 1) {
 		alloc(_rows, _cols); fill(1); return *this;
 	}
 	/*---------------- 随机元 ----------------*/
@@ -371,7 +371,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 			ans.eatMat(ansTmp); return ans;
 		}
 		if (dim == 1) {				//对每一行求和
-			Mat ansTmp(rows, 1);
+			Mat ansTmp(rows);
 			for (int i = 0; i < rows; i++)
 				for (int j = 0; j < cols; j++)
 					ansTmp[i] += (*this)(i, j);
@@ -423,7 +423,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		Mat L, U; Mat<int> P;
 		LUPdecomposition(U, L, P);
 		//对每一列
-		Mat b(n, 1), x(n, 1);
+		Mat b(n), x(n);
 		for (int k = 0; k < n; k++) {
 			b.zero(); b[k] = 1;
 			// 解线性方程组
@@ -575,7 +575,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 	**--------------------------------------------*/
 	Mat& solveEquations(Mat& b, Mat& x) {
 		int n = rows;
-		x.zero(n, 1);
+		x.zero(n);
 		//[1] LUP分解
 		Mat U, L; Mat<int> P;
 		LUPdecomposition(U, L, P);
@@ -613,7 +613,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		if (rows != cols)error();
 		int n = rows;
 		Mat A(*this);
-		P.zero(n, 1);
+		P.zero(n);
 		for (int i = 0; i < n; i++)P[i] = i;
 		//[1]
 		for (int k = 0; k < n; k++) {
@@ -649,7 +649,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 	Mat& diag(Mat& ans) {
 		Mat ansTmp;
 		if (rows == cols) {
-			ansTmp.alloc(rows, 1);
+			ansTmp.alloc(rows);
 			for (int i = 0; i < rows; i++)ansTmp[i] = data[i * rows + i];
 		}
 		else if (rows == 1 || cols == 1) {
@@ -689,7 +689,7 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 ******************************************************************************/
 	/*----------------读/写一列 [getCol/setCol]----------------*/
 	Mat& getCol(int _col, Mat& a) {
-		a.alloc(rows, 1);
+		a.alloc(rows);
 		for (int i = 0; i < rows; i++) a[i] = (*this)(i, _col);
 		return a;
 	}

@@ -28,7 +28,7 @@ public:
 			weights[i].rands(mem_cell_ct, concat_len, -0.1, 0.1);
 			bias[i].rands(mem_cell_ct, 1, -0.1, 0.1);
 			differWeights[i].zero(mem_cell_ct, concat_len);
-			differBias[i].zero(mem_cell_ct, 1);
+			differBias[i].zero(mem_cell_ct);
 		}
 	}
 	~LstmParam() {};
@@ -39,8 +39,8 @@ public:
 			weights[i].add(weights[i], differWeights[i]);
 			bias[i].add(bias[i], differBias[i]);
 			// reset diffs to zero
-			differWeights[i].clean();
-			differBias[i].clean();
+			differWeights[i].zero();
+			differBias[i].zero();
 		}
 	}
 };
@@ -52,11 +52,11 @@ public:
 	Mat<float> gate[4], s, h;
 	Mat<float> bottomDiffer_H, bottomDiffer_S;
 	LstmState(int mem_cell_ct, int x_dim) {
-		for (int i = 0; i < 4; i++)gate[i].zero(mem_cell_ct, 1);
-		s.zero(mem_cell_ct, 1);
-		h.zero(mem_cell_ct, 1);
-		bottomDiffer_H.zero(mem_cell_ct, 1);
-		bottomDiffer_S.zero(mem_cell_ct, 1);
+		for (int i = 0; i < 4; i++)gate[i].zero(mem_cell_ct);
+		s.zero(mem_cell_ct);
+		h.zero(mem_cell_ct);
+		bottomDiffer_H.zero(mem_cell_ct);
+		bottomDiffer_S.zero(mem_cell_ct);
 	}
 };
 
@@ -130,7 +130,7 @@ class LstmNetwork
 		param = _param;
 	}
 	void x_list_clear() {
-		x_list.clean();
+		x_list.zero();
 	}
 	void x_list_add() {
 		x_list.append(x);

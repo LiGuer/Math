@@ -40,7 +40,7 @@ void RungeKutta(Mat<double>& y, double dt, double t0, int enpoch, Mat<double>& (
 // | (x')' = - G M x / (x² + y²)^(3/2)
 // [ (y')' = - G M y / (x² + y²)^(3/2)
 Mat<double>& function(double t, Mat<double>& y) {
-	static Mat<double> output(y.rows, 1);
+	static Mat<double> output(y.rows);
 	static double GM = 1;
 	output[0] = y[2]; output[1] = y[3];
 	double temp = -GM / pow(y[0] * y[0] + y[1] * y[1], 3 / 2);
@@ -48,7 +48,7 @@ Mat<double>& function(double t, Mat<double>& y) {
 	return output;
 }
 int main() {
-	Mat<double> y(4, 1);
+	Mat<double> y(4);
 	y[0] = 1; y[1] = 0; y[2] = 0; y[3] = 0.7;
 	for (int i = 0; i < 1000; i++) {
 		RungeKutta(y, 0.01, 0, 1, function);
@@ -74,8 +74,8 @@ Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta,
 	// init
 	Mat<double> tmp;
 	tmp.sub(ed, st);
-	Mat<int> dim(st.rows);
-	for (int i = 0; i < st.rows; i++) dim[i] = (int)(tmp[i] / delta);
+	Mat<int> dim; dim.E(st.rows);
+	for (int i = 0; i < st.rows; i++) dim[i] = (int)(tmp[i] / delta[i]);
 	Tensor<double>* Map = new Tensor<double>(dim.rows, dim.data);
 	// compute Green's function
 	Mat<double> r = st;

@@ -33,7 +33,7 @@ double Statistics::Variance(Mat<double>& x, double mean) {
 	return var / (x.cols * x.rows - 1);
 }
 Mat<double>& Statistics::Variance(Mat<double>& x, Mat<double>& ans, Mat<double> mean) {
-	if (mean == NULL) { mean.alloc(x.rows, 1); Mean(x, mean); }
+	//if (mean == NULL) { mean.alloc(x.rows, 1); Mean(x, mean); }
 	ans.zero(x.rows, 1);
 	for (int i = 0; i < x.rows; i++) {
 		for (int j = 0; j < x.cols; j++)
