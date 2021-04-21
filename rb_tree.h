@@ -1,7 +1,35 @@
 #ifndef _RB_TREE_
 #define _RB_TREE_
-/*
-< Red-Black Tree >
+/*********************************************************************************
+*						红黑树  Red-Black Tree
+*********************************************************************************/
+#define NULL 0
+
+typedef bool _rb_tree_color_tpye;
+const _rb_tree_color_tpye red = false;
+const _rb_tree_color_tpye black = true;
+/*********************************************************************************
+*						红黑树 节点 Red-Black Tree Node
+*********************************************************************************/
+template<class T>
+struct _rb_tree_node
+{
+	typedef _rb_tree_color_tpye color_tpye;
+	typedef _rb_tree_node node;
+	color_tpye color = black;
+	node* parent = NULL, left = NULL, right = NULL;
+	T key;
+};
+/*********************************************************************************
+*						红黑树 迭代器 Red-Black Tree Iterator
+*********************************************************************************/
+template<class T>
+struct _rb_tree_iterator
+{
+
+};
+/*********************************************************************************
+*						红黑树  Red-Black Tree
 * red-black properties:
 1. Every node is either red or black.
 2. The root is black.
@@ -9,50 +37,21 @@
 4. If a node is red, then both its children are black.
 5. For each node, all simple paths from the node to
 descendant leaves contain the same number of black nodes.
-
+----------------------------------------------------------------------------------
 * API:
 	min、max、search						//搜索
 	left_rotate、right_rotate				//旋转
 	insert									//插入
 	erase									//删除
-*/
-#define NULL 0
-
-typedef bool _rb_tree_color_tpye;
-const _rb_tree_color_tpye red = false;
-const _rb_tree_color_tpye black = true;
-
-template<class T>
-struct _rb_tree_node
-{
-	typedef _rb_tree_color_tpye color_tpye;
-	typedef _rb_tree_node node;
-
-	color_tpye color = black;
-	node* parent = NULL;
-	node* left = NULL;
-	node* right = NULL;
-	T key;
-};
-
-template<class T>
-struct _rb_tree_iterator
-{
-
-};
-
+*********************************************************************************/
 template<class T>
 class rb_tree {
 	typedef _rb_tree_color_tpye color_tpye;
 	typedef _rb_tree_node node;
-
-	node* root;
-	node* nil;
-	rb_tree() {
-		nil = new node;
-		root = nil;
-	}
-
+	node* root = NULL, nil = NULL;
+	/*---------------- 构造函数 ----------------*/
+	rb_tree() { nil = new node; root = nil; }
+	/*---------------- 最大/最小值 ----------------*/
 	static node* min(node* x) {
 		while (x->left != nil)x = x->left;
 		return x;
@@ -61,24 +60,21 @@ class rb_tree {
 		while (x->right != nil)x = x->left;
 		return x;
 	}
-
+	/*---------------- 搜索 ----------------*/
 	void search(node* x) {
 		node* y = root;
 		while (y != nil) {
-			if (x.key == y.key)
-				return y;
-			else if (x.key < y.key)
-				y = y->left;
+			if (x.key == y.key) return y;
+			else if (x.key < y.key) y = y->left;
 			else y = y->right;
-		}
-		return NULL;
+		} return NULL;
 	}
-
+	/*---------------- 左转 ----------------*/
 	void left_rotate(node* x) {
 		node* y = x->right;
 		// y->left
 		x->right = y->left;
-		if (y->left != nil) (y->left)->parent = x;
+		if (y->left != nil) y->left->parent = x;
 		y->left = x;
 		// x->parent
 		y->parent = x->parent;
@@ -87,11 +83,12 @@ class rb_tree {
 		else x->parent->right = y;
 		x->parent = y;
 	}
+	/*---------------- 右转 ----------------*/
 	void right_rotate(node* x) {
 		node* y = x->left;
 		// y->right
 		x->left = y->right;
-		if (y->right != nil) (y->right)->parent = x;
+		if (y->right != nil) y->right->parent = x;
 		y->right = x;
 		// x->parent
 		y->parent = x->parent;
@@ -100,7 +97,7 @@ class rb_tree {
 		else x->parent->right = y;
 		x->parent = y;
 	}
-
+	/*---------------- 插入 ----------------*/
 	void insert(node* x) {
 		node* y;
 		for (node* t = root; t != nil;) {
@@ -118,8 +115,7 @@ class rb_tree {
 		//if red with black parent,black balance won't be broken
 		//if black,the child tree which insert always 1 more 
 		//in black total,must to balance.
-		if (y == nil)									//case1: empty tree
-		{
+		if (y == nil) {									//case1: empty tree
 			root = x; root->color = black; return;
 		}
 		else if (x->key < y.key) y->left = x;
@@ -183,14 +179,11 @@ class rb_tree {
 					break;
 				}
 			}
-		}root->color = black;
+		} root->color = black;
 	}
-
-	void erase(node* x) {
-	}
-
-	void erase_fixup(node* x) {
-	}
+	/*---------------- 删除 ----------------*/
+	void erase(node* x) { }
+	void erase_fixup(node* x) { }
 };
 
 #endif

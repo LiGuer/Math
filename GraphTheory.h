@@ -42,7 +42,7 @@ Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<Gra
 						最小生成树 
 *	[算法]: Prim
 		[输入]: 图的邻接链表[Graph], 节点数量[n]
-		[输出]：最小生成树,每一条有向边的 起点[TreeU],终点[TreeV],总边数[TreeCur]
+		[输出]: 最小生成树,每一条有向边的 起点[TreeU],终点[TreeV],总边数[TreeCur]
 		[原理]: 按点贪心, 每次加入已搜索点集u的最短边(u,v)，其中v不属于已搜索点集的点v
 		[流程]:
 			[1] 初始化[VertexNew]: 已搜索点集的存储数组
@@ -62,13 +62,13 @@ Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<Gra
 				[4] 若(u,v)不在同一颗树, u,v所在两棵树合并,(u,v)加入该树
 				[5] 点集中删(u,v)
 			[6] 最后剩下的那棵树,就是最小生成树
-			Kruskal	是按边贪心，适合稀疏图。
-			Prim	是按点贪心，适合稠密图。
+		Kruskal	是按边贪心，适合稀疏图。
+		Prim	是按点贪心，适合稠密图。
 *********************************************************************************/
-void Prim(Mat<GraphListNode*>& GraphList, int n, std::vector<int> TreeU[], std::vector<int> TreeV[])
+void Prim(Mat<GraphListNode*>& GraphList, std::vector<int> TreeU[], std::vector<int> TreeV[])
 {
-	Mat<bool> flag(n);
-	Mat<int> VertexNew(n);
+	Mat<bool> flag(GraphList.rows);
+	Mat<int> VertexNew(GraphList.rows);
 	int TreeNum = 0;
 	//[3]
 	while (true) {

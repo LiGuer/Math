@@ -1,17 +1,20 @@
 # LiGu_AlgorithmLib
 LiGu's Basic Algorithm Library.  
-* <Mat.h>                   矩阵类
-* <NeuralNetworks.h>        神经网络类
-* <BasicMachineLearning.h>  基础机器学习类
-*   
-* <Tensor.h>                张量类  
-* <GraphTheory.h>           图论类 
-* <BasicAlgorithm.h>        基础算法类  
-* <list.h>                  链表类  
-* <NumberTheory.h>          数论类
-* <PartialDifferentialEquation.h>   偏微分方程类  
-* <rb_tree.h>               红黑树  
-* <LSTM.h>                  长短期记忆网络  
+*  框架 (算法 + 数据结构)
+* <Mat.h>						矩阵类
+* <NeuralNetworks.h>			神经网络类
+* <BasicMachineLearning.h>		基础机器学习类
+*  算法 Algorithm
+* <BasicAlgorithm.h>			基础算法类  
+* <GraphTheory.h>				图论类 
+* <NumberTheory.h>			数论类
+*  数据结构 DataStructure
+* <list.h>						链表类  
+* <rb_tree.h>					红黑树  
+* <Tensor.h>					张量类  
+*  Other
+* <PartialDifferentialEquation.h>	偏微分方程类  
+* <LSTM.h>						长短期记忆网络  
 
 ## <Mat.h> 矩阵类  
 ```
