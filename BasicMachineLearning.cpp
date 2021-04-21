@@ -254,14 +254,14 @@ void BasicMachineLearning::MahalanobisDist(Mat<double>& x, Mat<double>& mahalano
 	// mean, diff, cov
 	Mat<double> mean, diff, covMat, tmp;
 	mean.mult(1.0 / x.cols, x.sum(mean, 1));
-	covMat.mult(x, x.transposi(covMat));
+	covMat.mult(x, x.transpose(covMat));
 	// mahalanobis distance
 	covMat.inv(covMat);
 	Mat<double> xt;
 	for (int i = 0; i < x.cols; i++) {
 		x.getCol(i, xt);
 		diff.sub(xt, mean);
-		tmp.mult(tmp.mult(diff.transposi(tmp), covMat), diff);
+		tmp.mult(tmp.mult(diff.transpose(tmp), covMat), diff);
 		mahalanobisDistance[i] = tmp[0];
 	}
 }
@@ -296,7 +296,7 @@ void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<double>& x, Mat<doubl
 			x2(i, j) -= mean[i];
 	//[2] 计算协方差矩阵
 	Mat<double> Cov;
-	Cov.mult(x2, x2.transposi(Cov));		//X*XT
+	Cov.mult(x2, x2.transpose(Cov));		//X*XT
 	//[3] 对协方差特征值分解
 	Mat<double> eigVec, eigValue;
 	Cov.eig(1e-5, eigVec, eigValue);
@@ -317,7 +317,7 @@ void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<double>& x, Mat<doubl
 		}
 	}
 	//[5]
-	y.mult(W.transposi(y), x);
+	y.mult(W.transpose(y), x);
 }
 /******************************************************************************
 *                    Support Vector Machines 支持向量机

@@ -103,9 +103,9 @@ public:
 		for (int j = 0; j < output.rows; j++)
 			delta[j] *= output[j] * (1 - output[j]);		//σ'(z_outL) 激活函数导数
 		Mat<float> t;
-		error.mult(weight.transposi(t), delta);
+		error.mult(weight.transpose(t), delta);
 		//[1][*]
-		t.mult(delta, preInput.transposi(t));
+		t.mult(delta, preInput.transpose(t));
 		weight.add(weight, t.mult(learnRate, t));
 		bias.add(bias, t.mult(learnRate, delta));
 	}

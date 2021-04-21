@@ -137,7 +137,7 @@ Mat& elementMult(Mat& a);
 Mat& elementDivide(Mat& a, Mat& b);		//元素除 [elementDivide /]
 Mat& elementDivide(Mat& a);
 Mat& negative(Mat& ans);				//负 [negative -]
-Mat& transposi(Mat& ans);				//转置 [transposi T]
+Mat& transpose(Mat& ans);				//转置 [transpose T]
 T sum();								//求和 [sum Σ]
 static T sum(Mat& a);
 Mat& sum(Mat& ans,int dim);
@@ -343,8 +343,8 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		for (int i = 0; i < size(); i++) ans[i] = -data[i];
 		return ans;
 	}
-	/*----------------转置 [ transposi T ]----------------*/
-	Mat& transposi(Mat& ans) {
+	/*----------------转置 [ transpose T ]----------------*/
+	Mat& transpose(Mat& ans) {
 		Mat ansTmp(cols, rows);
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
@@ -540,7 +540,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 			R.E(n);
 			R[p * n + p] = c; R[p * n + q] = s;		// R
 			R[q * n + p] = -s; R[q * n + q] = c;
-			R.transposi(RT);
+			R.transpose(RT);
 			eigvalue.mult(RT, eigvalue);			// Dj = RjT Dj-1 Rj
 			eigvalue.mult(eigvalue, R);
 			eigvec.mult(eigvec, R);					// X = R Y
@@ -719,7 +719,7 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 				ansTmp.data[i * cols + j] = j < a.cols ? a(i, j) : b(i, j - a.cols);
 		eatMat(ansTmp); return *this;
 	}
-	/*----------------复制拓展 [ repeatCol  ]----------------*/
+	/*----------------复制拓展 [repeatCol]----------------*/
 	Mat& repeatCol(int repeatNum, Mat& ans) {
 		if (cols != 1)error();
 		Mat ansTmp(rows, repeatNum);
@@ -727,6 +727,16 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 			for (int j = 0; j < repeatNum; j++)
 				ansTmp(i, j) = data[i];
 		ans.eatMat(ansTmp); return ans;
+	}
+	/*----------------函数操作 []----------------*/
+	Mat& function(Mat& x, T (*fun)(T)) {
+		alloc(x.rows, x.cols);
+		for (int i = 0; i < x.size(); i++)data[i] = fun(x[i]);
+		return *this;
+	}
+	Mat& function(T (*fun)(T)) {
+		for (int i = 0; i < size(); i++)data[i] = fun(data[i]);
+		return *this;
 	}
 };
 #endif

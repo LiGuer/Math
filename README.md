@@ -69,7 +69,7 @@ Mat& elementMult(Mat& a);
 Mat& elementDivide(Mat& a, Mat& b);     //元素除 [elementDivide /]
 Mat& elementDivide(Mat& a);
 Mat& negative(Mat& ans);                //负 [negative -]
-Mat& transposi(Mat& ans);               //转置 [transposi T]
+Mat& transpose(Mat& ans);               //转置 [transpose T]
 T sum();                                //求和 [sum Σ]
 static T sum(Mat& a);
 Mat& sum(Mat& ans,int dim);

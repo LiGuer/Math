@@ -3,18 +3,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-//约定: 左闭右开[first,last) 
-template <class T> const T& min(const T& a, const T& b);
-template <class T> const T& max(const T& a, const T& b);
-template <class T> bool next_permutation(T* first, T* last);
-template <class T> bool prev_permutation(T* first, T* last);
-template <class T> void reverse(T* first, T* last);
-template <class T> void sort(T* first, T* last);
-template <class T> void swap(T* a, T* b);
-
+namespace BasicAlgorithm {
+/******************************************************************************
+*                    基础算法
+-------------------------------------------------------------------------------
+//约定: 左闭右开[first,last)
+T& min(const T& a, const T& b);
+T& max(const T& a, const T& b);
+bool next_permutation(T* first, T* last);
+bool prev_permutation(T* first, T* last);
+void reverse(T* first, T* last);
+void sort(T* first, T* last);
+void swap(T* a, T* b);
+******************************************************************************/
 /*--------------------------------[ min/max 最大/小 ]--------------------------------*/
-template <class T> const T& min(const T& a, const T& b) { return !(b < a) ? a : b; }	// or: return !comp(b,a)?a:b; for version (2)
-template <class T> const T& max(const T& a, const T& b) { return (a < b) ? b : a; }	// or: return comp(a,b)?b:a; for version (2)
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+//template <class T> const T& min(const T& a, const T& b) { return (a < b) ? a : b; }	// or: return !comp(b,a)?a:b; for version (2)
+//template <class T> const T& max(const T& a, const T& b) { return (a > b) ? a : b; }	// or: return comp(a,b)?b:a; for version (2)
 /*--------------------------------[ swap 交换 ]--------------------------------*/
 template <class T> void swap(T* a, T* b){T c = *a; *a = *b; *b = c;}
 /*--------------------------------[ sort 排序 ]--------------------------------
@@ -31,7 +37,7 @@ template <class T> void swap(T* a, T* b){T c = *a; *a = *b; *b = c;}
 		[5] Ref 左右比他大/小的两方元素，分别从头开始。
 **-----------------------------------------------------------------------*/
 template <class T>
-void sort(T* first, T* last)
+void sort(T* first, T* last, bool*(cmp)(T a, T b))
 {
 	if (last - 1 <= first)return;
 	T* ref = last - 1;			//最后元素作为参考元素
@@ -42,12 +48,11 @@ void sort(T* first, T* last)
 			*border = *i; *i = temp;
 			border++;
 		}
-
 	}
 	T temp = *border;
 	*border = *ref; *ref = temp;
-	sort(first, border);
-	sort(border + 1, last);
+	sort(first, border, cmp);
+	sort(border + 1, last, cmp);
 }
 /*--------------------------------[ reverse 反序 ]--------------------------------*/
 template <class T> void reverse(T* first, T* last) { last--; while (first < last) { swap(first, last); first++; last--; } }
@@ -132,5 +137,6 @@ HuffmanTreeNode<T>* HuffmanCode(T weight[], int N, int codeLen[], unsigned long 
 				codeHuffman[i] += (unsigned long long)1 << j;
 	}
 	return root;
+}
 }
 #endif 
