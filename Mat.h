@@ -90,7 +90,7 @@ void swap(Mat& a);                          //交换数据 [ swap ]
 	/*---------------- 单位元 ----------------*/
 	Mat& E(const int _rows) {
 		zero(_rows, _rows);
-		for (int i = 0; i < rows; i++) data[i * cols + i] = 1;
+		for (int i = 0; i < rows; i++) (*this)(i, i) = 1;
 		return *this;
 	}
 	/*---------------- 全1元 ----------------*/
@@ -406,7 +406,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				if (i == i0 || j == j0)continue;
-				tmp(i < i0 ? i : i - 1, j < j0 ? j : j - 1) = data[i * cols + j];
+				tmp(i < i0 ? i : i - 1, j < j0 ? j : j - 1) = (*this)(i, j);
 			}
 		}
 		return tmp.abs();
@@ -466,7 +466,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		}
 		//普适
 		for (int i = 0; i < rows; i++)
-			ans += data[i * cols] * (i % 2 == 0 ? 1 : -1) * comi(i, 0);
+			ans += (*this)(i, 0) * (i % 2 == 0 ? 1 : -1) * comi(i, 0);
 		return ans;
 	}
 	/*--------------伴随矩阵 [ adjugate A* ]----------------
@@ -650,7 +650,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		Mat ansTmp;
 		if (rows == cols) {
 			ansTmp.alloc(rows);
-			for (int i = 0; i < rows; i++)ansTmp[i] = data[i * rows + i];
+			for (int i = 0; i < rows; i++)ansTmp[i] = (*this)(i, i);
 		}
 		else if (rows == 1 || cols == 1) {
 			int n = rows > cols ? rows : cols;
@@ -699,7 +699,7 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 		return a;
 	}
 	Mat& setCol(int _col, Mat& a) {
-		for (int i = 0; i < rows; i++)data[i * cols + _col] = a[i];
+		for (int i = 0; i < rows; i++)(*this)(i, _col) = a[i];
 		return a;
 	}
 	/*----------------子矩阵 [block]----------------*/
@@ -710,13 +710,21 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 				ansTmp(i - rowSt, j - colSt) = (*this)(i, j);
 		ans.eatMat(ansTmp); return ans;
 	}
-	/*----------------水平向拼接 [horizStack]----------------*/
-	Mat& horizStack(Mat& a, Mat& b) {
+	/*----------------拼接 [rows/colsStack]----------------*/
+	Mat& rowsStack(Mat& a, Mat& b) {
+		if (a.cols != b.cols)error();
+		Mat ansTmp(a.rows + b.rows, a.cols);
+		for (int i = 0; i < ansTmp.row; i++)
+			for (int j = 0; j < ansTmp.cols; j++)
+				ansTmp(i, j) = i < a.rows ? a(i, j) : b(i - a.rows, j);
+		eatMat(ansTmp); return *this;
+	}
+	Mat& colsStack(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
 		Mat ansTmp(a.rows, a.cols + b.cols);
 		for (int i = 0; i < ansTmp.row; i++)
 			for (int j = 0; j < ansTmp.cols; j++)
-				ansTmp.data[i * cols + j] = j < a.cols ? a(i, j) : b(i, j - a.cols);
+				ansTmp(i, j) = j < a.cols ? a(i, j) : b(i, j - a.cols);
 		eatMat(ansTmp); return *this;
 	}
 	/*----------------复制拓展 [repeatCol]----------------*/
