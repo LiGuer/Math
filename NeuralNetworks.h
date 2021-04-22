@@ -127,7 +127,7 @@ public:
 	}
 	/*----------------[ sigmoid ]----------------*/
 	void sigmoid(Mat<float>& x, Mat<float>& y) {
-		y.alloc(x.rows, 1);
+		y.alloc(x.rows);
 		for (int i = 0; i < x.rows; i++)
 			y[i] = 1 / (1 + exp(-x[i]));
 	}
@@ -154,7 +154,7 @@ public:
 	void init(int _inChannelNum, int _outChannelNum, int kernelSize, int _padding, int _stride) {
 		inChannelNum = _inChannelNum, outChannelNum = _outChannelNum, padding = _padding, stride = _stride;
 		kernel.rands(kernelSize, kernelSize, inChannelNum * outChannelNum, -1, 1);
-		bias.zero(outChannelNum , 1);
+		bias.zero(outChannelNum);
 	}
 	/*----------------[ forward ]----------------*/
 	Tensor<float>* operator()(Tensor<float>& input) { return forward(input); }
@@ -316,7 +316,7 @@ public:
 		y = Conv_2(*y);
 		y = MaxPool_2(*y);
 		Tensor<float> t = *y;
-		Mat<float> t2(t.dim.product(), 1); t2.data = t.data; t.data = NULL;
+		Mat<float> t2(t.dim.product()); t2.data = t.data; t.data = NULL;
 		Mat<float>* maty = &t2;
 		maty = FullConnect_1(*maty);
 		maty = FullConnect_2(*maty);
@@ -433,7 +433,7 @@ public:
 		y = b5(*a5(*y));
 		y = avgpool(*y);
 		Tensor<float> t = *y;
-		Mat<float> t2(t.dim.product(), 1); t2.data = t.data; t.data = NULL;
+		Mat<float> t2(t.dim.product()); t2.data = t.data; t.data = NULL;
 		Mat<float>* maty = &t2;
 		maty = linear(*maty);
 		output = *maty;

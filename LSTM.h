@@ -59,6 +59,7 @@ public:
 		param = _param;
 	}
 	/*-------------------------------- 正向传播 --------------------------------*/
+	void operator() (Mat<double>& x, Mat<double>& _s_prev, Mat<double>& _h_prev) { return forward(x, _s_prev, _h_prev); }
 	void forward(Mat<double>& x, Mat<double>& _s_prev, Mat<double>& _h_prev) {
 		s_prev = _s_prev, h_prev = _h_prev;
 		xc.rowsStack(x, h_prev);
@@ -114,16 +115,19 @@ class LstmNetwork
 	LstmNetwork(LstmNodeParam* _param) {
 		param = _param;
 	}
+	/*-------------------------------- 正向传播 --------------------------------*/
+	void operator() (Mat<double>& x) { return forward(x); }
 	void forward(Mat<double>& x) {
 		x_list.push_back(x);
 		LstmNode nt(param);
 		if (x_list.size() > nodeList.size()) nodeList.push_back(nt);
 		int index = x_list.size() - 1;
 		if (index == 0) {
-			Mat<double> zero(memCellCount); nodeList[index].forward(x, zero, zero);
+			Mat<double> zero(memCellCount); nodeList[index](x, zero, zero);
 		}
-		else nodeList[index].forward(x, nodeList[index - 1].s, nodeList[index - 1].h);
+		else nodeList[index](x, nodeList[index - 1].s, nodeList[index - 1].h);
 	}
+	/*-------------------------------- 反向传播 --------------------------------*/
 	double backward(Mat<double> y_list, double(*lossLayer)(Mat<double>&, double), Mat<double>& (*lossLayer_bottomDiff)(Mat<double>&, double)) {
 		int index = x_list.size() - 1;
 		double loss = lossLayer(nodeList[index].h, y_list[index]);

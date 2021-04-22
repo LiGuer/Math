@@ -20,48 +20,56 @@ class Tensor
 public:
 /******************************************************************************
 *                    核心数据
+*	[注]: Data堆叠方向: 低维优先
 ******************************************************************************/
 	T* data = NULL;	
 	Mat<int> dim;										//{x, y, z, ...}
 /******************************************************************************
 *                    函数
 ******************************************************************************/
-	/*---------------- 构造析构函数 ----------------*/
+	/*---------------- 构造/析构函数 ----------------*/
 	Tensor() { ; }
 	Tensor(int dimNum, int* dimLength) { zero(dimNum, dimLength); }
 	Tensor(int x0, int y0, int z0) { zero(x0, y0, z0); }
 	Tensor(Tensor& a) { *this = a; }
-	~Tensor() { free(data); }
+	~Tensor() { delete data; }
 	/*---------------- 基础函数 ----------------*/
-	void clean() { memset(data, 0, sizeof(T) * dim.product()); }											//清零 
 	void error() { exit(-1); }
-	void eatMat(Tensor& a) {									//吃掉另一个矩阵的数据 (指针操作)
-		if (data != NULL)free(data);
+	void eat(Tensor& a) {									//吃掉另一个矩阵的数据 (指针操作)
+		if (data != NULL)delete data;
 		data = a.data; a.data = NULL;
-		dim = a.dim; a.dim.zero(1, 1);
+		dim = a.dim; a.dim.zero(1);
 	}
-	/*---------------- 零元 ----------------*/
+	/*---------------- 分配空间 ----------------*/
+	Tensor& alloc(int dimNum, int* dimLength) {
+		if (dim.rows != dimNum || memcmp(dim.data, dimLength, dimNum * sizeof(int)) != 0) {
+			dim.alloc(dimNum); dim.getData(dimLength);
+			data = (T*)malloc(dim.product() * sizeof(T));
+		}
+		return *this;
+	}
+	Tensor& alloc(Mat<int> _dim) {
+		alloc(_dim.rows, _dim.data);
+	}
+	/*---------------- 零元/清零 ----------------*/
+	Tensor& zero() { memset(data, 0, sizeof(T) * dim.product()); }	//清零 
 	Tensor& zero(int dimNum, int* dimLength) {
-		dim.zero(dimNum, 1);
-		memcpy(dim.data, dimLength, dimNum * sizeof(int));
-		data = (T*)calloc(dim.product(), sizeof(T));
+		alloc(dimNum, dimLength); zero();
 		return *this;
 	}
 	Tensor& zero(int x0, int y0, int z0) {
-		dim.zero(3, 1);
-		dim[0] = x0; dim[1] = y0; dim[2] = z0;
-		data = (T*)calloc(dim.product(), sizeof(T));
+		int t[] = { x0, y0, x0 }; zero(3, t);
 		return *this;
 	}
 	/*---------------- 随机元 ----------------*/
 	Tensor& rands(int dimNum, int* dimLength, T st, T ed) {
-		zero(dimNum, dimLength);
+		alloc(dimNum, dimLength);
 		for (int i = 0; i < dim.product(); i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
 	}
 	Tensor& rands(int x0, int y0, int z0, T st, T ed) {
-		zero(x0, y0, z0);
+		alloc(x0, y0, z0);
 		for (int i = 0; i < dim.product(); i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
@@ -73,9 +81,7 @@ public:
 	T& operator[](int i) { return data[i]; }
 	T& operator()(int i) { return data[i]; }
 	T& operator()(int x, int y) { return data[y * dim[0] + x]; }
-	T& operator()(int x, int y, int z) {
-		return data[z * dim[1] * dim[0] + y * dim[0] + x];
-	}
+	T& operator()(int x, int y, int z) { return data[z * dim[1] * dim[0] + y * dim[0] + x]; }
 	T& operator()(int* dimIndex) {
 		int index = 0, step = 1;
 		for (int i = 0; i < dim.rows; i++) {
@@ -87,21 +93,33 @@ public:
 	/*----------------赋值 [ = ]----------------*/ //不能赋值自己
 	Tensor& operator=(const Tensor& a) {
 		if (a.data == NULL)error();
-		zero(a.dim.rows, a.dim.data);
-		int N = 1;
-		for (int i = 0; i < dim.rows; i++)N *= a.dim.data[i];
-		memcpy(data, a.data, sizeof(T) * N);
+		alloc(a.dim);
+		memcpy(data, a.data, dim.product()* sizeof(T))；
+		return *this;
+	}
+	/*----------------加法 [ add + ]----------------*/
+	Tensor& add(Tensor& a, Tensor& b) {
+		if (!(a.dim == b.dim)) error();
+		alloc(a.dim);
+		for (int i = 0; i < b.dim.product(); i++) data[i] = a[i] + b[i];
+		return *this;
+	}
+	Tensor& operator+=(Tensor& a) {
+		if (!(dim == a.dim)) error();
+		for (int i = 0; i < dim.product(); i++) data[i] += a[i];
 		return *this;
 	}
 	/*----------------数乘 [ mult × ]----------------*/
 	Tensor& mult(const double a, Tensor& b) {
-		Tensor ansTemp(b.dim.rows, b.dim.data);
-		for (int i = 0; i < b.dim.product(); i++)
-			ansTemp.data[i] = a * b.data[i];
-		eatMat(ansTemp);
+		alloc(b.dim);
+		for (int i = 0; i < b.dim.product(); i++) data[i] = a * b[i];
 		return *this;
 	}
-	/*----------------何并 [ merge ]----------------
+	Tensor& operator*=(const double a) {
+		for (int i = 0; i < dim.product(); i++) data[i] *= a;
+		return *this;
+	}
+	/*----------------合并 [ merge ]----------------
 	*	比 dimIndex 阶数低级的，作为元素块，整体进行内存复制
 		比 dimIndex 阶数高级的，作为复制次数
 	-----------------------------------------------*/
