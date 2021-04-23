@@ -1,140 +1,167 @@
+#ifndef BIGNUM_H
+#define BIGNUM_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define ll long long
-#define MAXN 1000
-class Num
+/*********************************************************************************
+						大数类
+*********************************************************************************/
+class BigNum
 {
-private:
 public:
-	bool* num = (bool*)malloc(MAXN);
-	Num(const char* input);
-	void add(Num* b);	//[add]加
-	void sub(Num* b);	//[sub]减
-	void mul(Num* b);	//[mul]乘
-	void div(Num* b);
-	void pow(ll n);		//[pow] 乘方
-	void leftShift();	//左移
-	void rightShift();	//右移
-	char* hex();
-	char* dec();
-};
-
-Num::Num(const char* inputStr)
-{
-	memset(num, 0, sizeof(bool) * MAXN);
-	ll cur = 0;
-	while (*(inputStr + cur++) != '\0');
-	char* input = (char*)malloc(MAXN / 3);
-	memcpy(input, inputStr, sizeof(char) * cur);
-	cur--;
-	for (ll i = 0; i < cur; i++)*(input + i) -= '0';
-	for (ll i = 0; i <= (cur - 1) / 2; i++) {	//高低位反转
-		unsigned char t = input[i];
-		input[i] = input[cur - 1 - i];
-		input[cur - 1 - i] = t;
+	typedef long long int64;
+	typedef unsigned char int8u;
+/******************************************************************************
+*                    核心数据
+*	Data堆叠顺序: 小低大高
+******************************************************************************/
+	bool sign = 0;
+	int8u* data;
+	int64 byte = 0;
+/******************************************************************************
+*                    基础函数
+-------------------------------------------------------------------------------
+******************************************************************************/
+	BigNum() {
+		byte = 8;
+		data = (int8u*)malloc(byte * sizeof(int8u));
 	}
-	int numCur = 0;
-	while (cur > 0) {
-		bool c = 0;
-		for (ll i = cur - 1; i >= 0; i--) {
-			unsigned char t = *(input + i) + c * 10;
-			c = t % 2;
-			*(input + i) = t / 2;
+	BigNum(int64 _byte) {
+		_byte = byte;
+		data = (int8u*)malloc(byte * sizeof(int8u));
+	}
+	BigNum(const char* input) {
+		byte = 8;
+		data = (int8u*)malloc(byte * sizeof(int8u));
+		int64 cur = 0;
+		while (input[cur++] != '\0'); cur--;
+		//for (int64 i = 0; i < cur; i++)input[i] -= '0';
+		for (int64 i = 0; i <= (cur - 1) / 2; i++) {	//高低位反转
+			unsigned char t = input[i];
+			//input[i] = input[cur - 1 - i];
+			//input[cur - 1 - i] = t;
 		}
-		num[numCur++] = c;
-		while (*(input + cur - 1) == 0)cur--;
+		int dataCur = 0;
+		while (cur > 0) {
+			bool c = 0;
+			for (int64 i = cur - 1; i >= 0; i--) {
+				unsigned char t = *(input + i) + c * 10;
+				c = t % 2;
+				//*(input + i) = t / 2;
+			}
+			data[dataCur++] = c;
+			while (*(input + cur - 1) == 0)cur--;
+		}
 	}
-}
-void Num::add(Num* b)	//[add]加
-{
-	bool c = 0;	//进位标志
-	for (ll i = 0; i < MAXN; i++) {
-		unsigned char t = num[i] + b->num[i] + c;
-		num[i] = t % 2;	c = t / 2;
+/******************************************************************************
+*                    基础函数
+-------------------------------------------------------------------------------
+******************************************************************************/
+	int8u operator[] (int64 index) { return data[index]; }
+	/*----------------加 [add]----------------*/
+	BigNum& add(BigNum& a, BigNum& b) {
+		int8u c = 0;	//进位标志
+		int t;
+		for (int64 i = 0; i < byte; i++) {
+			t = a[i] + b[i] + c;
+			data[i] = t % 0xFF;
+			c = t / 0xFF;
+		}return *this;
 	}
-}
-
-void Num::sub(Num* b)	//[sub]减
-{
-	bool c = 0;	//借位标志
-	for (ll i = 0; i < MAXN; i++) {
-		char t = num[i] - b->num[i] - c;
-		c = t < 0 ? 1 : 0;
-		num[i] = t < 0 ? t + 2 : t;
+	BigNum& operator+= (BigNum& a) {
+		int8u c = 0;	//进位标志
+		int t;
+		for (int64 i = 0; i < byte; i++) {
+			t = data[i] + a[i] + c;
+			data[i] = t % 0xFF;
+			c = t / 0xFF;
+		}return *this;
 	}
-}
-
-void Num::mul(Num* b)	//[mul]乘
-{
-	Num* t = new Num("0");
-	Num* ans = new Num("0");
-	memcpy(t, b, sizeof(bool) * MAXN);
-	for (ll i = 0; i < MAXN; i++) {
-		if (i != 0)t->leftShift();		//每次左移一位
-		if (num[i] == 1)ans->add(t);	//并加至ans
+	/*----------------减 [sub]----------------*/
+	BigNum& sub(BigNum& a, BigNum& b) {
+		int8u c = 0;		//借位标志
+		int t;
+		for (int64 i = 0; i < byte; i++) {
+			t = a[i] - b[i] - c;
+			data[i] = t > 0 ? t : t + 0xFF;
+			c = t > 0 ? 0 : 1;
+		}return *this;
 	}
-	memcpy(num, ans->num, sizeof(ans->num));
-}
-void Num::pow(ll n)	//[pow]乘方
-{
-	if (n == 0) {
-		memset(num, 0, sizeof(bool) * MAXN);
-		*num = 1; return;
+	BigNum& operator-= (BigNum& a) {
+		int8u c = 0;		//借位标志
+		int t;
+		for (int64 i = 0; i < byte; i++) {
+			t = data[i] - a[i] - c;
+			data[i] = t > 0 ? t : t + 0xFF;
+			c = t > 0 ? 0 : 1;
+		}return *this;
 	}
-	Num* t = new Num("0");
-	memcpy(t, num, sizeof(bool) * MAXN);
-	while (--n) {
-		mul(t);
+	/*----------------乘 [mul]----------------*/
+	BigNum& mul(BigNum& b) {
+		BigNum t("0"), ans("0");
+		//memcpy(t, b, sizeof(bool) * byte);
+		for (int64 i = 0; i < byte; i++) {
+			if (i != 0)t.leftShift();		//每次左移一位
+			//if (data[i] == 1)ans.add(t);	//并加至ans
+		}
+		memcpy(data, ans.data, sizeof(ans.data));
+		return *this;
 	}
-}
-
-void Num::leftShift()	//左移
-{
-	for (ll i = MAXN - 1; i > 0; i--) {
-		num[i] = num[i - 1];
-	}num[0] = 0;
-}
-void Num::rightShift()	//右移
-{
-	for (ll i = 0; i < MAXN - 1; i++) {
-		num[i] = num[i + 1];
-	}num[MAXN - 1] = 0;
-}
-
-char* Num::hex()	//十六进制输出
-{
-	char* ans = (char*)malloc(MAXN);		//新建存储十六进制结果的内存块
-	ll cur = MAXN - 1, ansCur = 0;
-	while (cur >= 0 && *(num + cur) == 0)cur--;	//找到num的最高位
-	unsigned char t = 0;
-	while (cur >= 0) {
-		t = t * 2 + *(num + cur);
-		if (cur % 4 == 0) {		//二转十六，是四位合一位
-			ans[ansCur++] = t;	//写十六进制结果
-			t = 0;
-		}cur--;
+	BigNum& operator*= (BigNum& a){ }
+	/*----------------除 [div]----------------*/
+	BigNum& div(BigNum& b) { }
+	BigNum& operator/= (BigNum& a){ }
+	/*----------------余 [mod]----------------*/
+	BigNum& mod(BigNum& b) { }
+	/*----------------乘方 [pow]----------------*/
+	BigNum& pow(int64 n) {
+		if (n == 0) {
+			memset(data, 0, sizeof(bool) * byte);
+			*data = 1; return;
+		}
+		BigNum t("0");
+		//memcpy(t, data, sizeof(bool) * byte);
+		while (--n)  mul(t);
 	}
-	for (ll i = 0; i < ansCur; i++) {	//十六进制转'0-9''A-F'的符号表示
-		if (ans[i] <= 9)ans[i] += '0';
-		else ans[i] += 'A' - 10;
+	/*----------------左移 []----------------*/
+	void leftShift() {
+		for (int64 i = 0; i < byte; i++) {
+			if (i != byte - 1)data[i + 1] = data[i] / 0x80;
+			data[i] = (data[i] % 0x80) * 2;
+		}
 	}
-	ans[ansCur]='\0';	//尾'\0'
-	return ans;
-}
-char* Num::dec()		//十进制输出
-{
-	char ans[100];
-	ll cur = MAXN - 1, ansCur = 0;
-	return ans;
-}
-
-void main()
-{
-	Num* a = new Num("12345");
-	Num* b = new Num("903");
-	a->mul(b);
-	printf("%s\n", a->hex());
-	b->add(a);
-	printf("%s\n", b->hex());
-}
+	/*----------------右移 []----------------*/
+	void rightShift() {
+		for (int64 i = 0; i < byte; i++) {
+			if (i != 0)data[i - 1] += 0x80 * (data[i] % 2);
+			data[i] /= 2;
+		}
+	}
+	/*----------------十六进制输出 ----------------*/
+	char* hex() {
+		char* ans = (char*)malloc(byte);		//新建存储十六进制结果的内存块
+		int64 cur = byte - 1, ansCur = 0;
+		while (cur >= 0 && *(data + cur) == 0)cur--;	//找到data的最高位
+		unsigned char t = 0;
+		while (cur >= 0) {
+			t = t * 2 + *(data + cur);
+			if (cur % 4 == 0) {		//二转十六，是四位合一位
+				ans[ansCur++] = t;	//写十六进制结果
+				t = 0;
+			}cur--;
+		}
+		for (int64 i = 0; i < ansCur; i++) {	//十六进制转'0-9''A-F'的符号表示
+			if (ans[i] <= 9)ans[i] += '0';
+			else ans[i] += 'A' - 10;
+		}
+		ans[ansCur] = '\0';	//尾'\0'
+		return ans;
+	}
+	/*----------------十进制输出 ----------------*/
+	char* dec() {
+		char ans[100];
+		int64 cur = byte - 1, ansCur = 0;
+		return ans;
+	}
+};
+#endif

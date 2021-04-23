@@ -143,23 +143,17 @@ public:
 		else nodeList[index](x, nodeList[index - 1].s, nodeList[index - 1].h);
 	}
 	/*-------------------------------- 反向传播 --------------------------------*/
-	double backward(Mat<double>& y, double(*lossLayer)(Mat<double>&, double), Mat<double>& (*lossLayer_bottomDiff)(Mat<double>&, double, Mat<double>&)) {
+	double backward(Mat<double>& y, double(*Loss)(Mat<double>&, double), Mat<double>& (*LossDiff)(Mat<double>&, double, Mat<double>&)) {
+		if (y.size() != xList.size())exit(-1);
 		double loss = 0;
 		Mat<double> tmp, zero(param->memCellCount);
 		for (int i = xList.size() - 1; i >= 0; i--) {
-			loss += lossLayer(nodeList[i].h, y[i]);
-			if (i == xList.size() - 1)
-				nodeList[i].backward(
-					lossLayer_bottomDiff(nodeList[i].h, y[i], tmp),
-					zero
-				);
-			else 
-				nodeList[i].backward(
-					lossLayer_bottomDiff(nodeList[i].h, y[i], tmp) += nodeList[i + 1].diff_h,
-					nodeList[i + 1].diff_s
-				);
-		}
-		return loss;
+			loss += Loss(nodeList[i].h, y[i]);
+			nodeList[i].backward(
+				LossDiff(nodeList[i].h, y[i], tmp) += (i == xList.size() - 1 ? zero : nodeList[i + 1].diff_h),
+				i == xList.size() - 1 ? zero : nodeList[i + 1].diff_s
+			);
+		} return loss;
 	}
 };
 #endif

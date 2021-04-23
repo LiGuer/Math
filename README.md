@@ -4,6 +4,8 @@ LiGu's Basic Algorithm Library.
 * <Mat.h>						矩阵类
 * <NeuralNetworks.h>			神经网络类
 * <BasicMachineLearning.h>		基础机器学习类
+* <LSTM.h>						长短期记忆网络
+* <BigNum.h>					大数类
 *  算法 Algorithm
 * <BasicAlgorithm.h>			基础算法类  
 * <GraphTheory.h>				图论类 
@@ -14,7 +16,6 @@ LiGu's Basic Algorithm Library.
 * <Tensor.h>					张量类  
 *  Other
 * <PartialDifferentialEquation.h>	偏微分方程类  
-* <LSTM.h>						长短期记忆网络  
 
 ## <Mat.h> 矩阵类  
 ```
