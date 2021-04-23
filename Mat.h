@@ -194,7 +194,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 	}
 	/*----------------赋矩阵 [ = ]----------------*/ //不能赋值自己
 	Mat& operator=(const Mat& a) {
-		if (a.data == NULL)error();
+		if (a.data == NULL) return *this;
 		alloc(a.rows, a.cols);
 		memcpy(data, a.data, sizeof(T) * size());
 		return *this;
@@ -714,7 +714,7 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 	Mat& rowsStack(Mat& a, Mat& b) {
 		if (a.cols != b.cols)error();
 		Mat ansTmp(a.rows + b.rows, a.cols);
-		for (int i = 0; i < ansTmp.row; i++)
+		for (int i = 0; i < ansTmp.rows; i++)
 			for (int j = 0; j < ansTmp.cols; j++)
 				ansTmp(i, j) = i < a.rows ? a(i, j) : b(i - a.rows, j);
 		eatMat(ansTmp); return *this;
@@ -722,7 +722,7 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 	Mat& colsStack(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
 		Mat ansTmp(a.rows, a.cols + b.cols);
-		for (int i = 0; i < ansTmp.row; i++)
+		for (int i = 0; i < ansTmp.rows; i++)
 			for (int j = 0; j < ansTmp.cols; j++)
 				ansTmp(i, j) = j < a.cols ? a(i, j) : b(i, j - a.cols);
 		eatMat(ansTmp); return *this;

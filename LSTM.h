@@ -1,3 +1,17 @@
+/*
+Copyright 2020 LiGuer. All Rights Reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+	http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+[Reference]:
+[1] Thanks for nicodjimenez at https://github.com/nicodjimenez/lstm
+==============================================================================*/
 #ifndef LSTM_H
 #define LSTM_H
 /*********************************************************************************
@@ -27,14 +41,14 @@
 *********************************************************************************/
 class LstmNodeParam {
 public:
-	int memCellCount, x_dim;
+	int memCellCount, xDim;
 	Mat<double> weights[4], bias[4], diffWeights[4], diffBias[4];
 	LstmNodeParam(int _memCellCount, int _x_dim) {
-		memCellCount = _memCellCount; x_dim = _x_dim;
+		memCellCount = _memCellCount; xDim = _x_dim;
 		for (int i = 0; i < 4; i++) {
-			weights[i].rands(memCellCount, memCellCount + x_dim, -0.1, 0.1);
+			weights[i].rands(memCellCount, memCellCount + xDim, -0.1, 0.1);
 			bias[i].rands(memCellCount, 1, -0.1, 0.1);
-			diffWeights[i].zero(memCellCount, memCellCount + x_dim);
+			diffWeights[i].zero(memCellCount, memCellCount + xDim);
 			diffBias[i].zero(memCellCount);
 		}
 	}
@@ -54,15 +68,16 @@ public:
 	// Gate[4]: G, F, I, O
 	LstmNodeParam* param;
 	Mat<double> gate[4];
-	Mat<double> s, h, s_prev, h_prev,xc, diff_h, diff_s;
+	Mat<double> s, h, s_prev, h_prev, diff_s, diff_h, xc;
 	LstmNode(LstmNodeParam* _param) {
 		param = _param;
 	}
 	/*-------------------------------- 正向传播 --------------------------------*/
 	void operator() (Mat<double>& x, Mat<double>& _s_prev, Mat<double>& _h_prev) { return forward(x, _s_prev, _h_prev); }
+	void operator() (Mat<double>& x) { Mat<double> zero(param->memCellCount); return forward(x, zero, zero); }
 	void forward(Mat<double>& x, Mat<double>& _s_prev, Mat<double>& _h_prev) {
 		s_prev = _s_prev, h_prev = _h_prev;
-		xc.rowsStack(x, h_prev);
+		xc.rowsStack(x, h_prev);							//[h_(t-1), xt]
 		// G F I O
 		Mat<double> tmp;
 		gate[0].function(									//gt = tanh(Wg×[h_(t-1), xt] + bg)
@@ -76,7 +91,8 @@ public:
 			);
 		// S H
 		s.add(tmp.elementMult(gate[0], gate[2]), s.elementMult(s_prev, gate[1]));//st = gt * it + s_(t-1) * ft
-		h.elementMult(gate[3], tmp.function(s, [](double x) { return tanh(x); }));	//ht = ot·tanh(Ct)
+		h.elementMult(gate[3], s);
+		//h.elementMult(gate[3], tmp.function(s, [](double x) { return tanh(x); }));	//ht = ot·tanh(Ct)
 	}
 	/*-------------------------------- 反向传播 --------------------------------*/
 	void backward(Mat<double>& top_diff_h, Mat<double>& top_diff_s) {
@@ -100,46 +116,50 @@ public:
 		}
 		//save bottom diffs
 		diff_s.elementMult(gate[1]);
-		diff_h = diff_xc.block(param->x_dim, diff_xc.rows - 1, 0, 0, tmp);
+		diff_h = diff_xc.block(param->xDim, diff_xc.rows - 1, 0, 0, tmp);
 	}
 };
 /*********************************************************************************
 						LSTM 长短期记忆网络
+*	正向传播: 
+		xList, nodeList: 保持运行过程数据, 在反向传播中使用
 *********************************************************************************/
 class LstmNetwork
 {
+public:
 	LstmNodeParam* param;
-	int memCellCount, x_dim;
 	std::vector<LstmNode> nodeList;
-	std::vector<Mat<double>> x_list;		//input sequence
+	std::vector<Mat<double>> xList;		//input sequence
 	LstmNetwork(LstmNodeParam* _param) {
 		param = _param;
 	}
 	/*-------------------------------- 正向传播 --------------------------------*/
 	void operator() (Mat<double>& x) { return forward(x); }
 	void forward(Mat<double>& x) {
-		x_list.push_back(x);
-		LstmNode nt(param);
-		if (x_list.size() > nodeList.size()) nodeList.push_back(nt);
-		int index = x_list.size() - 1;
-		if (index == 0) {
-			Mat<double> zero(memCellCount); nodeList[index](x, zero, zero);
-		}
+		xList.push_back(x);
+		LstmNode node(param); nodeList.push_back(node);
+		int index = xList.size() - 1; 
+		if (index == 0) nodeList[index](x);
 		else nodeList[index](x, nodeList[index - 1].s, nodeList[index - 1].h);
 	}
 	/*-------------------------------- 反向传播 --------------------------------*/
-	double backward(Mat<double> y_list, double(*lossLayer)(Mat<double>&, double), Mat<double>& (*lossLayer_bottomDiff)(Mat<double>&, double)) {
-		int index = x_list.size() - 1;
-		double loss = lossLayer(nodeList[index].h, y_list[index]);
-		Mat<double> tmp;
-		nodeList[index].backward(lossLayer_bottomDiff(nodeList[index].h, y_list[index]), tmp.zero(memCellCount));
-		while (--index >= 0) {
-			loss += lossLayer(nodeList[index].h, y_list[index]);
-			tmp = lossLayer_bottomDiff(nodeList[index].h, y_list[index]);
-			nodeList[index].backward(tmp += nodeList[index + 1].diff_h, nodeList[index + 1].diff_s);
+	double backward(Mat<double>& y, double(*lossLayer)(Mat<double>&, double), Mat<double>& (*lossLayer_bottomDiff)(Mat<double>&, double, Mat<double>&)) {
+		double loss = 0;
+		Mat<double> tmp, zero(param->memCellCount);
+		for (int i = xList.size() - 1; i >= 0; i--) {
+			loss += lossLayer(nodeList[i].h, y[i]);
+			if (i == xList.size() - 1)
+				nodeList[i].backward(
+					lossLayer_bottomDiff(nodeList[i].h, y[i], tmp),
+					zero
+				);
+			else 
+				nodeList[i].backward(
+					lossLayer_bottomDiff(nodeList[i].h, y[i], tmp) += nodeList[i + 1].diff_h,
+					nodeList[i + 1].diff_s
+				);
 		}
 		return loss;
 	}
 };
-
 #endif
