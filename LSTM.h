@@ -136,21 +136,24 @@ public:
 	/*-------------------------------- 正向传播 --------------------------------*/
 	void operator() (Mat<double>& x) { return forward(x); }
 	void forward(Mat<double>& x) {
+		//save x, node
+		LstmNode node(param); 
+		nodeList.push_back(node);
 		xList.push_back(x);
-		LstmNode node(param); nodeList.push_back(node);
+		//forward
 		int index = xList.size() - 1; 
 		if (index == 0) nodeList[index](x);
 		else nodeList[index](x, nodeList[index - 1].s, nodeList[index - 1].h);
 	}
 	/*-------------------------------- 反向传播 --------------------------------*/
-	double backward(Mat<double>& y, double(*Loss)(Mat<double>&, double), Mat<double>& (*LossDiff)(Mat<double>&, double, Mat<double>&)) {
-		if (y.size() != xList.size())exit(-1);
+	double backward(Mat<double>& y, double(*Loss)(Mat<double>&, double), Mat<double>&(*LossDiff)(Mat<double>&, double, Mat<double>&)) {
+		if (y.size() != xList.size()) exit(-1);
 		double loss = 0;
 		Mat<double> tmp, zero(param->memCellCount);
 		for (int i = xList.size() - 1; i >= 0; i--) {
 			loss += Loss(nodeList[i].h, y[i]);
 			nodeList[i].backward(
-				LossDiff(nodeList[i].h, y[i], tmp) += (i == xList.size() - 1 ? zero : nodeList[i + 1].diff_h),
+				tmp.add(LossDiff(nodeList[i].h, y[i], tmp), i == xList.size() - 1 ? zero : nodeList[i + 1].diff_h),
 				i == xList.size() - 1 ? zero : nodeList[i + 1].diff_s
 			);
 		} return loss;

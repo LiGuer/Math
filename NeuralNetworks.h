@@ -26,9 +26,15 @@ class LeNet_NeuralNetworks()						//LeNet卷积神经网络 : 1998.Yann LeCun
 class Inception()									//Inception模块 : 2014.Google
 class GoogLeNet_NeuralNetworks()					//GoogLeNet卷积神经网络 : 2014.Google
 ################################################################################################*/
-
+/*----------------[ ReLU ]----------------*/
+float relu(float x) { return x < 0 ? x : 0; }
+/*----------------[ sigmoid ]----------------*/
+float sigmoid(float x) { return 1 / (1 + exp(-x)); }
 /*************************************************************************************************
 *							NeuralLayer	神经网络层
+*	[核心数据]: [1] weight, bias	[2] actFunc 激活函数
+				[3] output 输出(运行过程存储, 反向传递使用)
+				[4] delta 更新值
 *	[公式]:
 		[正向]: y = σ( Σwi·xi + b )
 				(矩阵式): y = σ(W x + b)
@@ -68,26 +74,25 @@ class GoogLeNet_NeuralNetworks()					//GoogLeNet卷积神经网络 : 2014.Google
 class NeuralLayer {
 public:
 	Mat<float> weight, bias;
-	Mat<float> output, linearOut, delta;
-	int ActivFuncType = 1;
+	Mat<float> output, delta;
+	float(*actFunc)(float);
 	/*----------------[ init ]----------------*/
 	NeuralLayer() { ; }
-	NeuralLayer(int inputSize, int outputSize) { init(inputSize, outputSize); }
-	void init(int inputSize, int outputSize) {
+	NeuralLayer(int inputSize, int outputSize, float(*_actFunc)(float)) { init(inputSize, outputSize, _actFunc); }
+	NeuralLayer(int inputSize, int outputSize) { init(inputSize, outputSize, [](float x) {return x; }); }
+	void init(int inputSize, int outputSize, float(*_actFunc)(float)) {
 		weight.rands(outputSize, inputSize, -1, 1);
 		bias.rands(outputSize, 1, -1, 1);
+		actFunc = _actFunc;
 	}
 	/*----------------[ forward ]----------------
 	*	y = σ(W x + b)
 	*-------------------------------------------*/
 	Mat<float>* operator()(Mat<float>& input) { return forward(input); }
 	Mat<float>* forward(Mat<float>& input) {
-		linearOut.mult(weight, input);
-		switch (ActivFuncType) {
-		case 0:output = linearOut; break;
-		case 1:sigmoid(linearOut, output); break;
-		case 2:relu(linearOut, output); break;
-		}return &output;
+		output.add(output.mult(weight, input), bias);
+		output.function(output, actFunc);
+		return &output;
 	}
 	/*----------------[ backward ]----------------
 	[1] ∂E/∂wL = δL·y_L-1'
@@ -118,18 +123,6 @@ public:
 	void load(FILE* file) {
 		for (int i= 0; i < weight.rows * weight.cols; i++) fscanf(file, "%f", &weight[i]);
 		for (int i = 0; i < bias.rows; i++) fscanf(file, "%f", &bias[i]);
-	}
-	/*----------------[ ReLU ]----------------*/
-	void relu(Mat<float>& x, Mat<float>& y) {
-		y = x;
-		for (int i = 0; i < y.rows; i++)
-			y[i] = y[i] < 0 ? y[i] : 0;
-	}
-	/*----------------[ sigmoid ]----------------*/
-	void sigmoid(Mat<float>& x, Mat<float>& y) {
-		y.alloc(x.rows);
-		for (int i = 0; i < x.rows; i++)
-			y[i] = 1 / (1 + exp(-x[i]));
 	}
 };
 /*************************************************************************************************
@@ -268,13 +261,15 @@ public:
 	void setLayer(int index, int inputSize, int outputSize) {
 		if (index >= layer.size())exit(1);
 		delete layer[index];
-		layer[index] = new NeuralLayer(inputSize, outputSize);
+		layer[index] = new NeuralLayer(inputSize, outputSize, sigmoid);
 	}
 	/*----------------[ forward ]----------------*/
-	void forward(Mat<float>& input, Mat<float>& output) {
-		Mat<float>* y = layer[0]->forward(input);
-		for (int i = 1; i < layer.size(); i++) y = layer[i]->forward(*y);
+	Mat<float>& operator()(Mat<float>& input, Mat<float>& output) { return forward(input, output); }
+	Mat<float>& forward(Mat<float>& input, Mat<float>& output) {
+		Mat<float>* y = (*layer[0])(input);
+		for (int i = 1; i < layer.size(); i++) y = (*layer[i])(*y);
 		output = *y; preIntput = input;
+		return output;
 	}
 	/*----------------[ backward ]----------------*/
 	void backward(Mat<float>& target) {
@@ -305,11 +300,10 @@ public:
 	ConvLayer Conv_1{ 1,16,5,2,1 }, Conv_2{ 16,32,5,2,1 };
 	PoolLayer MaxPool_1{ 2,0,2,MaxPool_1.M }, MaxPool_2{ 2,0,2,MaxPool_2.M };
 	NeuralLayer FullConnect_1{ 32 * 7 * 7,128 }, FullConnect_2{ 128,64 }, FullConnect_3{ 64,10 };
-	LeNet_NeuralNetworks() {
-		FullConnect_1.ActivFuncType = FullConnect_2.ActivFuncType = FullConnect_3.ActivFuncType = 0;
-	}
+	LeNet_NeuralNetworks() { ; }
 	/*----------------[ forward ]----------------*/
-	void forward(Tensor<float>& input, Mat<float>& output) {
+	Mat<float>& operator()(Tensor<float>& input, Mat<float>& output) { return forward(input, output); }
+	Mat<float>& forward(Tensor<float>& input, Mat<float>& output) {
 		Tensor<float>* y;
 		y = Conv_1(input);
 		y = MaxPool_1(*y);
@@ -321,7 +315,7 @@ public:
 		maty = FullConnect_1(*maty);
 		maty = FullConnect_2(*maty);
 		maty = FullConnect_3(*maty);
-		output = *maty;
+		return output = *maty;
 	}
 	/*----------------[ backward ]----------------*/
 	/*----------------[ save/load ]----------------*/
@@ -420,10 +414,11 @@ public:
 		a5.init(832, 256, 160, 320, 32, 128, 128);
 		b5.init(832, 384, 192, 384, 48, 128, 128);
 		avgpool.init(8, 8, 0, avgpool.A);
-		linear.init(1024 * 5 * 5, 7);
+		linear.init(1024 * 5 * 5, 7, relu);
 	}
 	/*----------------[ forward ]----------------*/
-	void forward(Tensor<float>& input, Mat<float>& output) {
+	Mat<float>& operator()(Tensor<float>& input, Mat<float>& output) { return forward(input, output); }
+	Mat<float>& forward(Tensor<float>& input, Mat<float>& output) {
 		Tensor<float>* y;
 		y = pre_layers(input);
 		y = b3(*a3(*y));
@@ -436,7 +431,7 @@ public:
 		Mat<float> t2(t.dim.product()); t2.data = t.data; t.data = NULL;
 		Mat<float>* maty = &t2;
 		maty = linear(*maty);
-		output = *maty;
+		return output = *maty;
 	}
 	/*----------------[ save/load ]----------------*/
 	void save(const char* saveFile) {
