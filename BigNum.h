@@ -1,3 +1,15 @@
+/*
+Copyright 2020,2021 LiGuer. All Rights Reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+	http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
 #ifndef BIGNUM_H
 #define BIGNUM_H
 #include <stdio.h>
@@ -22,44 +34,42 @@ public:
 *                    基础函数
 -------------------------------------------------------------------------------
 ******************************************************************************/
-	BigNum() {
-		byte = 8;
-		data = (int8u*)malloc(byte * sizeof(int8u));
-	}
-	BigNum(int64 _byte) {
-		_byte = byte;
-		data = (int8u*)malloc(byte * sizeof(int8u));
-	}
+	BigNum() { zero(8); }
+	BigNum(int64 _byte) { zero(_byte); }
 	BigNum(const char* input) {
-		byte = 8;
-		data = (int8u*)malloc(byte * sizeof(int8u));
-		int64 cur = 0;
-		while (input[cur++] != '\0'); cur--;
-		//for (int64 i = 0; i < cur; i++)input[i] -= '0';
-		for (int64 i = 0; i <= (cur - 1) / 2; i++) {	//高低位反转
-			unsigned char t = input[i];
-			//input[i] = input[cur - 1 - i];
-			//input[cur - 1 - i] = t;
-		}
-		int dataCur = 0;
-		while (cur > 0) {
-			bool c = 0;
-			for (int64 i = cur - 1; i >= 0; i--) {
-				unsigned char t = *(input + i) + c * 10;
-				c = t % 2;
-				//*(input + i) = t / 2;
-			}
-			data[dataCur++] = c;
-			while (*(input + cur - 1) == 0)cur--;
+		zero(8);
+		int8u t;
+		for (int i = 0; input[i]; i++) {
+			if (i == 0 && input[i] == '-') { sign = 1; continue; }
+			t = input[i] - '0';
+			((*this) *= 10) += t;
 		}
 	}
+	~BigNum() { delete data; }
 /******************************************************************************
-*                    基础函数
+*                    基础操作
 -------------------------------------------------------------------------------
 ******************************************************************************/
 	int8u operator[] (int64 index) { return data[index]; }
+	/*----------------零----------------*/
+	BigNum& alloc(int64 _byte){
+		_byte = byte;
+		data = (int8u*)malloc(byte * sizeof(int8u));
+	}
+	BigNum& Realloc() {
+		if (byte == 0)return alloc(8);
+		byte *= 2;
+		realloc(data, byte * sizeof(int8u));
+	}
+	BigNum& zero() { sign = 0; memset(data, 0, byte * sizeof(int8u)); }
+	BigNum& zero(int64 _byte) { alloc(_byte); zero(); }
 	/*----------------加 [add]----------------*/
 	BigNum& add(BigNum& a, BigNum& b) {
+		if (a.sign == 1 && b.sign == 0) { sign = 0; return subU(b, a); }
+		if (a.sign == 0 && b.sign == 1) { sign = 0; return subU(a, b); }
+		sign = (a.sign == 1 && b.sign == 1) ? 1 : 0; return addU(a, b);
+	}
+	BigNum& addU(BigNum& a, BigNum& b) {
 		int8u c = 0;	//进位标志
 		int t;
 		for (int64 i = 0; i < byte; i++) {
@@ -77,8 +87,14 @@ public:
 			c = t / 0xFF;
 		}return *this;
 	}
+	BigNum& operator+= (int a) { }
 	/*----------------减 [sub]----------------*/
 	BigNum& sub(BigNum& a, BigNum& b) {
+		if (a.sign == 0 && b.sign == 1) { sign = 0; return addU(a, b); }
+		if (a.sign == 1 && b.sign == 0) { sign = 1; return addU(a, b); }
+		sign = (a.sign == 1 && b.sign == 1) ? 1 : 0; subU(a, b);
+	}
+	BigNum& subU(BigNum& a, BigNum& b) {
 		int8u c = 0;		//借位标志
 		int t;
 		for (int64 i = 0; i < byte; i++) {
@@ -96,6 +112,7 @@ public:
 			c = t > 0 ? 0 : 1;
 		}return *this;
 	}
+	BigNum& operator-= (int a) { }
 	/*----------------乘 [mul]----------------*/
 	BigNum& mul(BigNum& b) {
 		BigNum t("0"), ans("0");
@@ -108,9 +125,11 @@ public:
 		return *this;
 	}
 	BigNum& operator*= (BigNum& a){ }
+	BigNum& operator*= (int a){ }
 	/*----------------除 [div]----------------*/
 	BigNum& div(BigNum& b) { }
 	BigNum& operator/= (BigNum& a){ }
+	BigNum& operator/= (int a) { }
 	/*----------------余 [mod]----------------*/
 	BigNum& mod(BigNum& b) { }
 	/*----------------乘方 [pow]----------------*/

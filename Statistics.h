@@ -21,8 +21,8 @@ namespace Statistics {
 	/*--------------------------------[ 基础参数 ]--------------------------------*/
 	double Mean(Mat<double>& x);														//平均值
 	Mat<double>& Mean(Mat<double>& x, Mat<double>& ans);								//平均值
-	double Variance(Mat<double>& x, double mean = NULL);								//方差
-	Mat<double>& Variance(Mat<double>& x, Mat<double>& ans, Mat<double> mean);			//方差
+	double Variance(Mat<double>& x);													//方差
+	Mat<double>& Variance(Mat<double>& x, Mat<double>& ans);							//方差
 	/*--------------------------------[ 概率分布、检验 ]--------------------------------*/
 	Mat<double>& NormalDistribution(double mean, double variance, double min, double max, double delta, Mat<double>& output);	//正态分布
 	bool SkewnessKurtosisTest(Mat<double>& x, double SignificanceLevel);														//正态分布-偏度峰度检验

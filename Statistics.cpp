@@ -11,14 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 #include "Statistics.h"
-
 /***************************************************************************
 *								平均值
 *	Mean = Σx_i / N
 /***************************************************************************/
-double Statistics::Mean(Mat<double>& x) {
-	return x.sum() / x.cols;
-}
+double Statistics::Mean(Mat<double>& x) { return x.sum() / x.cols; }
 Mat<double>& Statistics::Mean(Mat<double>& x, Mat<double>& ans) {
 	return ans.mult(1.0 / x.cols, x.sum(ans, 1));
 }
@@ -26,14 +23,13 @@ Mat<double>& Statistics::Mean(Mat<double>& x, Mat<double>& ans) {
 *								方差
 *	Var² = Σ(x_i - x_mean)² / (N - 1)
 /***************************************************************************/
-double Statistics::Variance(Mat<double>& x, double mean) {
-	if (mean == NULL) mean = Mean(x);
-	double var = 0;
+double Statistics::Variance(Mat<double>& x) {
+	double var = 0, mean = Mean(x);
 	for (int i = 0; i < x.cols * x.rows; i++) var += (x[i] - mean) * (x[i] - mean);
 	return var / (x.cols * x.rows - 1);
 }
-Mat<double>& Statistics::Variance(Mat<double>& x, Mat<double>& ans, Mat<double> mean) {
-	//if (mean == NULL) { mean.alloc(x.rows, 1); Mean(x, mean); }
+Mat<double>& Statistics::Variance(Mat<double>& x, Mat<double>& ans) {
+	Mat<double> mean; Mean(x, mean);
 	ans.zero(x.rows, 1);
 	for (int i = 0; i < x.rows; i++) {
 		for (int j = 0; j < x.cols; j++)
