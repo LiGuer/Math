@@ -18,6 +18,7 @@ limitations under the License.
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <functional>
 template<class T>
 class Mat
 {
@@ -737,12 +738,22 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 		ans.eatMat(ansTmp); return ans;
 	}
 	/*----------------函数操作 []----------------*/
+	//Function Pointer
 	Mat& function(Mat& x, T (*fun)(T)) {
 		alloc(x.rows, x.cols);
 		for (int i = 0; i < x.size(); i++)data[i] = fun(x[i]);
 		return *this;
 	}
 	Mat& function(T (*fun)(T)) {
+		for (int i = 0; i < size(); i++)data[i] = fun(data[i]);
+		return *this;
+	}
+	Mat& function_(Mat& x, std::function<T(T)> fun) {
+		alloc(x.rows, x.cols);
+		for (int i = 0; i < x.size(); i++)data[i] = fun(x[i]);
+		return *this;
+	}
+	Mat& function_(std::function<T(T)> fun) {
 		for (int i = 0; i < size(); i++)data[i] = fun(data[i]);
 		return *this;
 	}

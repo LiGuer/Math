@@ -68,7 +68,7 @@ public:
 		return *this;
 	}
 	Tensor& rands(int x0, int y0, int z0, T st, T ed) {
-		alloc(x0, y0, z0);
+		zero(x0, y0, z0);
 		for (int i = 0; i < dim.product(); i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
@@ -93,7 +93,7 @@ public:
 	Tensor& operator=(const Tensor& a) {
 		if (a.data == NULL)error();
 		alloc(a.dim);
-		memcpy(data, a.data, dim.product()* sizeof(T))£»
+		memcpy(data, a.data, dim.product() * sizeof(T));
 		return *this;
 	}
 	/*----------------¼Ó·¨ [ add + ]----------------*/
@@ -142,7 +142,7 @@ public:
 				pos += t; inputPosMem[i] += t;
 			}
 		}
-		eatMat(ansTemp);
+		//eatMat(ansTemp); 
 		return *this;
 	}
 };
