@@ -302,7 +302,7 @@ public:
 		prevHSet.clear(); prevHSet.push_back(h_prev);
 		xcSet.clear();
 		for (int timeStep = 0; timeStep < input.size(); timeStep++) {
-			forward(input[timeStep], prevSSet[timeStep], prevSSet[timeStep]);
+			forward(input[timeStep], prevSSet[timeStep], prevHSet[timeStep]);
 			for (int i = 0; i < 4; i++) 
 				gateSet[i].push_back(gate[i]);
 			prevSSet.push_back(s);
@@ -312,21 +312,18 @@ public:
 		return &prevHSet;
 	}
 	Mat<double>* forward(Mat<double>& input, Mat<double>& prevS, Mat<double>& prevH) {
-		xc.rowsStack(input, prevH);							//[h_(t-1), xt]
+		xc.rowsStack(input, prevH);														//[h_(t-1), xt]
 		// G F I O
-		gate[0].function(									//gt = tanh(Wg×[h_(t-1), xt] + bg)
-			gate[0].add(gate[0].mult(weights[0], xc), bias[0]),
-			[](double x) { return tanh(x); }
-		);
-		for (int i = 1; i < 4; i++) 						//Ft, It, Ot = Sigmoid( W_ifo×[h_(t-1), xt] + b_ifo )	
-			gate[i].function(
-				gate[i].add(gate[i].mult(weights[i], xc), bias[i]),
-				[](double x) { return 1 / (1 + exp(-x)); }
-		);
+		for (int i = 0; i < 4; i++) { 													//gt = tanh(Wg×[h_(t-1), xt] + bg) //Ft, It, Ot = Sigmoid( W_ifo×[h_(t-1), xt] + b_ifo )	
+			gate[i].add(gate[i].mult(weights[i], xc), bias[i]);
+			i == 0 ?
+				gate[i].function([](double x) { return tanh(x); }):
+				gate[i].function([](double x) { return 1 / (1 + exp(-x)); });
+		}
 		// S H
 		Mat<double> tmp;
 		s.add(tmp.elementMult(gate[0], gate[2]), s.elementMult(prevS, gate[1]));		//st = gt·it + s_(t-1)·ft
-		return &(h.elementMult(gate[3], s));
+		return &h.elementMult(gate[3], s);
 		//h.elementMult(gate[3], tmp.function(s, [](double x) { return tanh(x); }));	//ht = ot·tanh(st)
 	}
 	/*-------------------------------- 反向传播 --------------------------------*/
@@ -334,18 +331,14 @@ public:
 		Mat<double> tmp, diffH(error[0].rows), diffS(error[0].rows);
 		for (int timeStep = error.size() - 1; timeStep >= 0; timeStep--) {
 			for (int i = 0; i < 4; i++) gate[i] = gateSet[i][timeStep];
+			s = prevSSet[timeStep + 1];
 			xc = xcSet[timeStep];
-			backward(
-				prevSSet[timeStep],
-				error[timeStep],
-				diffH,
-				diffS
-			);
+			backward(prevSSet[timeStep], error[timeStep], diffH, diffS);
 		}
 		//Update
 		for (int i = 0; i < 4; i++) {
-			weights[i] += diffWeights[i] *= -learnRate;
-			bias[i] += diffBias[i] *= -learnRate;
+			weights[i] += (diffWeights[i] *= -learnRate);
+			bias[i] += (diffBias[i] *= -learnRate);
 			diffWeights[i].zero();
 			diffBias[i].zero();
 		}
@@ -354,24 +347,25 @@ public:
 		diffH += error;
 		//notice that top_diffS is carried along the constant error carousel
 		Mat<double> diffGate[4], tmp;
-		diffS.add(diffS.elementMult(gate[3], diffH), diffS);						//Δs = ot·Δh_(t+1) + Δs_(t+1) 
+		diffS.add(tmp.elementMult(gate[3], diffH), diffS);							//Δs = ot·Δh_(t+1) + Δs_(t+1) 
 		diffGate[0].elementMult(gate[2], diffS);									//Δg = it·Δs
-		diffGate[1].elementMult(prevS, diffS);										//Δf = s_(t-1)·Δs
+		diffGate[1].elementMult(prevS,   diffS);									//Δf = s_(t-1)·Δs
 		diffGate[2].elementMult(gate[0], diffS);									//Δi = gt·Δs
-		diffGate[3].elementMult(s, diffH);											//Δo = st·Δh_(t+1)
-		//diffs w.r.t. vector inside sigma / tanh function
-		diffGate[0].elementMult(tmp.function(gate[0], [](double x) { return 1 - x * x; }));
-		for (int i = 1; i < 4; i++)
+		diffGate[3].elementMult(s,       diffH);									//Δo = st·Δh_(t+1)
+		//arctive function
+		for (int i = 0; i < 4; i++)
+			i == 0 ?
+			diffGate[i].elementMult(tmp.function(gate[i], [](double x) { return 1 - x * x; })) :
 			diffGate[i].elementMult(tmp.function(gate[i], [](double x) { return x * (1 - x); }));
 		//diffs w.r.t. inputs & compute bottom diff
 		Mat<double> diffXc(xc.rows);												//Δgfio_W += Δgfio×xc^T //Δgfio_b += Δgfio //Δxc = ΣW^T×Δ_gfio
 		for (int i = 0; i < 4; i++) {
 			diffWeights[i] += tmp.mult(diffGate[i], xc.transpose(tmp));
 			diffBias[i] += diffGate[i];
-			diffXc += tmp.mult(weights->transpose(tmp), diffGate[i]);
+			diffXc += tmp.mult(weights[i].transpose(tmp), diffGate[i]);
 		}
 		diffS.elementMult(gate[1]);
-		diffH = diffXc.block(diffXc.rows - diffH.rows, diffXc.rows - 1, 0, 0, tmp);
+		diffXc.block(diffXc.rows - diffH.rows, diffXc.rows - 1, 0, 0, diffH);		//Δh
 	}
 	/*----------------[ save / load ]----------------*/
 	void save(FILE* file) {
@@ -613,7 +607,7 @@ public:
 	NeuralLayer nn;
 	Mat<double> prevLstmS, prevLstmH;
 	std::vector<Mat<double>> output;
-	double learnRate = 0.02;
+	double learnRate = 0.005;
 	LstmNetwork(int inputSize, int LstmOutputSize, int outputSize) {
 		lstm.init(inputSize, LstmOutputSize);
 		nn.init(LstmOutputSize, outputSize, [](double x) { return x; });
@@ -627,6 +621,7 @@ public:
 		prevLstmS = lstm.s;
 		prevLstmH = lstm.h;
 		output.clear();
+		Mat<double> tmp;
 		for (int i = 0; i < input.size(); i++)
 			output.push_back(*nn(lstm.prevHSet[i + 1]));
 		return output;
