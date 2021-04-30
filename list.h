@@ -32,7 +32,7 @@ public:
 	iterator& operator++ () { node = node->next; return *this; }		//递增[++] 
 	iterator& operator-- () { node = node->prev; return *this; }		//递减[--]
 	T operator* ()const { return (*node).data; }						//指针[*]
-	T* operator-> ()const { return &(operator*()); }					//指针[->]
+	T*operator->()const { return &(operator*()); }						//指针[->]
 };
 /*********************************************************************************
 *						list 环状双向链表(主)
@@ -75,7 +75,7 @@ public:
 	}
 	/*---------------- 首末地址 ----------------*/
 	iterator begin() { return iterator(head->next); }
-	iterator end() { return iterator(head); }
+	iterator end  () { return iterator(head); }
 	/*---------------- 判断为空 ----------------*/
 	bool empty() { return head.next == head; }
 	/*---------------- 元素数量 ----------------*/
@@ -107,15 +107,13 @@ public:
 	}
 	/*---------------- 首末插入删除 ----------------*/
 	void push_front(const T& x) { insert(begin(), x); }
-	void push_back(const T& x) { insert(end(), x); }
+	void push_back (const T& x) { insert(end(), x); }
 	void pop_front() { erase(begin()); }
-	void pop_back() { erase(--end()); }
+	void pop_back () { erase(--end()); }
 	/*---------------- 全清 ----------------*/
 	void clear() {
-		for (iterator it = begin(); it != end();) {
-			iterator temp = it++;
-			erase(temp);
-		}
+		for (iterator it = begin(); it != end(); it++) 
+			erase(it);
 	}
 	/*---------------- 查找 ----------------*/
 	iterator search(const T& x) {

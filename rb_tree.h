@@ -17,7 +17,10 @@ struct _rb_tree_node
 	typedef _rb_tree_color_tpye color_tpye;
 	typedef _rb_tree_node node;
 	color_tpye color = black;
-	node* parent = NULL, left = NULL, right = NULL;
+	node* 
+		parent = NULL, 
+		left   = NULL, 
+		right  = NULL;
 	T key;
 };
 /*********************************************************************************
@@ -53,11 +56,11 @@ class rb_tree {
 	rb_tree() { nil = new node; root = nil; }
 	/*---------------- 最大/最小值 ----------------*/
 	static node* min(node* x) {
-		while (x->left != nil)x = x->left;
+		while (x->left  != nil) x = x->left;
 		return x;
 	}
 	static node* max(node* x) {
-		while (x->right != nil)x = x->left;
+		while (x->right != nil) x = x->left;
 		return x;
 	}
 	/*---------------- 搜索 ----------------*/
@@ -105,11 +108,12 @@ class rb_tree {
 			if (x.key == t.key) {						//case2: key exist
 				t.key = x.key; return;
 			}
-			else if (x.key < t.key) t = t->left;
+			else if (x.key < t.key) 
+				 t = t->left;
 			else t = t->right;
 		}
 		x->parent = y;
-		x->left = nil;
+		x->left  = nil;
 		x->right = nil;
 		x->color = red;
 		//if red with black parent,black balance won't be broken

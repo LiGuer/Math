@@ -33,7 +33,8 @@ Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<Gra
 	GraphList.zero(N);
 	for (int i = 0; i < N; i++) {
 		GraphListNode* ptr = new GraphListNode;
-		ptr->v = v[i]; ptr->w = w[i];
+		ptr->v = v[i]; 
+		ptr->w = w[i];
 		ptr->next = GraphList[u[i]]; GraphList[u[i]] = ptr; 		//加入临接链表
 	} return GraphList;
 }
@@ -150,7 +151,7 @@ void Floyd(Mat<double>& GraphMat, Mat<double>& Distance, Mat<double>& Path)
 	int N = GraphMat.cols;
 	Distance = GraphMat;
 	Path.zero(N, N);
-	for (int i = 0; i < Path.size(); i++)Path[i] = i % N;
+	for (int i = 0; i < Path.size(); i++) Path[i] = i % N;
 	//[2]
 	for (int k = 1; k <= N; k++) 
 		for (int i = 1; i <= N; i++) 

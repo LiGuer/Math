@@ -2,6 +2,7 @@
 #define CALCULUS_H
 #include "Mat.h"
 #include "Tensor.h"
+#define PI 3.141592653589
 namespace Calculus {
 /*--------------------------------[ Runge Kutta 方法 ]--------------------------------
 *	[公式]:           ->   ->       ->      ->
@@ -27,7 +28,7 @@ void RungeKutta(Mat<double>& y, double dt, double t0, int enpoch, Mat<double>& (
 		k1 = f(t, y);
 		k2 = f(t + dt / 2, tmp.add(y, tmp.mult(dt / 2, k1)));
 		k3 = f(t + dt / 2, tmp.add(y, tmp.mult(dt / 2, k2)));
-		k4 = f(t + dt, tmp.add(y, tmp.mult(dt, k3)));
+		k4 = f(t + dt,     tmp.add(y, tmp.mult(dt, k3)));
 		// y[n+1] = y[n] + h/6·(k1 + 2·k2 + 2·k3 + k4)
 		k.add(k.add(k1, k4), tmp.mult(2, tmp.add(k2, k3)));
 		y.add(y, k.mult(dt / 6, k));
@@ -79,19 +80,23 @@ Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta,
 	Tensor<double>* Map = new Tensor<double>(dim.rows, dim.data);
 	// compute Green's function
 	Mat<double> r = st;
-	const double pi = 3.141592653589;
 	for (int i = 0; i < Map->dim.product(); i++) {
 		double t = 0;
 		Mat<double> rt = st;
 		for (int j = 0; j < Map->dim.product(); j++) {
-			for (int k = 0; k < rt.rows; k++)
-				{rt[k] += delta[k]; if(rt[k]>=ed[k])rt[k]=st[k]; else break;}
+			for (int k = 0; k < rt.rows; k++) {
+				rt[k] += delta[k]; 
+				if(rt[k] >= ed[k]) rt[k] = st[k]; 
+				else break;
+			}
 			t += f(rt) / tmp.sub(r, rt).norm();
 		}
-		(*Map)[i] = 1 / (4 * pi) * delta.product() * t;
+		(*Map)[i] = 1 / (4 * PI) * delta.product() * t;
 		// update r
-		for (int k = 0; k < rt.rows; k++)
-			{r[k] += delta[k]; if(r[k]>=ed[k])r[k]=st[k]; else break;}
+		for (int k = 0; k < r.rows; k++) {
+			r[k] += delta[k];
+			if (r[k] >= ed[k]) r[k] = st[k]; else break;
+		}
 	}
 	return Map;
 }
@@ -127,8 +132,8 @@ void WaveEquation(Mat<double>& Map, Mat<double>& veloc, void (*setBoundaryEquati
 		for (int y = 1; y < Map.cols - 1; y++) {
 			MapNow(x, y) += veloc(x, y) * deltaTime + alpha * deltaTime * deltaTime * (
 				(Map(x + 1, y) - 2 * Map(x, y) + Map(x - 1, y)) / (deltaX * deltaX)
-				+ (Map(x, y + 1) - 2 * Map(x, y) + Map(x, y - 1)) / (deltaY * deltaY)
-				);
+			  + (Map(x, y + 1) - 2 * Map(x, y) + Map(x, y - 1)) / (deltaY * deltaY)
+			);
 		}
 	}setBoundaryEquations(MapNow, 0);
 	for (int time = 1; time < EndTimes; time++) {
@@ -137,8 +142,8 @@ void WaveEquation(Mat<double>& Map, Mat<double>& veloc, void (*setBoundaryEquati
 			for (int y = 1; y < Map.cols - 1; y++) {
 				MapPrev(x, y) = 2 * MapNow(x, y) - MapPrev(x, y) + alpha * deltaTime * deltaTime * (
 					(MapNow(x + 1, y) - 2 * MapNow(x, y) + MapNow(x - 1, y)) / (deltaX * deltaX)
-					+ (MapNow(x, y + 1) - 2 * MapNow(x, y) + MapNow(x, y - 1)) / (deltaY * deltaY)
-					);
+				  + (MapNow(x, y + 1) - 2 * MapNow(x, y) + MapNow(x, y - 1)) / (deltaY * deltaY)
+				);
 			}
 		}
 		MapPrev.swap(MapNow);

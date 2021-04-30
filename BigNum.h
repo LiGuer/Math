@@ -39,8 +39,8 @@ public:
 	BigNum(const char* input) {
 		zero(8);
 		int8u t;
+		if (input[0] == '-') { sign = 1; input++; }
 		for (int i = 0; input[i]; i++) {
-			if (i == 0 && input[i] == '-') { sign = 1; continue; }
 			t = input[i] - '0';
 			((*this) *= 10) += t;
 		}
@@ -67,7 +67,7 @@ public:
 	BigNum& add(BigNum& a, BigNum& b) {
 		if (a.sign == 1 && b.sign == 0) { sign = 0; return subU(b, a); }
 		if (a.sign == 0 && b.sign == 1) { sign = 0; return subU(a, b); }
-		sign = (a.sign == 1 && b.sign == 1) ? 1 : 0; return addU(a, b);
+		sign = (a.sign == 1 && b.sign == 1) ? 1 : 0;return addU(a, b);
 	}
 	BigNum& addU(BigNum& a, BigNum& b) {
 		int8u c = 0;	//进位标志
@@ -92,7 +92,7 @@ public:
 	BigNum& sub(BigNum& a, BigNum& b) {
 		if (a.sign == 0 && b.sign == 1) { sign = 0; return addU(a, b); }
 		if (a.sign == 1 && b.sign == 0) { sign = 1; return addU(a, b); }
-		sign = (a.sign == 1 && b.sign == 1) ? 1 : 0; subU(a, b);
+		sign = (a.sign == 1 && b.sign == 1) ? 1 : 0;return subU(a, b);
 	}
 	BigNum& subU(BigNum& a, BigNum& b) {
 		int8u c = 0;		//借位标志

@@ -84,7 +84,7 @@ void Apriori_Filter(std::vector<Mat<int>>& dataSet, std::vector<Mat<int>>& froze
 	std::vector<Mat<int>> frozenSet_Tmp;
 	for (int i = 0; i < frozenSet.size(); i++) {
 		if (frozenSet_Count[i] > minSupport) {
-			frozenSet_Tmp.push_back(frozenSet[i]);
+			frozenSet_Tmp.    push_back(frozenSet[i]);
 			frozenSet_Support.push_back(frozenSet_Count[i]);
 		}
 	}frozenSet = frozenSet_Tmp;
@@ -151,19 +151,27 @@ void Apriori_RulesFromConseqence(std::vector < std::vector<Mat<int>>>& frozenSet
 		}
 		// 可以进一步合并BSet
 		BSet = BSet_Tmp;
-		if (BSet.size() > 1) Apriori_RulesFromConseqence(frozenSet, frozenSet_Support, K, BSet, minConfidence, RuleSet_A, RuleSet_B, RuleSet_confidence);
+		if (BSet.size() > 1) Apriori_RulesFromConseqence(
+			frozenSet, 
+			frozenSet_Support, 
+			K, BSet, minConfidence, 
+			RuleSet_A, 
+			RuleSet_B, 
+			RuleSet_confidence
+		);
 	}
 }
 //Main
 void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence) {
 	std::vector<std::vector<Mat<int>>> frozenSet;
-	std::vector<std::vector<double>>frozenSet_Support;
+	std::vector<std::vector<double>>   frozenSet_Support;
 	std::vector<Mat<int>> frozenSet_K;
-	std::vector<double> frozenSet_Support_K;
-	frozenSet.push_back(frozenSet_K);  frozenSet_Support.push_back(frozenSet_Support_K);	//故意填占 frozenSet[0]位置
+	std::vector<double>   frozenSet_Support_K;
+	frozenSet.push_back(frozenSet_K); 
+	frozenSet_Support.push_back(frozenSet_Support_K);	//故意填占 frozenSet[0]位置
 	//[2] 初始一个元素的频繁项集，Frozen Set[{ 1 }, { 2 }, { 3 }, { 4 }, { 5 }]
 	{
-		Mat<int> tmp(1,1);
+		Mat<int> tmp(1);
 		for (int i = 0; i < dataSet.size(); i++) {
 			for (int item = 0; item < dataSet[i].cols; item++) {
 				bool flag = true;
@@ -196,7 +204,14 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 				}
 			}
 		}
-		Apriori_RulesFromConseqence(frozenSet, frozenSet_Support, k, OneElementSet, minConfidence, RuleSet_A, RuleSet_B, RuleSet_confidence);
+		Apriori_RulesFromConseqence(
+			frozenSet, 
+			frozenSet_Support, 
+			k, OneElementSet, minConfidence, 
+			RuleSet_A, 
+			RuleSet_B, 
+			RuleSet_confidence
+		);
 	}
 }
 /******************************************************************************
@@ -215,24 +230,26 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 *******************************************************************************/
 void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax) {
 	int Dimension = x.rows, N = x.cols;
-	Center.zero(Dimension, K);
-	Cluster.zero(K, N); ClusterKthNum.zero(K);
+	Center. zero(Dimension, K);
+	Cluster.zero(K, N); 
+	ClusterKthNum.zero(K);
 	//[1] 随机选择 K 个簇心点 
 	for (int i = 0; i < K; i++) {
 		int index = rand() % N;
-		for (int dim = 0; dim < Dimension; dim++)Center(dim, i) = x(dim, index);
+		for (int dim = 0; dim < Dimension; dim++) Center(dim, i) = x(dim, index);
 	}
 	//[2]
 	int times = 0;
 	while (times++ < TimeMax) {
 		//[3]
-		Cluster.zero(); ClusterKthNum.zero();
+		Cluster.      zero(); 
+		ClusterKthNum.zero();
 		//[4] 计算每个xi到Center_j的距离
 		for (int i = 0; i < N; i++) {
 			Mat<double> d(1, K);
 			for (int j = 0; j < K; j++)
 				for (int dim = 0; dim < Dimension; dim++)
-					d[j] += (x(dim, i) - Center(dim, j)) * (x(dim, i) - Center(dim, j));
+					d[j] += pow(x(dim, i) - Center(dim, j), 2);
 			//[5]
 			int index; d.min(index);
 			Cluster(index, ClusterKthNum[index]++) = i;
@@ -265,7 +282,7 @@ void BasicMachineLearning::MahalanobisDist(Mat<double>& x, Mat<double>& mahalano
 	mahalanobisDistance.alloc(1, x.cols);
 	// mean, diff, cov
 	Mat<double> mean, diff, covMat, tmp;
-	mean.mult(1.0 / x.cols, x.sum(mean, 1));
+	mean.  mult(1.0 / x.cols, x.sum(mean, 1));
 	covMat.mult(x, x.transpose(covMat));
 	// mahalanobis distance
 	covMat.inv(covMat);

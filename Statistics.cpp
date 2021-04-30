@@ -25,7 +25,7 @@ Mat<double>& Statistics::Mean(Mat<double>& x, Mat<double>& ans) {
 /***************************************************************************/
 double Statistics::Variance(Mat<double>& x) {
 	double var = 0, mean = Mean(x);
-	for (int i = 0; i < x.cols * x.rows; i++) var += (x[i] - mean) * (x[i] - mean);
+	for (int i = 0; i < x.cols * x.rows; i++) var += pow(x[i] - mean, 2);
 	return var / (x.cols * x.rows - 1);
 }
 Mat<double>& Statistics::Variance(Mat<double>& x, Mat<double>& ans) {
@@ -61,22 +61,22 @@ Mat<double>& Statistics::NormalDistribution(double mean, double variance, double
 		[3] 假设检验
 /***************************************************************************/
 bool Statistics::SkewnessKurtosisTest(Mat<double>& x, double SignificanceLevel) {
-	int N = x.cols;
 	//[1]
+	int N = x.cols;
 	double mean = Mean(x), B[5] = { 0 };
 	for (int k = 2; k <= 4; k++) {
 		for (int i = 0; i < N; i++) B[k] += pow(x[i] - mean, k);
 		B[k] /= N;
 	}
 	//[2]
-	double Skewness = B[3] / pow(B[2], 1.5);
-	double Kurtosis = B[4] / pow(B[2], 2);
+	double Skewness = B[3] / pow(B[2], 1.5),
+		   Kurtosis = B[4] / pow(B[2],   2);
 	//[3]
-	double sigma_1 = sqrt(6.0 * (N - 2) / (N + 1) / (N + 3));
-	double sigma_2 = sqrt(24.0 * N * (N - 2) * (N - 3) / (N + 1) / (N + 1) / (N + 3) / (N + 5));
-	double mu_2 = 3 - 6.0 / (N + 1);
-	double u1 = fabs(Skewness / sigma_1);
-	double u2 = fabs(Kurtosis - mu_2) / sigma_2;
+	double sigma_1 = sqrt(6.0  *     (N - 2) / (N + 1) / (N + 3)),
+		   sigma_2 = sqrt(24.0 * N * (N - 2) * (N - 3) / (N + 1) / (N + 1) / (N + 3) / (N + 5)),
+		   mu_2 = 3 - 6.0 / (N + 1);
+	double u1 = fabs(Skewness / sigma_1),
+		   u2 = fabs(Kurtosis - mu_2) / sigma_2;
 	//printf("%f %f %f %f\n", Skewness, Kurtosis, u1, u2);
 	if (u1 >= SignificanceLevel || u2 >= SignificanceLevel) return false;
 	return true;
@@ -102,8 +102,7 @@ double Statistics::X2Test(Mat<double>& x, double delta, int N, double (*F)(doubl
 		//printf("%d\t%f\t%f\t%f\n", frequency[i],p, x.cols * p, pow(frequency[i], 2) / (x.cols * p));
 		X2 += pow(frequency[i], 2) / (x.cols * p);
 	}
-	X2 -= x.cols;
-	return X2;
+	return X2 -= x.cols;
 }
 /***************************************************************************
 *								直方图
@@ -111,8 +110,8 @@ double Statistics::X2Test(Mat<double>& x, double delta, int N, double (*F)(doubl
 *	[注]: 区间规定"左开右闭"
 /***************************************************************************/
 Mat<int>& Statistics::Histogram(Mat<double>& x, int N, Mat<int>& frequency, double overFlow, double underFlow) {
-	double max =  overFlow == NULL ? x.max() : overFlow;
-	double min = underFlow == NULL ? x.min() : underFlow;
+	double max =  overFlow == NULL ? x.max() : overFlow,
+		   min = underFlow == NULL ? x.min() : underFlow,
 	double delta = (max - min) / N;
 	frequency.zero(1, N + (overFlow == NULL ? 1 : 0) + (underFlow == NULL ? 1 : 0));
 	for (int i = 0; i < x.cols; i++) {
@@ -125,24 +124,27 @@ Mat<int>& Statistics::Histogram(Mat<double>& x, int N, Mat<int>& frequency, doub
 }
 /***************************************************************************
 *								箱形图
-*[输出]: MedianQuartileThreshold: (1) 中位数 (2/3) 小/大四分位数 (4/5) 小/大边缘
+*[输出]: MediQuartThreshold: (1) 中位数 (2/3) 小/大四分位数 (4/5) 小/大边缘
 *[目的]: 数据 => 中位数、小/大四分位数  => 小/大边缘
 /***************************************************************************/
-void Statistics::BoxPlot(Mat<double>& x, Mat<double>& MedianQuartileThreshold, std::vector<int>* OutlierIndex) {
+void Statistics::BoxPlot(Mat<double>& x, Mat<double>& MediQuartThreshold, std::vector<int>* OutlierIndex) {
 	// 中位数、小/大四分位数、小/大边缘
-	MedianQuartileThreshold.zero(x.rows, 5);
+	MediQuartThreshold.zero(x.rows, 5);
 	Mat<double> xTmp(x);
 	for (int i = 0; i < x.rows; i++) {
-		std::sort(xTmp.data + i * xTmp.cols, xTmp.data + (i + 1) * xTmp.cols);
-		MedianQuartileThreshold(i, 0) = (xTmp(i, xTmp.cols / 2) + xTmp(i, (int)(xTmp.cols / 2 + 0.5))) / 2;
-		MedianQuartileThreshold(i, 1) = (xTmp(i, 1.0 / 4 * xTmp.cols) + xTmp(i, (int)(1.0 / 4 * xTmp.cols + 0.5))) / 2;
-		MedianQuartileThreshold(i, 2) = (xTmp(i, 3.0 / 4 * xTmp.cols) + xTmp(i, (int)(3.0 / 4 * xTmp.cols + 0.5))) / 2;
-		double delta = MedianQuartileThreshold(i, 2) - MedianQuartileThreshold(i, 1);
-		MedianQuartileThreshold(i, 3) = MedianQuartileThreshold(i, 1) - 1.5 * delta;
-		MedianQuartileThreshold(i, 4) = MedianQuartileThreshold(i, 2) + 1.5 * delta;
+		std::sort(
+			xTmp.data +  i      * xTmp.cols, 
+			xTmp.data + (i + 1) * xTmp.cols
+		);
+		MediQuartThreshold(i, 0) = (xTmp(i, 1.0 / 2 * xTmp.cols) + xTmp(i, (int)(1.0 / 2 * xTmp.cols + 0.5))) / 2;
+		MediQuartThreshold(i, 1) = (xTmp(i, 1.0 / 4 * xTmp.cols) + xTmp(i, (int)(1.0 / 4 * xTmp.cols + 0.5))) / 2;
+		MediQuartThreshold(i, 2) = (xTmp(i, 3.0 / 4 * xTmp.cols) + xTmp(i, (int)(3.0 / 4 * xTmp.cols + 0.5))) / 2;
+		double delta = MediQuartThreshold(i, 2) - MediQuartThreshold(i, 1);
+		MediQuartThreshold(i, 3) = MediQuartThreshold(i, 1) - 1.5 * delta;
+		MediQuartThreshold(i, 4) = MediQuartThreshold(i, 2) + 1.5 * delta;
 	}
 	for (int i = 0; i < x.rows; i++)
 		for (int j = 0; j < x.cols; j++)
-			if (x(i, j) < MedianQuartileThreshold(i, 3) || x(i, j) > MedianQuartileThreshold(i, 4))
+			if (x(i, j) < MediQuartThreshold(i, 3) || x(i, j) > MediQuartThreshold(i, 4))
 				OutlierIndex[i].push_back(j);
 } 

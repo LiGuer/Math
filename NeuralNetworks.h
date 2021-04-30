@@ -82,12 +82,12 @@ class NeuralLayer {
 public:
 	Mat<double> weight, bias;
 	Mat<double> output, delta;
-	double(*actFunc)(double);
+	double(*actFunc)     (double);
 	double(*actDerivFunc)(double);
 	/*----------------[ init ]----------------*/
 	NeuralLayer() { ; }
 	NeuralLayer(int inputSize, int outputSize, double(*_actFunc)(double)) { init(inputSize, outputSize, _actFunc); }
-	NeuralLayer(int inputSize, int outputSize) { init(inputSize, outputSize, [](double x) {return x; }); }
+	NeuralLayer(int inputSize, int outputSize) { init(inputSize, outputSize, [](double x) { return x; }); }
 	void init(int inputSize, int outputSize, double(*_actFunc)(double)) {
 		weight.rands(outputSize, inputSize, -1, 1);
 		bias.  rands(outputSize, 1, -1, 1);
@@ -99,8 +99,7 @@ public:
 	Mat<double>* operator()(Mat<double>& input) { return forward(input); }
 	Mat<double>* forward(Mat<double>& input) {
 		output.add(output.mult(weight, input), bias);
-		output.function(output, actFunc);
-		return &output;
+		return &output.function(output, actFunc);
 	}
 	/*----------------[ backward ]----------------
 	[1] δL = ((w_L+1)^T×δ_L+1)·σ'(zL)
@@ -124,12 +123,12 @@ public:
 	/*----------------[ save / load ]----------------*/
 	void save(FILE* file) {
 		for (int i = 0; i < weight.size(); i++) fprintf(file, "%f ", weight[i]);
-		for (int i = 0; i < bias.rows; i++)     fprintf(file, "%f ", bias[i]);
+		for (int i = 0; i < bias.rows;     i++) fprintf(file, "%f ", bias  [i]);
 		fprintf(file, "\n");
 	}
 	void load(FILE* file) {
-		for (int i= 0; i < weight.size(); i++) fscanf(file, "%f", &weight[i]);
-		for (int i = 0; i < bias.rows; i++)    fscanf(file, "%f", &bias[i]);
+		for (int i = 0; i < weight.size(); i++) fscanf(file, "%f", &weight[i]);
+		for (int i = 0; i < bias.rows;    i++)  fscanf(file, "%f", &bias  [i]);
 	}
 };
 /*************************************************************************************************
@@ -152,7 +151,7 @@ public:
 		init(_inChannelNum, _outChannelNum, kernelSize, _padding, _stride);
 	}
 	void init(int _inChannelNum, int _outChannelNum, int kernelSize, int _padding, int _stride) {
-		inChannelNum  = _inChannelNum, 
+		inChannelNum  =  _inChannelNum, 
 		outChannelNum = _outChannelNum, 
 		padding = _padding, 
 		stride  = _stride;
@@ -177,7 +176,7 @@ public:
 								// get the corresponding element of input
 								int xt = -padding + x * stride + kx, 
 									yt = -padding + y * stride + ky;
-								if (xt < 0 || xt >= input.dim[0] || yt < 0 || yt >= input.dim[1])t = 0;
+								if (xt < 0 || xt >= input.dim[0] || yt < 0 || yt >= input.dim[1]) t = 0;
 								else t = input(xt, yt, kz % inChannelNum) * kernel(kx, ky, kz);
 								output(x, y, z) += t;
 							}
@@ -193,13 +192,13 @@ public:
 	/*----------------[ backward ]----------------*/
 	/*----------------[ save / load ]----------------*/
 	void save(FILE* file) {
-		for (int i = 0; i < kernel.dim.product(); i++)      fprintf(file, "%f ", kernel[i]);
-		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fprintf(file, "%f ", bias[i]);
+		for (int i = 0; i < kernel.dim.product();      i++) fprintf(file, "%f ", kernel[i]);
+		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fprintf(file, "%f ", bias  [i]);
 		fprintf(file, "\n");
 	}
 	void load(FILE* file) {
-		for (int i = 0; i < kernel.dim.product(); i++)      fscanf(file, "%f", &kernel[i]);
-		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fscanf(file, "%f", &bias[i]);
+		for (int i = 0; i < kernel.dim.product();      i++) fscanf(file, "%f", &kernel[i]);
+		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fscanf(file, "%f", &bias  [i]);
 	}
 };
 /*************************************************************************************************
@@ -240,7 +239,7 @@ public:
 							else t = input(xt, yt, z);
 							switch (poolType) {
 							case A: output(x, y, z) += t; break;
-							case M: output(x, y, z) = t > output(x, y, z) ? t : output(x, y, z); break;
+							case M: output(x, y, z)  = t > output(x, y, z) ? t : output(x, y, z); break;
 							}
 						}
 					}
@@ -292,7 +291,7 @@ public:
 	LstmLayer(int inputSize, int outputSize) { init(inputSize, outputSize); }
 	void init(int inputSize, int outputSize) {
 		for (int i = 0; i < 4; i++) {
-			gate[i].	zero(outputSize);
+			gate[i].	zero (outputSize);
 			weights[i].	rands(outputSize, outputSize + inputSize, -0.1, 0.1);
 			bias[i].	rands(outputSize, 1, -0.1, 0.1);
 			diffWeights[i].zero(weights[i]);
@@ -307,7 +306,11 @@ public:
 		prevHSet.clear(); prevHSet.push_back(h_prev);
 		xcSet.   clear();
 		for (int timeStep = 0; timeStep < input.size(); timeStep++) {
-			forward(input[timeStep], prevSSet[timeStep], prevHSet[timeStep]);
+			forward(
+				input   [timeStep], 
+				prevSSet[timeStep], 
+				prevHSet[timeStep]
+			);
 			for (int i = 0; i < 4; i++) 
 				gateSet[i].push_back(gate[i]);
 			prevSSet.push_back(s);
@@ -333,12 +336,21 @@ public:
 	}
 	/*-------------------------------- 反向传播 --------------------------------*/
 	void backward(std::vector<Mat<double>>& error, double learnRate) {
-		Mat<double> tmp, diffH(error[0].rows), diffS(error[0].rows);
+		Mat<double> 
+			tmp, 
+			diffH(error[0].rows), 
+			diffS(error[0].rows);
 		for (int timeStep = error.size() - 1; timeStep >= 0; timeStep--) {
-			for (int i = 0; i < 4; i++) gate[i] = gateSet[i][timeStep];
-			s = prevSSet[timeStep + 1];
+			for (int i = 0; i < 4; i++) 
+				gate[i] = gateSet[i][timeStep];
+			s  = prevSSet[timeStep + 1];
 			xc = xcSet[timeStep];
-			backward(prevSSet[timeStep], error[timeStep], diffH, diffS);
+			backward(
+				prevSSet[timeStep],
+				error   [timeStep], 
+				diffH, 
+				diffS
+			);
 		}
 		//Update
 		for (int i = 0; i < 4; i++) {
@@ -376,14 +388,13 @@ public:
 	void save(FILE* file) {
 		for (int k = 0; k < 4; k++) {
 			for (int i = 0; i < weights[k].size(); i++) fprintf(file, "%f ", weights[k][i]);
-			for (int i = 0; i < bias[k].rows; i++)		fprintf(file, "%f ", bias[k][i]);
-		}
-		fprintf(file, "\n");
+			for (int i = 0; i < bias[k].rows;      i++) fprintf(file, "%f ", bias   [k][i]);
+		} fprintf(file, "\n");
 	}
 	void load(FILE* file) {
 		for (int k = 0; k < 4; k++) {
 			for (int i = 0; i < weights[k].size(); i++) fscanf(file, "%f", &weights[k][i]);
-			for (int i = 0; i < bias[k].rows; i++)		fscanf(file, "%f", &bias[k][i]);
+			for (int i = 0; i < bias[k].rows;      i++)	fscanf(file, "%f", &bias   [k][i]);
 		}
 	}
 };
@@ -406,7 +417,7 @@ public:
 	/*----------------[ set Layer ]----------------*/
 	void addLayer(int inputSize, int outputSize) { layer.push_back(new NeuralLayer(inputSize, outputSize)); }
 	void setLayer(int index, int inputSize, int outputSize) {
-		if (index >= layer.size())exit(1);
+		if (index >= layer.size()) exit(-1);
 		delete layer[index];
 		layer[index] = new NeuralLayer(inputSize, outputSize, sigmoid);
 	}
@@ -447,9 +458,16 @@ public:
 *************************************************************************************************/
 class LeNet_NeuralNetworks {
 public:
-	ConvLayer Conv_1{ 1,16,5,2,1 }, Conv_2{ 16,32,5,2,1 };
-	PoolLayer MaxPool_1{ 2,0,2,MaxPool_1.M }, MaxPool_2{ 2,0,2,MaxPool_2.M };
-	NeuralLayer FullConnect_1{ 32 * 7 * 7,128 }, FullConnect_2{ 128,64 }, FullConnect_3{ 64,10 };
+	ConvLayer 
+		Conv_1{  1, 16, 5, 2, 1 }, 
+		Conv_2{ 16, 32, 5, 2, 1 };
+	PoolLayer 
+		MaxPool_1{ 2, 0, 2, MaxPool_1.M }, 
+		MaxPool_2{ 2, 0, 2, MaxPool_2.M };
+	NeuralLayer 
+		FullConnect_1{ 32 * 7 * 7, 128 }, 
+		FullConnect_2{ 128, 64 }, 
+		FullConnect_3{  64, 10 };
 	LeNet_NeuralNetworks() { ; }
 	/*----------------[ forward ]----------------*/
 	Mat<double>& operator()(Tensor<double>& input, Mat<double>& output) { return forward(input, output); }
@@ -514,7 +532,7 @@ public:
 		b3_3x3_c.init(n5x5, n5x5, 3, 1, 1);
 		// x3 pool -> 1x1 conv branch
 		b4_pool.init(3, 0, 3, b4_pool.M);
-		b4_1x1.init(inChannelNum, poolChannelNum, 1, 0, 1);
+		b4_1x1. init(inChannelNum, poolChannelNum, 1, 0, 1);
 	};
 	/*----------------[ forward ]----------------*/
 	Tensor<double>* operator()(Tensor<double>& input) { return forward(input); }
@@ -548,14 +566,14 @@ public:
 class GoogLeNet_NeuralNetworks {
 public:
 	Inception a3, b3, a4, b4, c4, d4, e4, a5, b5;
-	ConvLayer pre_layers;
+	ConvLayer preLayers;
 	PoolLayer maxpool, avgpool;
 	NeuralLayer linear;
 	GoogLeNet_NeuralNetworks() {
-		pre_layers.init(1, 64, 5, 1, 2);
+		preLayers.init(1, 64, 5, 1, 2);
 		a3.init( 64,  64,  96, 128, 16, 32, 32);
 		b3.init(256, 128, 128, 192, 32, 96, 64);
-		maxpool.init(3,  2, 1, avgpool.M);
+		maxpool.init(3, 2, 1, avgpool.M);
 		a4.init(480, 192,  96, 208, 16, 48, 64);
 		b4.init(512, 160, 112, 224, 24, 64, 64);
 		c4.init(512, 128, 128, 256, 24, 64, 64);
@@ -570,7 +588,7 @@ public:
 	Mat<double>& operator()(Tensor<double>& input, Mat<double>& output) { return forward(input, output); }
 	Mat<double>& forward(Tensor<double>& input, Mat<double>& output) {
 		Tensor<double>* y;
-		y = pre_layers(input);
+		y = preLayers(input);
 		y = b3(*a3(*y));
 		y = maxpool(*y);
 		y = e4(*d4(*c4(*b4(*a4(*y)))));
@@ -586,7 +604,7 @@ public:
 	/*----------------[ save/load ]----------------*/
 	void save(const char* saveFile) {
 		FILE* file = fopen(saveFile, "w+");
-		pre_layers.save(file);
+		preLayers.save(file);
 		a3.save(file); b3.save(file);
 		a4.save(file); b4.save(file); c4.save(file); d4.save(file); e4.save(file);
 		a5.save(file); b5.save(file);
@@ -595,7 +613,7 @@ public:
 	}
 	void load(const char* loadFile) {
 		FILE* file = fopen(loadFile, "r+");
-		pre_layers.load(file);
+		preLayers.load(file);
 		a3.load(file); b3.load(file);
 		a4.load(file); b4.load(file); c4.load(file); d4.load(file); e4.load(file);
 		a5.load(file); b5.load(file);

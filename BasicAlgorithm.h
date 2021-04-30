@@ -49,8 +49,7 @@ void sort(T* first, T* last, bool*(cmp)(T a, T b))
 			border++;
 		}
 	}
-	T temp = *border;
-	*border = *ref; *ref = temp;
+	T temp = *border; *border = *ref; *ref = temp;
 	sort(first, border, cmp);
 	sort(border + 1, last, cmp);
 }
@@ -105,7 +104,7 @@ HuffmanTreeNode<T>* HuffmanCode(T weight[], int N, int codeLen[], unsigned long 
 	// [Tree] 建树 build Huffman tree
 	// [1]
 	HuffmanTreeNode<T>* HuffmanTree = (HuffmanTreeNode<T>*)calloc(N * 2 + 1, sizeof(HuffmanTreeNode<T>));
-	for (int i = 0; i < N; i++) HuffmanTree[i].weight = weight[i];
+	for (int i = 0; i < N; i++)		HuffmanTree[i].weight = weight[i];
 	for (int i = N; i < N * 2; i++) HuffmanTree[i].weight = 1e9;
 	// [2] find two smallest nodes 'min1, min2'
 	int min1, min2, pos1 = N - 1, pos2 = N;
@@ -115,9 +114,10 @@ HuffmanTreeNode<T>* HuffmanCode(T weight[], int N, int codeLen[], unsigned long 
 		if (pos1 >= 0 && HuffmanTree[pos1].weight < HuffmanTree[pos2].weight) min2 = pos1--;
 		else min2 = pos2++; 
 		// [3] combine to new tree 
-		HuffmanTree[N + i].child[0] = &HuffmanTree[min1];	HuffmanTree[N + i].child[1] = &HuffmanTree[min2];
-		HuffmanTree[N + i].weight = HuffmanTree[min1].weight + HuffmanTree[min2].weight;
-		HuffmanTree[min1].parent = HuffmanTree[min2].parent = &HuffmanTree[N + i];
+		HuffmanTree[N + i].child[0] = &HuffmanTree[min1];
+		HuffmanTree[N + i].child[1] = &HuffmanTree[min2];
+		HuffmanTree[N + i].weight= HuffmanTree[min1].weight + HuffmanTree[min2].weight;
+		HuffmanTree[min1].parent = HuffmanTree[min2].parent =&HuffmanTree[N + i];
 		HuffmanTree[min2].binary = 1;
 	}
 	HuffmanTreeNode<T>* root = &HuffmanTree[N * 2 - 2];

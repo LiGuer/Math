@@ -37,12 +37,13 @@ public:
 	void eat(Tensor& a) {									//吃掉另一个矩阵的数据 (指针操作)
 		if (data != NULL)delete data;
 		data = a.data; a.data = NULL;
-		dim = a.dim; a.dim.zero(1);
+		dim  = a.dim;  a.dim.zero(1);
 	}
 	/*---------------- 分配空间 ----------------*/
 	Tensor& alloc(int dimNum, int* dimLength) {
 		if (dim.rows != dimNum || memcmp(dim.data, dimLength, dimNum * sizeof(int)) != 0) {
-			dim.alloc(dimNum); dim.getData(dimLength);
+			dim.alloc(dimNum); 
+			dim.getData(dimLength);
 			data = (T*)malloc(dim.product() * sizeof(T));
 		}
 		return *this;
@@ -85,19 +86,19 @@ public:
 		int index = 0, step = 1;
 		for (int i = 0; i < dim.rows; i++) {
 			index += step * dimIndex[i];
-			step *= dim[i];
+			step  *= dim[i];
 		}
 		return data[index];
 	}
 	/*----------------赋值 [ = ]----------------*/ //不能赋值自己
 	Tensor& operator=(const Tensor& a) {
-		if (a.data == NULL)error();
+		if (a.data == NULL) error();
 		alloc(a.dim);
 		memcpy(data, a.data, dim.product() * sizeof(T));
 		return *this;
 	}
 	Tensor& eat(const Tensor& a) {
-		if (a.data == NULL)error();
+		if (a.data == NULL) error();
 		data = a.data; a.data = NULL;
 		dim.eatMat(a.dim);
 		return *this;
@@ -131,13 +132,13 @@ public:
 	Tensor& merge(Tensor* a[], const int N, int dimIndex) {
 		// new memory
 		int length = 0;
-		for (int i = 0; i < N; i++)length += a[i]->dim[dimIndex];
+		for (int i = 0; i < N; i++) length += a[i]->dim[dimIndex];
 		Mat<int> dimSize = a[0]->dim;
 		dimSize[dimIndex] = length;
 		Tensor ansTemp(dimSize.rows, dimSize.data);
 		// merge
 		int elementBlockSize = 1, copyTimes = 1;
-		for (int i = 0; i < dimIndex; i++)elementBlockSize *= dim[i];
+		for (int i = 0; i < dimIndex; i++)    elementBlockSize *= dim[i];
 		for (int i = dimIndex + 1; i < dim.rows; i++)copyTimes *= dim[i];
 		int pos = 0;
 		Mat<int> inputPosMem(N, 1);
@@ -148,6 +149,6 @@ public:
 				pos += t; inputPosMem[i] += t;
 			}
 		}
-		eat(ansTemp);  return *this;
+		eat(ansTemp); return *this;
 	}
 };
