@@ -248,8 +248,8 @@ public:
 	/*----------------[ backward ]----------------*/
 };
 /*********************************************************************************
-						LSTM 长短期记忆层
-*	结构: Gate[4]: G, F, I, O
+						LSTM Layer 长短期记忆层
+*	结构: Gate[4]: G, F, I, O 四个并行神经网络层
 ----------------------------------------------------------------------------------
 *	正向传播
 		gt = tanh(Wg×[h_(t-1), xt] + bg)
@@ -312,13 +312,13 @@ public:
 		return &prevHSet;
 	}
 	Mat<double>* forward(Mat<double>& input, Mat<double>& prevS, Mat<double>& prevH) {
-		xc.rowsStack(input, prevH);														//[h_(t-1), xt]
 		// G F I O
-		for (int i = 0; i < 4; i++) { 													//gt = tanh(Wg×[h_(t-1), xt] + bg) //Ft, It, Ot = Sigmoid( W_ifo×[h_(t-1), xt] + b_ifo )	
+		xc.rowsStack(input, prevH);														//[h_(t-1), xt]
+		for (int i = 0; i < 4; i++) { 													
 			gate[i].add(gate[i].mult(weights[i], xc), bias[i]);
 			i == 0 ?
-				gate[i].function([](double x) { return tanh(x); }):
-				gate[i].function([](double x) { return 1 / (1 + exp(-x)); });
+				gate[i].function([](double x) { return tanh(x); }):						//gt = tanh(Wg×[h_(t-1), xt] + bg) 	
+				gate[i].function([](double x) { return 1 / (1 + exp(-x)); });			//Ft, It, Ot = Sigmoid( W_ifo×[h_(t-1), xt] + b_ifo )
 		}
 		// S H
 		Mat<double> tmp;

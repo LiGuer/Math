@@ -29,8 +29,7 @@ Mat<double>& bulidGraphMat(int u[], int v[], double w[], int N, Mat<double>& Gra
 	for (int i = 0; i < N; i++) GraphMat(u[i], v[i]) = w[i];
 	return GraphMat;
 }
-Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<GraphListNode*>& GraphList)
-{
+Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<GraphListNode*>& GraphList) {
 	GraphList.zero(N);
 	for (int i = 0; i < N; i++) {
 		GraphListNode* ptr = new GraphListNode;

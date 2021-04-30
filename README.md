@@ -2,9 +2,8 @@
 LiGu's Basic Algorithm Library.  
 *  框架 (算法 + 数据结构)
 * <Mat.h>						矩阵类
-* <NeuralNetworks.h>			神经网络类
+* <NeuralNetworks.h>			神经网络类(+长短期记忆网络)
 * <BasicMachineLearning.h>		基础机器学习类
-* <LSTM.h>						长短期记忆网络
 * <BigNum.h>					大数类
 *  算法 Algorithm
 * <BasicAlgorithm.h>			基础算法类  

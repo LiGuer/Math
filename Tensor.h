@@ -96,6 +96,12 @@ public:
 		memcpy(data, a.data, dim.product() * sizeof(T));
 		return *this;
 	}
+	Tensor& eat(const Tensor& a) {
+		if (a.data == NULL)error();
+		data = a.data; a.data = NULL;
+		dim.eatMat(a.dim);
+		return *this;
+	}
 	/*----------------¼Ó·¨ [ add + ]----------------*/
 	Tensor& add(Tensor& a, Tensor& b) {
 		if (!(a.dim == b.dim)) error();
@@ -142,7 +148,6 @@ public:
 				pos += t; inputPosMem[i] += t;
 			}
 		}
-		//eatMat(ansTemp); 
-		return *this;
+		eat(ansTemp);  return *this;
 	}
 };

@@ -2,6 +2,7 @@
 #define HASH_TABLE_H
 #include <stdio.h>
 #include <stdlib.h>
+typedef long long int64;
 template<class T>
 /***************************************************************************
 *	HashTable 
@@ -10,7 +11,6 @@ template<class T>
 ****************************************************************************/
 class HashTable {
 	/*-------------------------------- »ù´¡Á¿ --------------------------------*/
-	typedef long long int64;
 	int64 MaxSize, deltaMemSize = 1e3, memSize = deltaMemSize, size = 0;
 	int64* HashMem;
 	T* ValueMem;
