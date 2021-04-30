@@ -83,6 +83,7 @@ public:
 	Mat<double> weight, bias;
 	Mat<double> output, delta;
 	double(*actFunc)(double);
+	double(*actDerivFunc)(double);
 	/*----------------[ init ]----------------*/
 	NeuralLayer() { ; }
 	NeuralLayer(int inputSize, int outputSize, double(*_actFunc)(double)) { init(inputSize, outputSize, _actFunc); }
@@ -112,9 +113,8 @@ public:
 	*-------------------------------------------*/
 	void backward(Mat<double>& preInput, Mat<double>& error, double learnRate) {
 		//[1]
-		delta = error;
-		//for (int j = 0; j < output.rows; j++)
-		//	delta[j] *= output[j] * (1 - output[j]);		//σ'(z_outL) 激活函数导数
+		delta = error;	
+		//delta[i].elementMult(tmp.function(outputLiner[i], actDerivFunc) :	//σ'(z_outL) 激活函数导数
 		Mat<double> t;
 		error.mult(weight.transpose(t), delta);
 		//[2]
@@ -195,7 +195,7 @@ public:
 	}
 	void load(FILE* file) {
 		for (int i = 0; i < kernel.dim.product(); i++) fscanf(file, "%f", &kernel[i]);
-		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fscanf(file, "%f ", &bias[i]);
+		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fscanf(file, "%f", &bias[i]);
 	}
 };
 /*************************************************************************************************
@@ -265,10 +265,10 @@ public:
 		gfiosh_t		(cellNum)
 ----------------------------------------------------------------------------------
 *	反向传播
-		Δg = tan'( it·Δs )
-		Δf = Sigmoid'( s_(t-1)·Δs )
-		Δi = Sigmoid'( gt·Δs )
-		Δo = Sigmoid'( st·Δh_(t+1) )
+		Δg = it	 ·Δs		·tanh'(gt)
+		Δf = s_(t-1)·Δs		·Sigmoid'(ft)
+		Δi = gt	 ·Δs		·Sigmoid'(it)
+		Δo = st	 ·Δh_(t+1)·Sigmoid'(ot)
 		------
 		Δgfio_W += Δgfio×xc^T
 		Δgfio_b += Δgfio
@@ -290,8 +290,8 @@ public:
 			gate[i].zero(outputSize);
 			weights[i].rands(outputSize, outputSize + inputSize, -0.1, 0.1);
 			bias[i].rands(outputSize, 1, -0.1, 0.1);
-			diffWeights[i].zero(outputSize, outputSize + inputSize);
-			diffBias[i].zero(outputSize);
+			diffWeights[i].zero(weights[i]);
+			diffBias[i].zero(bias[i]);
 		}
 	}
 	/*-------------------------------- 正向传播 --------------------------------*/
@@ -352,10 +352,10 @@ public:
 		diffGate[1].elementMult(prevS,   diffS);									//Δf = s_(t-1)·Δs
 		diffGate[2].elementMult(gate[0], diffS);									//Δi = gt·Δs
 		diffGate[3].elementMult(s,       diffH);									//Δo = st·Δh_(t+1)
-		//arctive function
+		//arctive Derivative function												//Δgfio = Δgfio·σ'(gfio)
 		for (int i = 0; i < 4; i++)
 			i == 0 ?
-			diffGate[i].elementMult(tmp.function(gate[i], [](double x) { return 1 - x * x; })) :
+			diffGate[i].elementMult(tmp.function(gate[i], [](double x) { return x * x > 0 ? 0 : 1 - x * x; })) :
 			diffGate[i].elementMult(tmp.function(gate[i], [](double x) { return x * (1 - x); }));
 		//diffs w.r.t. inputs & compute bottom diff
 		Mat<double> diffXc(xc.rows);												//Δgfio_W += Δgfio×xc^T //Δgfio_b += Δgfio //Δxc = ΣW^T×Δ_gfio
@@ -364,21 +364,21 @@ public:
 			diffBias[i] += diffGate[i];
 			diffXc += tmp.mult(weights[i].transpose(tmp), diffGate[i]);
 		}
-		diffS.elementMult(gate[1]);
-		diffXc.block(diffXc.rows - diffH.rows, diffXc.rows - 1, 0, 0, diffH);		//Δh
+		diffS.elementMult(gate[1]);													//Δs = Δs·ft
+		diffXc.block_(diffXc.rows - diffH.rows, diffXc.rows - 1, 0, 0, diffH);		//Δh
 	}
 	/*----------------[ save / load ]----------------*/
 	void save(FILE* file) {
 		for (int k = 0; k < 4; k++) {
-			for (int i = 0; i < weights[k].size(); i++) fprintf(file, "%f", weights[k][i]);
-			for (int i = 0; i < bias[k].rows; i++) fprintf(file, "%f ", bias[k][i]);
+			for (int i = 0; i < weights[k].size(); i++) fprintf(file, "%f ", weights[k][i]);
+			for (int i = 0; i < bias[k].rows; i++)		fprintf(file, "%f ", bias[k][i]);
 		}
 		fprintf(file, "\n");
 	}
 	void load(FILE* file) {
 		for (int k = 0; k < 4; k++) {
 			for (int i = 0; i < weights[k].size(); i++) fscanf(file, "%f", &weights[k][i]);
-			for (int i = 0; i < bias[k].rows; i++) fscanf(file, "%f ", &bias[k][i]);
+			for (int i = 0; i < bias[k].rows; i++)		fscanf(file, "%f", &bias[k][i]);
 		}
 	}
 };

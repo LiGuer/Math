@@ -88,6 +88,7 @@ void swap(Mat& a);                          //交换数据 [ swap ]
 	Mat& zero(const int _rows, const int _cols = 1) {
 		alloc(_rows, _cols); zero();  return *this;
 	}
+	Mat& zero(Mat& a) { zero(a.rows, a.cols);  return *this; }
 	/*---------------- 单位元 ----------------*/
 	Mat& E(const int _rows) {
 		zero(_rows, _rows);
@@ -710,6 +711,13 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 			for (int j = colSt; j <= colEd; j++)
 				ansTmp(i - rowSt, j - colSt) = (*this)(i, j);
 		ans.eatMat(ansTmp); return ans;
+	}
+	Mat& block_(int rowSt, int rowEd, int colSt, int colEd, Mat& ans) {
+		ans.alloc(rowEd - rowSt + 1, colEd - colSt + 1);
+		for (int i = rowSt; i <= rowEd; i++)
+			for (int j = colSt; j <= colEd; j++)
+				ans(i - rowSt, j - colSt) = (*this)(i, j);
+		return ans;
 	}
 	/*----------------拼接 [rows/colsStack]----------------*/
 	Mat& rowsStack(Mat& a, Mat& b) {
