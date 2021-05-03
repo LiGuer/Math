@@ -54,7 +54,8 @@ INT64S C_Lucas(INT64S n, INT64S m, INT64S p) {
 *********************************************************************************/
 INT64S* FibonacciSequence(int N) {
 	INT64S* seq = (INT64S*)calloc(N, sizeof(INT64S));
-	seq[0] = 0; seq[1] = 1;
+	seq[0] = 0; 
+	seq[1] = 1;
 	for (int i = 2; i < N; i++) seq[i] = seq[i - 1] + seq[i - 2];
 	return seq;
 }

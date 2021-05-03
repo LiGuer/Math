@@ -128,7 +128,7 @@ public:
 	}
 	void load(FILE* file) {
 		for (int i = 0; i < weight.size(); i++) fscanf(file, "%f", &weight[i]);
-		for (int i = 0; i < bias.rows;    i++)  fscanf(file, "%f", &bias  [i]);
+		for (int i = 0; i < bias.rows;     i++) fscanf(file, "%f", &bias  [i]);
 	}
 };
 /*************************************************************************************************

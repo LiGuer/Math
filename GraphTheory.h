@@ -67,13 +67,13 @@ Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<Gra
 *********************************************************************************/
 void Prim(Mat<GraphListNode*>& GraphList, std::vector<int> TreeU[], std::vector<int> TreeV[])
 {
-	Mat<bool> flag(GraphList.rows);
-	Mat<int> VertexNew(GraphList.rows);
+	Mat<bool> flag     (GraphList.rows);
+	Mat<int>  VertexNew(GraphList.rows);
 	int TreeNum = 0;
 	//[3]
 	while (true) {
 		//[4]
-		Edge minEdge = { -1,-1,DBL_MAX };
+		Edge minEdge = { -1, -1, DBL_MAX };
 		for (int i = 0; i < TreeNum + 1; i++) {
 			int u = VertexNew[i];
 			GraphListNode* ptr = GraphList[u];
@@ -103,7 +103,8 @@ void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV
 	Mat<int> root;
 	for (int i = 0; i < N; i++) {
 		//[3]
-		int uRoot = edge[i].u, vRoot = edge[i].v;
+		int uRoot = edge[i].u, 
+			vRoot = edge[i].v;
 		while (root[uRoot] != 0) uRoot = root[uRoot];			//并查集思想, 找该点根节点
 		while (root[vRoot] != 0) vRoot = root[vRoot];
 		if (uRoot == 0 || vRoot == 0 || uRoot != vRoot) {

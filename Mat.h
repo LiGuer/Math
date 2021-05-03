@@ -19,7 +19,7 @@ limitations under the License.
 #include <string.h>
 #include <math.h>
 #include <functional>
-template<class T>
+template<class T = double>
 class Mat
 {
 public:
@@ -169,8 +169,12 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 	* 索引方向: 先纵再横.
 	---------------------------------------------*/
 	T& operator[](int i) { return data[i]; }
-	T& operator()(int i, int j) { return data[i * cols + j]; }
+	T& operator()(int x, int y) { return data[x * cols + y]; }
 	T& operator()(int i) { return data[i]; }
+	inline void i2xy(int& i, int& x, int& y) { x = i / cols ; y = i % cols; }
+	inline int  i2x (int i)			{ return i / cols; }
+	inline int  i2y (int i)			{ return i % cols; }
+	inline int xy2i (int x, int y)	{ return x * cols + y; }
 	/*---------------- max/min ----------------*/
 	T max() const {
 		T maxdata = *data;
@@ -665,7 +669,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		Mat ansTmp;
 		if (rows == cols) {
 			ansTmp.alloc(rows);
-			for (int i = 0; i < rows; i++) bansTmp[i] = (*this)(i, i);
+			for (int i = 0; i < rows; i++) ansTmp[i] = (*this)(i, i);
 		}
 		else if (rows == 1 || cols == 1) {
 			int n = rows > cols ? rows : cols;

@@ -110,14 +110,14 @@ double Statistics::X2Test(Mat<double>& x, double delta, int N, double (*F)(doubl
 *	[注]: 区间规定"左开右闭"
 /***************************************************************************/
 Mat<int>& Statistics::Histogram(Mat<double>& x, int N, Mat<int>& frequency, double overFlow, double underFlow) {
-	double max =  overFlow == NULL ? x.max() : overFlow,
+	double max =  overFlow == NULL ? x.max() :  overFlow,
 		   min = underFlow == NULL ? x.min() : underFlow,
 	double delta = (max - min) / N;
 	frequency.zero(1, N + (overFlow == NULL ? 1 : 0) + (underFlow == NULL ? 1 : 0));
 	for (int i = 0; i < x.cols; i++) {
 		int index = (x[i] - min) / delta + (overFlow == NULL ? 1 : 0);
 		index = x[i] <= min ? 0 : index;
-		index = x[i] > max ? frequency.cols - 1 : index;
+		index = x[i] >  max ? frequency.cols - 1 : index;
 		frequency[index]++;
 	}
 	return frequency;
