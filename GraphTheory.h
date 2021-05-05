@@ -24,7 +24,7 @@ struct Edge { int u, v; double w; };
 						构建  邻接图 / 邻接链表
 *********************************************************************************/
 struct GraphListNode { int v; double w; GraphListNode* next = NULL; };	//邻接链表节点
-Mat<double>& bulidGraphMat(int u[], int v[], double w[], int N, Mat<double>& GraphMat) {
+Mat<>& bulidGraphMat(int u[], int v[], double w[], int N, Mat<>& GraphMat) {
 	GraphMat.alloc(N, N).fill(DBL_MAX);
 	for (int i = 0; i < N; i++) GraphMat(u[i], v[i]) = w[i];
 	return GraphMat;
@@ -146,7 +146,7 @@ void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV
 			Dijkstra一次只能算出给定两点间的最短路径。
 			Floyd   一次可以算出任意两点间的最短路径。
 *********************************************************************************/
-void Floyd(Mat<double>& GraphMat, Mat<double>& Distance, Mat<double>& Path)
+void Floyd(Mat<>& GraphMat, Mat<>& Distance, Mat<>& Path)
 {
 	//[1]
 	int N = GraphMat.cols;
@@ -201,7 +201,7 @@ void Dinic_DFS(int s, int t, int N) {/*
 		}
 	}*/
 }
-double Dinic(Mat<double>& GraphMat, Mat<double>& Path,int s, int t, int N) {
+double Dinic(Mat<>& GraphMat, Mat<>& Path,int s, int t, int N) {
 	double ans = 0;
 	Mat<int> level; level.alloc(N).fill(-1);
 	Dinic_BFS(s, N);

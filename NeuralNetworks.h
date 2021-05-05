@@ -27,9 +27,9 @@ class Inception()									//Inception模块 : 2014.Google
 class GoogLeNet_NeuralNetworks()					//GoogLeNet卷积神经网络 : 2014.Google
 ################################################################################################*/
 /*----------------[ ReLU ]----------------*/
-double relu(double x) { return x < 0 ? x : 0; }
+double relu		(double x) { return x < 0 ? x : 0; }
 /*----------------[ sigmoid ]----------------*/
-double sigmoid(double x) { return 1 / (1 + exp(-x)); }
+double sigmoid	(double x) { return 1 / (1 + exp(-x)); }
 /*************************************************************************************************
 *							NeuralLayer	神经网络层
 *	[核心数据]: 
@@ -80,15 +80,15 @@ double sigmoid(double x) { return 1 / (1 + exp(-x)); }
 *************************************************************************************************/
 class NeuralLayer {
 public:
-	Mat<double> weight, bias;
-	Mat<double> output, delta;
+	Mat<> weight, bias;
+	Mat<> output, delta;
 	double(*actFunc)     (double);
 	double(*actDerivFunc)(double);
 	/*----------------[ init ]----------------*/
 	NeuralLayer() { ; }
 	NeuralLayer(int inputSize, int outputSize, double(*_actFunc)(double)) { init(inputSize, outputSize, _actFunc); }
 	NeuralLayer(int inputSize, int outputSize) { init(inputSize, outputSize, [](double x) { return x; }); }
-	void init(int inputSize, int outputSize, double(*_actFunc)(double)) {
+	void init  (int inputSize, int outputSize, double(*_actFunc)(double)) {
 		weight.rands(outputSize, inputSize, -1, 1);
 		bias.  rands(outputSize, 1, -1, 1);
 		actFunc = _actFunc;
@@ -96,8 +96,8 @@ public:
 	/*----------------[ forward ]----------------
 	*	y = σ(W x + b)
 	*-------------------------------------------*/
-	Mat<double>* operator()(Mat<double>& input) { return forward(input); }
-	Mat<double>* forward(Mat<double>& input) {
+	Mat<>* operator()(Mat<>& input) { return forward(input); }
+	Mat<>* forward   (Mat<>& input) {
 		output.add(output.mult(weight, input), bias);
 		return &output.function(output, actFunc);
 	}
@@ -110,11 +110,11 @@ public:
 		wL = wL + lr·∂E/∂wL
 		bL = bL + lr·∂E/∂bL
 	*-------------------------------------------*/
-	void backward(Mat<double>& preInput, Mat<double>& error, double learnRate) {
+	void backward(Mat<>& preInput, Mat<>& error, double learnRate) {
 		//[1]
 		delta = error;	
 		//delta[i].elementMult(tmp.function(outputLiner[i], actDerivFunc) :	//σ'(z_outL) 激活函数导数
-		Mat<double> t;
+		Mat<> t;
 		error.mult(weight.transpose(t), delta);
 		//[2]
 		weight += t.mult(-learnRate, t.mult(delta, preInput.transpose(t)));
@@ -142,7 +142,7 @@ public:
 class ConvLayer {
 public:
 	Tensor<double> kernel, output;
-	Mat<double> bias;
+	Mat<> bias;
 	int inChannelNum, outChannelNum, padding, stride;
 	bool biasSwitch = false;
 	/*----------------[ init ]----------------*/
@@ -160,7 +160,7 @@ public:
 	}
 	/*----------------[ forward ]----------------*/
 	Tensor<double>* operator()(Tensor<double>& input) { return forward(input); }
-	Tensor<double>* forward(Tensor<double>& input) {
+	Tensor<double>* forward   (Tensor<double>& input) {
 		int rows_out = (input.dim[0] - kernel.dim[0] + 2 * padding) / stride + 1,
 			cols_out = (input.dim[1] - kernel.dim[1] + 2 * padding) / stride + 1;
 		output.zero(rows_out, cols_out, outChannelNum);
@@ -220,7 +220,7 @@ public:
 	}
 	/*----------------[ forward ]----------------*/
 	Tensor<double>* operator()(Tensor<double>& input) { return forward(input); }
-	Tensor<double>* forward(Tensor<double>& input) {
+	Tensor<double>* forward   (Tensor<double>& input) {
 		int rows_out = (input.dim[0] - kernelSize + 2 * padding) / stride + 1,
 			cols_out = (input.dim[1] - kernelSize + 2 * padding) / stride + 1;
 		output.zero(rows_out, cols_out, input.dim[2]);
@@ -284,9 +284,9 @@ public:
 class LstmLayer
 {
 public:
-	Mat<double> gate[4], weights[4], bias[4], diffWeights[4], diffBias[4];	// Gate[4]: G, F, I, O
-	Mat<double> s, h, xc;													// State,output
-	std::vector<Mat<double>> gateSet[4], prevSSet, prevHSet, xcSet;
+	Mat<> gate[4], weights[4], bias[4], diffWeights[4], diffBias[4];	// Gate[4]: G, F, I, O
+	Mat<> s, h, xc;													// State,output
+	std::vector<Mat<>> gateSet[4], prevSSet, prevHSet, xcSet;
 	LstmLayer() { ; }
 	LstmLayer(int inputSize, int outputSize) { init(inputSize, outputSize); }
 	void init(int inputSize, int outputSize) {
@@ -299,8 +299,8 @@ public:
 		}
 	}
 	/*-------------------------------- 正向传播 --------------------------------*/
-	std::vector<Mat<double>>* operator()(std::vector<Mat<double>>& input, Mat<double>& s_prev, Mat<double>& h_prev) { return forward(input, s_prev, h_prev); }
-	std::vector<Mat<double>>* forward(std::vector<Mat<double>>& input, Mat<double>& s_prev, Mat<double>& h_prev) {
+	std::vector<Mat<>>* operator()(std::vector<Mat<>>& input, Mat<>& s_prev, Mat<>& h_prev) { return forward(input, s_prev, h_prev); }
+	std::vector<Mat<>>* forward   (std::vector<Mat<>>& input, Mat<>& s_prev, Mat<>& h_prev) {
 		for (int i = 0; i < 4; i++)gateSet[i].clear();
 		prevSSet.clear(); prevSSet.push_back(s_prev);
 		prevHSet.clear(); prevHSet.push_back(h_prev);
@@ -319,7 +319,7 @@ public:
 		}
 		return &prevHSet;
 	}
-	Mat<double>* forward(Mat<double>& input, Mat<double>& prevS, Mat<double>& prevH) {
+	Mat<>* forward(Mat<>& input, Mat<>& prevS, Mat<>& prevH) {
 		// G F I O
 		xc.rowsStack(input, prevH);														//[h_(t-1), xt]
 		for (int i = 0; i < 4; i++) { 													
@@ -329,14 +329,14 @@ public:
 				gate[i].function([](double x) { return 1 / (1 + exp(-x)); });			//Ft, It, Ot = Sigmoid( W_ifo×[h_(t-1), xt] + b_ifo )
 		}
 		// S H
-		Mat<double> tmp;
+		Mat<> tmp;
 		s.add(tmp.elementMult(gate[0], gate[2]), s.elementMult(prevS, gate[1]));		//st = gt·it + s_(t-1)·ft
 		return &h.elementMult(gate[3], s);
 		//h.elementMult(gate[3], tmp.function(s, [](double x) { return tanh(x); }));	//ht = ot·tanh(st)
 	}
 	/*-------------------------------- 反向传播 --------------------------------*/
-	void backward(std::vector<Mat<double>>& error, double learnRate) {
-		Mat<double> 
+	void backward(std::vector<Mat<>>& error, double learnRate) {
+		Mat<> 
 			tmp, 
 			diffH(error[0].rows), 
 			diffS(error[0].rows);
@@ -360,10 +360,10 @@ public:
 			diffBias   [i].zero();
 		}
 	}
-	void backward(Mat<double>& prevS, Mat<double>& error, Mat<double>& diffH, Mat<double>& diffS) {
+	void backward(Mat<>& prevS, Mat<>& error, Mat<>& diffH, Mat<>& diffS) {
 		diffH += error;
 		//notice that top_diffS is carried along the constant error carousel
-		Mat<double> diffGate[4], tmp;
+		Mat<> diffGate[4], tmp;
 		diffS.add(tmp.elementMult(gate[3], diffH), diffS);							//Δs = ot·Δh_(t+1) + Δs_(t+1) 
 		diffGate[0].elementMult(gate[2], diffS);									//Δg = it·Δs
 		diffGate[1].elementMult(prevS,   diffS);									//Δf = s_(t-1)·Δs
@@ -375,7 +375,7 @@ public:
 			diffGate[i].elementMult(tmp.function(gate[i], [](double x) { return x * x > 0 ? 0 : 1 - x * x; })) :
 			diffGate[i].elementMult(tmp.function(gate[i], [](double x) { return x * (1 - x); }));
 		//diffs w.r.t. inputs & compute bottom diff
-		Mat<double> diffXc(xc.rows);												//Δgfio_W += Δgfio×xc^T //Δgfio_b += Δgfio //Δxc = ΣW^T×Δ_gfio
+		Mat<> diffXc(xc.rows);												//Δgfio_W += Δgfio×xc^T //Δgfio_b += Δgfio //Δxc = ΣW^T×Δ_gfio
 		for (int i = 0; i < 4; i++) {
 			diffWeights[i] += tmp.mult(diffGate[i], xc.transpose(tmp));
 			diffBias   [i] += diffGate[i];
@@ -412,7 +412,7 @@ public:
 class BackPropagation_NeuralNetworks {
 public:
 	std::vector<NeuralLayer*> layer;
-	Mat<double> preIntput;
+	Mat<> preIntput;
 	double learnRate = 0.01;
 	/*----------------[ set Layer ]----------------*/
 	void addLayer(int inputSize, int outputSize) { layer.push_back(new NeuralLayer(inputSize, outputSize)); }
@@ -422,16 +422,16 @@ public:
 		layer[index] = new NeuralLayer(inputSize, outputSize, sigmoid);
 	}
 	/*----------------[ forward ]----------------*/
-	Mat<double>& operator()(Mat<double>& input, Mat<double>& output) { return forward(input, output); }
-	Mat<double>& forward(Mat<double>& input, Mat<double>& output) {
-		Mat<double>* y = (*layer[0])(input);
+	Mat<>& operator()(Mat<>& input, Mat<>& output) { return forward(input, output); }
+	Mat<>& forward   (Mat<>& input, Mat<>& output) {
+		Mat<>* y = (*layer[0])(input);
 		for (int i = 1; i < layer.size(); i++) y = (*layer[i])(*y);
 		preIntput = input;
 		return output = *y;
 	}
 	/*----------------[ backward ]----------------*/
-	void backward(Mat<double>& target) {
-		Mat<double> error;
+	void backward(Mat<>& target) {
+		Mat<> error;
 		error.sub(target, layer.back()->output);
 		for (int i = layer.size() - 1; i >= 1; i--)
 			layer[i]->backward(
@@ -470,16 +470,16 @@ public:
 		FullConnect_3{  64, 10 };
 	LeNet_NeuralNetworks() { ; }
 	/*----------------[ forward ]----------------*/
-	Mat<double>& operator()(Tensor<double>& input, Mat<double>& output) { return forward(input, output); }
-	Mat<double>& forward(Tensor<double>& input, Mat<double>& output) {
+	Mat<>& operator()(Tensor<double>& input, Mat<>& output) { return forward(input, output); }
+	Mat<>& forward(Tensor<double>& input, Mat<>& output) {
 		Tensor<double>* y;
 		y = Conv_1(input);
 		y = MaxPool_1(*y);
 		y = Conv_2(*y);
 		y = MaxPool_2(*y);
 		Tensor<double> t = *y;
-		Mat<double> t2(t.dim.product()); t2.data = t.data; t.data = NULL;
-		Mat<double>* maty = &t2;
+		Mat<> t2(t.dim.product()); t2.data = t.data; t.data = NULL;
+		Mat<>* maty = &t2;
 		maty = FullConnect_1(*maty);
 		maty = FullConnect_2(*maty);
 		maty = FullConnect_3(*maty);
@@ -489,8 +489,8 @@ public:
 	/*----------------[ save/load ]----------------*/
 	void save(const char* saveFile) {
 		FILE* file = fopen(saveFile, "w+");
-		Conv_1.save(file);
-		Conv_2.save(file);
+		Conv_1.		  save(file);
+		Conv_2.		  save(file);
 		FullConnect_1.save(file);
 		FullConnect_2.save(file);
 		FullConnect_3.save(file);
@@ -498,8 +498,8 @@ public:
 	}
 	void load(const char* loadFile) {
 		FILE* file = fopen(loadFile, "r+");
-		Conv_1.load(file);
-		Conv_2.load(file);
+		Conv_1.		  load(file);
+		Conv_2.		  load(file);
 		FullConnect_1.load(file);
 		FullConnect_2.load(file);
 		FullConnect_3.load(file);
@@ -522,41 +522,37 @@ public:
 	}
 	void init(int inChannelNum, int n1x1, int n3x3red, int n3x3, int n5x5red, int n5x5, int poolChannelNum) {
 		// 1x1 conv branch
-		b1.init(inChannelNum, n1x1, 1, 0, 1);
-		// 1x1 conv -> 3x3 conv branch
-		b2_1x1_a.init(inChannelNum, n3x3red, 1, 0, 1);
-		b2_3x3_b.init(n3x3red, n3x3, 3, 1, 1);
-		// 1x1 conv -> 3x3 conv -> 3x3 conv branch
-		b3_1x1_a.init(inChannelNum, n5x5red, 1, 0, 1);
-		b3_3x3_b.init(n5x5red, n5x5, 3, 1, 1);
-		b3_3x3_c.init(n5x5, n5x5, 3, 1, 1);
-		// x3 pool -> 1x1 conv branch
-		b4_pool.init(3, 0, 3, b4_pool.M);
-		b4_1x1. init(inChannelNum, poolChannelNum, 1, 0, 1);
+		b1.		 init(inChannelNum, n1x1,			1, 0, 1);	// 1x1 conv -> 3x3 conv branch
+		b2_1x1_a.init(inChannelNum, n3x3red,		1, 0, 1);
+		b2_3x3_b.init(n3x3red,		n3x3,			3, 1, 1);
+		b3_1x1_a.init(inChannelNum, n5x5red,		1, 0, 1);	// 1x1 conv -> 3x3 conv -> 3x3 conv branch
+		b3_3x3_b.init(n5x5red,		n5x5,			3, 1, 1);
+		b3_3x3_c.init(n5x5,			n5x5,			3, 1, 1);
+		b4_pool. init(3, 0, 3, b4_pool.M);						// x3 pool -> 1x1 conv branch
+		b4_1x1.  init(inChannelNum, poolChannelNum, 1, 0, 1);
 	};
 	/*----------------[ forward ]----------------*/
 	Tensor<double>* operator()(Tensor<double>& input) { return forward(input); }
 	Tensor<double>* forward(Tensor<double>& input) {
-		Tensor<double>* y1 = b1(input);
-		Tensor<double>* y2 = b2_3x3_b(*b2_1x1_a(input));
-		Tensor<double>* y3 = b3_3x3_c(*b3_3x3_b(*b3_1x1_a(input)));
-		Tensor<double>* y4 = b4_1x1(*b4_pool(input));
+		Tensor<double>* y1 = b1								(input);
+		Tensor<double>* y2 = b2_3x3_b(*b2_1x1_a				(input));
+		Tensor<double>* y3 = b3_3x3_c(*b3_3x3_b(*b3_1x1_a	(input)));
+		Tensor<double>* y4 = b4_1x1  (*b4_pool				(input));
 		Tensor<double>* t[]{ y1, y2, y3, y4 };
-		output.merge(t, 4, 1);
-		return &output;
+		return &output.merge(t, 4, 1);
 	}
 	/*----------------[ save/load ]----------------*/
 	void save(FILE* file) {
-		b1.save(file);
+		b1.		 save(file);
 		b2_1x1_a.save(file); b2_3x3_b.save(file);
 		b3_1x1_a.save(file); b3_3x3_b.save(file); b3_3x3_c.save(file);
-		b4_1x1.save(file);
+		b4_1x1.  save(file);
 	}
 	void load(FILE* file) {
-		b1.load(file);
+		b1.		 load(file);
 		b2_1x1_a.load(file); b2_3x3_b.load(file);
 		b3_1x1_a.load(file); b3_3x3_b.load(file); b3_3x3_c.load(file);
-		b4_1x1.load(file);
+		b4_1x1.  load(file);
 	}
 };
 /*************************************************************************************************
@@ -571,13 +567,13 @@ public:
 	NeuralLayer linear;
 	GoogLeNet_NeuralNetworks() {
 		preLayers.init(1, 64, 5, 1, 2);
-		a3.init( 64,  64,  96, 128, 16, 32, 32);
-		b3.init(256, 128, 128, 192, 32, 96, 64);
+		a3.init( 64,  64,  96, 128, 16,  32,  32);
+		b3.init(256, 128, 128, 192, 32,  96,  64);
 		maxpool.init(3, 2, 1, avgpool.M);
-		a4.init(480, 192,  96, 208, 16, 48, 64);
-		b4.init(512, 160, 112, 224, 24, 64, 64);
-		c4.init(512, 128, 128, 256, 24, 64, 64);
-		d4.init(512, 112, 144, 288, 32, 64, 64);
+		a4.init(480, 192,  96, 208, 16,  48,  64);
+		b4.init(512, 160, 112, 224, 24,  64,  64);
+		c4.init(512, 128, 128, 256, 24,  64,  64);
+		d4.init(512, 112, 144, 288, 32,  64,  64);
 		e4.init(528, 256, 160, 320, 32, 128, 128);
 		a5.init(832, 256, 160, 320, 32, 128, 128);
 		b5.init(832, 384, 192, 384, 48, 128, 128);
@@ -585,19 +581,19 @@ public:
 		linear. init(1024 * 5 * 5, 7, relu);
 	}
 	/*----------------[ forward ]----------------*/
-	Mat<double>& operator()(Tensor<double>& input, Mat<double>& output) { return forward(input, output); }
-	Mat<double>& forward(Tensor<double>& input, Mat<double>& output) {
+	Mat<>& operator()(Tensor<double>& input, Mat<>& output) { return forward(input, output); }
+	Mat<>& forward   (Tensor<double>& input, Mat<>& output) {
 		Tensor<double>* y;
 		y = preLayers(input);
-		y = b3(*a3(*y));
+		y = b3(*a3 (*y));
 		y = maxpool(*y);
 		y = e4(*d4(*c4(*b4(*a4(*y)))));
 		y = maxpool(*y);
-		y = b5(*a5(*y));
+		y = b5(*a5 (*y));
 		y = avgpool(*y);
 		Tensor<double> t = *y;
-		Mat<double> t2(t.dim.product()); t2.data = t.data; t.data = NULL;
-		Mat<double>* maty = &t2;
+		Mat<> t2(t.dim.product()); t2.data = t.data; t.data = NULL;
+		Mat<>* maty = &t2;
 		maty = linear(*maty);
 		return output = *maty;
 	}
@@ -631,8 +627,8 @@ class LstmNetwork
 public:
 	LstmLayer lstm;
 	NeuralLayer nn;
-	Mat<double> prevLstmS, prevLstmH;
-	std::vector<Mat<double>> output;
+	Mat<> prevLstmS, prevLstmH;
+	std::vector<Mat<>> output;
 	double learnRate = 0.005;
 	LstmNetwork(int inputSize, int LstmOutputSize, int outputSize) {
 		lstm.init(inputSize, LstmOutputSize);
@@ -641,21 +637,21 @@ public:
 		prevLstmH.zero(LstmOutputSize);
 	}
 	/*-------------------------------- 正向传播 --------------------------------*/
-	std::vector<Mat<double>>& operator() (std::vector<Mat<double>>& input) { return forward(input); }
-	std::vector<Mat<double>>& forward(std::vector<Mat<double>>& input) {
+	std::vector<Mat<>>& operator()(std::vector<Mat<>>& input) { return forward(input); }
+	std::vector<Mat<>>& forward   (std::vector<Mat<>>& input) {
 		*lstm(input, prevLstmS, prevLstmH);
 		prevLstmS = lstm.s;
 		prevLstmH = lstm.h;
 		output.clear();
-		Mat<double> tmp;
+		Mat<> tmp;
 		for (int i = 0; i < input.size(); i++)
 			output.push_back(*nn(lstm.prevHSet[i + 1]));
 		return output;
 	}
 	/*-------------------------------- 反向传播 --------------------------------*/
-	double backward(std::vector<Mat<double>>& target) {
-		std::vector<Mat<double>> errorSet;
-		Mat<double> error;
+	double backward(std::vector<Mat<>>& target) {
+		std::vector<Mat<>> errorSet;
+		Mat<> error;
 		for (int i = 0; i < target.size(); i++) {
 			nn.backward(
 				lstm.prevHSet[i + 1],

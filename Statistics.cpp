@@ -15,21 +15,21 @@ limitations under the License.
 *								平均值
 *	Mean = Σx_i / N
 /***************************************************************************/
-double Statistics::Mean(Mat<double>& x) { return x.sum() / x.cols; }
-Mat<double>& Statistics::Mean(Mat<double>& x, Mat<double>& ans) {
+double Statistics::Mean(Mat<>& x) { return x.sum() / x.cols; }
+Mat<>& Statistics::Mean(Mat<>& x, Mat<>& ans) {
 	return ans.mult(1.0 / x.cols, x.sum(ans, 1));
 }
 /***************************************************************************
 *								方差
 *	Var² = Σ(x_i - x_mean)² / (N - 1)
 /***************************************************************************/
-double Statistics::Variance(Mat<double>& x) {
+double Statistics::Variance(Mat<>& x) {
 	double var = 0, mean = Mean(x);
 	for (int i = 0; i < x.cols * x.rows; i++) var += pow(x[i] - mean, 2);
 	return var / (x.cols * x.rows - 1);
 }
-Mat<double>& Statistics::Variance(Mat<double>& x, Mat<double>& ans) {
-	Mat<double> mean; Mean(x, mean);
+Mat<>& Statistics::Variance(Mat<>& x, Mat<>& ans) {
+	Mat<> mean; Mean(x, mean);
 	ans.zero(x.rows, 1);
 	for (int i = 0; i < x.rows; i++) {
 		for (int j = 0; j < x.cols; j++)
@@ -41,7 +41,7 @@ Mat<double>& Statistics::Variance(Mat<double>& x, Mat<double>& ans) {
 *								正态分布
 *	f(x) = 1 / sqrt(2πσ²)·exp(-(x-μ)² / (2σ²))
 /***************************************************************************/
-Mat<double>& Statistics::NormalDistribution(double mean, double variance, double min, double max, double delta, Mat<double>& output) {
+Mat<>& Statistics::NormalDistribution(double mean, double variance, double min, double max, double delta, Mat<>& output) {
 	output.alloc(1, (max - min) / delta + 1);
 	double x = min, A = 1.0 / (sqrt(2 * PI * variance));
 	for (int i = 0; i < output.cols; i++) {
@@ -60,7 +60,7 @@ Mat<double>& Statistics::NormalDistribution(double mean, double variance, double
 		[2] 计算偏度、峰度 E[(X-E(X))³]/D(X)³`², E[(X-E(X))⁴]/D(X)²
 		[3] 假设检验
 /***************************************************************************/
-bool Statistics::SkewnessKurtosisTest(Mat<double>& x, double SignificanceLevel) {
+bool Statistics::SkewnessKurtosisTest(Mat<>& x, double SignificanceLevel) {
 	//[1]
 	int N = x.cols;
 	double mean = Mean(x), B[5] = { 0 };
@@ -87,7 +87,7 @@ bool Statistics::SkewnessKurtosisTest(Mat<double>& x, double SignificanceLevel) 
 		[1] 频数统计
 		[2] X²拟合检验
 /***************************************************************************/
-double Statistics::X2Test(Mat<double>& x, double delta, int N, double (*F)(double)) {
+double Statistics::X2Test(Mat<>& x, double delta, int N, double (*F)(double)) {
 	//[1]
 	Mat<int> frequency(1, N + 1);
 	double X2 = 0, mean = Mean(x);
@@ -109,10 +109,10 @@ double Statistics::X2Test(Mat<double>& x, double delta, int N, double (*F)(doubl
 *	[输入]: OverFlow: 上溢出	UnderFlow: 下溢出
 *	[注]: 区间规定"左开右闭"
 /***************************************************************************/
-Mat<int>& Statistics::Histogram(Mat<double>& x, int N, Mat<int>& frequency, double overFlow, double underFlow) {
+Mat<int>& Statistics::Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow, double underFlow) {
 	double max =  overFlow == NULL ? x.max() :  overFlow,
 		   min = underFlow == NULL ? x.min() : underFlow,
-	double delta = (max - min) / N;
+		   delta = (max - min) / N;
 	frequency.zero(1, N + (overFlow == NULL ? 1 : 0) + (underFlow == NULL ? 1 : 0));
 	for (int i = 0; i < x.cols; i++) {
 		int index = (x[i] - min) / delta + (overFlow == NULL ? 1 : 0);
@@ -127,10 +127,10 @@ Mat<int>& Statistics::Histogram(Mat<double>& x, int N, Mat<int>& frequency, doub
 *[输出]: MediQuartThreshold: (1) 中位数 (2/3) 小/大四分位数 (4/5) 小/大边缘
 *[目的]: 数据 => 中位数、小/大四分位数  => 小/大边缘
 /***************************************************************************/
-void Statistics::BoxPlot(Mat<double>& x, Mat<double>& MediQuartThreshold, std::vector<int>* OutlierIndex) {
+void Statistics::BoxPlot(Mat<>& x, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex) {
 	// 中位数、小/大四分位数、小/大边缘
 	MediQuartThreshold.zero(x.rows, 5);
-	Mat<double> xTmp(x);
+	Mat<> xTmp(x);
 	for (int i = 0; i < x.rows; i++) {
 		std::sort(
 			xTmp.data +  i      * xTmp.cols, 

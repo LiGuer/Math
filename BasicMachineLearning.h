@@ -19,10 +19,10 @@ limitations under the License.
 #include <vector>
 namespace BasicMachineLearning {
 	void Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence);
-	void K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax = 0x7FFFFFFF);
-	void MahalanobisDist(Mat<double>& x, Mat<double>& mahalanobisDistance);
-	void PrincipalComponentsAnalysis(Mat<double>& x, Mat<double>& y, int yDim);
-	void SupportVectorMachines(Mat<double> X, Mat<int> Y);
+	void K_Mean(Mat<>& x, int K, Mat<>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax = 0x7FFFFFFF);
+	void MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance);
+	void PrincipalComponentsAnalysis(Mat<>& x, Mat<>& y, int yDim);
+	void SupportVectorMachines(Mat<> X, Mat<int> Y);
 }
 
 /******************************************************************************
@@ -50,7 +50,7 @@ class QLearning {
 public:
 	double learnRate = 0.6, Gamma = 0.8, greedy = 0.9; //奖励递减值# 贪婪度
 	int actionNum = 0, stateNum = 0;
-	Mat<double> QTable;
+	Mat<> QTable;
 	double preState = 0;
 	/*---------------- 初始化 ----------------*/
 	QLearning(int _stateNum, int _actionNum) { init(_stateNum, _actionNum); }

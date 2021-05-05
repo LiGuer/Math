@@ -20,8 +20,8 @@ namespace Calculus {
 *	[性质]:
 		* RK4法是四阶方法，每步误差是h⁵阶，总积累误差为h⁴阶
 **-----------------------------------------------------------------------------------*/
-void RungeKutta(Mat<double>& y, double dt, double t0, int enpoch, Mat<double>& (*f)(double t, Mat<double>& y)) {
-	Mat<double> tmp, k, k1, k2, k3, k4;
+void RungeKutta(Mat<>& y, double dt, double t0, int enpoch, Mat<>& (*f)(double t, Mat<>& y)) {
+	Mat<> tmp, k, k1, k2, k3, k4;
 	double t = t0;
 	while (enpoch--) {
 		// k1, k2, k3 ,k4
@@ -40,8 +40,8 @@ void RungeKutta(Mat<double>& y, double dt, double t0, int enpoch, Mat<double>& (
 // | y' = (y')
 // | (x')' = - G M x / (x² + y²)^(3/2)
 // [ (y')' = - G M y / (x² + y²)^(3/2)
-Mat<double>& function(double t, Mat<double>& y) {
-	static Mat<double> output(y.rows);
+Mat<>& function(double t, Mat<>& y) {
+	static Mat<> output(y.rows);
 	static double GM = 1;
 	output[0] = y[2]; output[1] = y[3];
 	double temp = -GM / pow(y[0] * y[0] + y[1] * y[1], 3 / 2);
@@ -49,7 +49,7 @@ Mat<double>& function(double t, Mat<double>& y) {
 	return output;
 }
 int main() {
-	Mat<double> y(4);
+	Mat<> y(4);
 	y[0] = 1; y[1] = 0; y[2] = 0; y[3] = 0.7;
 	for (int i = 0; i < 1000; i++) {
 		RungeKutta(y, 0.01, 0, 1, function);
@@ -71,18 +71,18 @@ int main() {
 		对于各种边界条件，Poisson's方程可能有许多种解，但每个解的梯度相同. 
 		静电场情况下, 意味着在边界条件下的满足Poisson's方程的势函数，所解得的电场唯一确定.
 **--------------------------------------------------------------------------*/
-Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta, double (*f) (Mat<double>& x)) {
+Tensor<double>* PoissonEquation(Mat<>st, Mat<>ed, Mat<> delta, double (*f) (Mat<>& x)) {
 	// init
-	Mat<double> tmp;
+	Mat<> tmp;
 	tmp.sub(ed, st);
 	Mat<int> dim; dim.E(st.rows);
 	for (int i = 0; i < st.rows; i++) dim[i] = (int)(tmp[i] / delta[i]);
 	Tensor<double>* Map = new Tensor<double>(dim.rows, dim.data);
 	// compute Green's function
-	Mat<double> r = st;
+	Mat<> r = st;
 	for (int i = 0; i < Map->dim.product(); i++) {
 		double t = 0;
-		Mat<double> rt = st;
+		Mat<> rt = st;
 		for (int j = 0; j < Map->dim.product(); j++) {
 			for (int k = 0; k < rt.rows; k++) {
 				rt[k] += delta[k]; 
@@ -124,9 +124,9 @@ Tensor<double>* PoissonEquation(Mat<double>st, Mat<double>ed, Mat<double> delta,
 		u(r,t=Δt) = u(r,t=0) + ∂u(r,t=0)/∂t·Δt + a▽²u·Δt²
 	[*] 暂时只二维
 **--------------------------------------------------------------------------*/
-void WaveEquation(Mat<double>& Map, Mat<double>& veloc, void (*setBoundaryEquations) (Mat<double>& x, int time),
+void WaveEquation(Mat<>& Map, Mat<>& veloc, void (*setBoundaryEquations) (Mat<>& x, int time),
 	double alpha, double deltaTime, double deltaX, double deltaY, int EndTimes) {
-	Mat<double> MapNow(Map), MapPrev(Map);
+	Mat<> MapNow(Map), MapPrev(Map);
 	//对于t = 1 * Δt时刻, 有 u(r,t=Δt) = u(r,t=0) + ∂u(r,t=0)/∂t·Δt + a▽²u·Δt²
 	for (int x = 1; x < Map.rows - 1; x++) {
 		for (int y = 1; y < Map.cols - 1; y++) {

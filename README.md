@@ -84,7 +84,7 @@ void eig(T esp, Mat& eigvec, Mat& eigvalue);    //特征值特征向量 [eig]
 Mat& solveEquations(Mat& b, Mat& x);            //解方程组 [solveEquations]
 void LUPdecomposition(Mat& U, Mat& L, Mat<int>& P);                     //LUP分解 [LUPdecomposition]
 Mat& diag(Mat& ans);                                                    //构造对角矩阵 [diag]
-Mat<double>& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);     //卷积 [conv]
+Mat<>& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);     //卷积 [conv]
 /**************** 特殊操作 ****************/  
 Mat& getCol(int _col, Mat& a)               //读/写一列 [getCol/setCol]
 Mat& setCol(int _col, Mat& a)

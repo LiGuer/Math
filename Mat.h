@@ -261,7 +261,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 					ansTmp(i, j) += a(i, k) * b(k, j);
 		eatMat(ansTmp); return *this;
 	}
-	Mat& operator*=(const Mat& a) {
+	Mat& operator*=(Mat& a) {
 		if (cols != a.rows) error();
 		Mat ansTmp(rows, a.cols);
 		for (int i = 0; i < rows; i++)
@@ -534,7 +534,7 @@ Mat& conv(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		int n = rows;
 		eigvalue = (*this);
 		eigvec.E(n);
-		Mat<double> R, RT;
+		Mat<> R, RT;
 		//[2] begin iteration
 		while (true) {
 			//[3] Calculate row p and col q

@@ -19,16 +19,16 @@ limitations under the License.
 
 namespace Statistics {
 	/*--------------------------------[ 基础参数 ]--------------------------------*/
-	double		 Mean(Mat<double>& x);													//平均值
-	Mat<double>& Mean(Mat<double>& x, Mat<double>& ans);								//平均值
-	double		 Variance(Mat<double>& x);												//方差
-	Mat<double>& Variance(Mat<double>& x, Mat<double>& ans);							//方差
+	double		 Mean(Mat<>& x);													//平均值
+	Mat<>& Mean(Mat<>& x, Mat<>& ans);								//平均值
+	double		 Variance(Mat<>& x);												//方差
+	Mat<>& Variance(Mat<>& x, Mat<>& ans);							//方差
 	/*--------------------------------[ 概率分布、检验 ]--------------------------------*/
-	Mat<double>& NormalDistribution(double mean, double variance, double min, double max, double delta, Mat<double>& output);	//正态分布
-	bool SkewnessKurtosisTest(Mat<double>& x, double SignificanceLevel);														//正态分布-偏度峰度检验
-	double X2Test(Mat<double>& x, double delta, int N, double (*F)(double));
+	Mat<>& NormalDistribution(double mean, double variance, double min, double max, double delta, Mat<>& output);	//正态分布
+	bool SkewnessKurtosisTest(Mat<>& x, double SignificanceLevel);														//正态分布-偏度峰度检验
+	double X2Test(Mat<>& x, double delta, int N, double (*F)(double));
 	/*--------------------------------[ 统计图表 ]--------------------------------*/
-	Mat<int>& Histogram(Mat<double>& x, int N, Mat<int>& frequency, double overFlow = NULL, double underFlow = NULL);			//直方图
-	void BoxPlot(Mat<double>& input, Mat<double>& MediQuartThreshold, std::vector<int>* OutlierIndex);						//箱形图
+	Mat<int>& Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow = NULL, double underFlow = NULL);			//直方图
+	void BoxPlot(Mat<>& input, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex);						//箱形图
 }
 #endif

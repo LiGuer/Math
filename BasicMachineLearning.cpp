@@ -69,7 +69,7 @@ void Apriori_GenCandidate(std::vector<Mat<int>>& frozenSet, int K, std::vector<M
 void Apriori_Filter(std::vector<Mat<int>>& dataSet, std::vector<Mat<int>>& frozenSet, double minSupport, std::vector<double>& frozenSet_Support) {
 	//[3.1]计算支持度P(AB) ≌ num(AB) / num(all)
 	frozenSet_Support.clear();
-	Mat<double> frozenSet_Count(1, frozenSet.size());
+	Mat<> frozenSet_Count(1, frozenSet.size());
 	for (int i = 0; i < frozenSet.size(); i++) {
 		for (int j = 0; j < dataSet.size(); j++) {
 			// if frozenSet[i] is dataSet[j]'s subset
@@ -228,7 +228,7 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 			[8] 迭代重新开始
 		[9] 一轮无更正时，迭代结束
 *******************************************************************************/
-void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax) {
+void BasicMachineLearning::K_Mean(Mat<>& x, int K, Mat<>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax) {
 	int Dimension = x.rows, N = x.cols;
 	Center. zero(Dimension, K);
 	Cluster.zero(K, N); 
@@ -246,7 +246,7 @@ void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Ma
 		ClusterKthNum.zero();
 		//[4] 计算每个xi到Center_j的距离
 		for (int i = 0; i < N; i++) {
-			Mat<double> d(1, K);
+			Mat<> d(1, K);
 			for (int j = 0; j < K; j++)
 				for (int dim = 0; dim < Dimension; dim++)
 					d[j] += pow(x(dim, i) - Center(dim, j), 2);
@@ -255,7 +255,7 @@ void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Ma
 			Cluster(index, ClusterKthNum[index]++) = i;
 		}
 		//[6] 对每个簇,计算其质心 Center'
-		Mat<double> CenterTemp(Dimension, K);
+		Mat<> CenterTemp(Dimension, K);
 		for (int i = 0; i < K; i++) {
 			for (int dim = 0; dim < Dimension; dim++) {
 				for (int j = 0; j < ClusterKthNum[i]; j++)
@@ -278,15 +278,15 @@ void BasicMachineLearning::K_Mean(Mat<double>& x, int K, Mat<double>& Center, Ma
 *				Mahalanobis Distance
 * Mahalanobis Distance
 *******************************************************************************/
-void BasicMachineLearning::MahalanobisDist(Mat<double>& x, Mat<double>& mahalanobisDistance) {
+void BasicMachineLearning::MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance) {
 	mahalanobisDistance.alloc(1, x.cols);
 	// mean, diff, cov
-	Mat<double> mean, diff, covMat, tmp;
+	Mat<> mean, diff, covMat, tmp;
 	mean.  mult(1.0 / x.cols, x.sum(mean, 1));
 	covMat.mult(x, x.transpose(covMat));
 	// mahalanobis distance
 	covMat.inv(covMat);
-	Mat<double> xt;
+	Mat<> xt;
 	for (int i = 0; i < x.cols; i++) {
 		x.getCol(i, xt);
 		diff.sub(xt, mean);
@@ -315,23 +315,23 @@ void BasicMachineLearning::MahalanobisDist(Mat<double>& x, Mat<double>& mahalano
 		拉格朗日乘子法,得:	X XT ωi = λi ωi,		即.对协方差X XT, 特征值求解
 		取特征值最大的yDim个特征向量, 即目标投影矩阵W
 *******************************************************************************/
-void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<double>& x, Mat<double>& y, int yDim) {
+void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<>& x, Mat<>& y, int yDim) {
 	//[1] 数据中心化
-	Mat<double> mean;
+	Mat<> mean;
 	mean.mult(1.0 / x.cols, x.sum(mean, 1));		//得到均值
-	Mat<double> x2(x);
+	Mat<> x2(x);
 	for (int i = 0; i < x.rows; i++)
 		for (int j = 0; j < x.cols; j++)
 			x2(i, j) -= mean[i];
 	//[2] 计算协方差矩阵
-	Mat<double> Cov;
+	Mat<> Cov;
 	Cov.mult(x2, x2.transpose(Cov));		//X*XT
 	//[3] 对协方差特征值分解
-	Mat<double> eigVec, eigValue;
+	Mat<> eigVec, eigValue;
 	Cov.eig(1e-5, eigVec, eigValue);
 	//[4] 取最大的d'个特征值所对应的特征向量{w1,w2,...,wd'},投影矩阵 W = [w1,w2,...,wd']T
 	// sort
-	Mat<double> eigValueTemp(1, eigValue.cols), W(eigVec.rows, yDim);
+	Mat<> eigValueTemp(1, eigValue.cols), W(eigVec.rows, yDim);
 	for (int i = 0; i < eigValue.cols; i++)eigValueTemp[i] = eigValue(i, i);
 	std::sort(eigValueTemp.data, eigValueTemp.data + eigValueTemp.cols);
 	// W
@@ -380,6 +380,6 @@ void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<double>& x, Mat<doubl
 		[3] 得到分离超平面 w x + b = 0
 			分类决策函数: f(x) = sign( w x + b )
 ******************************************************************************/
-void BasicMachineLearning::SupportVectorMachines(Mat<double> X, Mat<int> Y) {
+void BasicMachineLearning::SupportVectorMachines(Mat<> X, Mat<int> Y) {
 
 };
