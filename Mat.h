@@ -140,9 +140,9 @@ static T dot	(Mat& a, Mat& b);			//点乘 [dot ·]
 T dot			(Mat& a);
 Mat& crossProduct	(Mat& a, Mat& b);		//叉乘 [crossProduct ×]
 Mat& crossProduct_	(Mat& a, Mat& b);
-Mat& elementMult	(Mat& a, Mat& b);		//元素乘 [elementMult ×]
-Mat& elementMult	(Mat& a);
-Mat& elementDiv	(Mat& a, Mat& b);		//元素除 [elementDiv /]
+Mat& elementMult(Mat& a, Mat& b);			//元素乘 [elementMult ×]
+Mat& elementMult(Mat& a);
+Mat& elementDiv	(Mat& a, Mat& b);			//元素除 [elementDiv /]
 Mat& elementDiv	(Mat& a);
 Mat& negative	(Mat& ans);					//负 [negative -]
 Mat& transpose	(Mat& ans);					//转置 [transpose T]
@@ -543,8 +543,8 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 			T maxelement = eigvalue[1];
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < n; j++) {
-					if (i != j && fabs(eigvalue[i * n + j]) >= maxelement) {
-						maxelement = fabs(eigvalue[i * n + j]); 
+					if (i != j && fabs(eigvalue(i, j)) >= maxelement) {
+						maxelement = fabs(eigvalue(i, j)); 
 						p = i; 
 						q = j;
 					}
@@ -552,14 +552,14 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 			}if (maxelement < esp)return;			// [2]
 			//[4] eigvalue eigvec
 			T theta = 0.5 * atan2(
-				2 * eigvalue[p * n + q], 
-				eigvalue[q * n + q] - eigvalue[p * n + p]
+				2 * eigvalue(p, q),
+				eigvalue(q, q) - eigvalue(p, p)
 			);
 			T c = cos(theta), 
 			  s = sin(theta);							// c,s
 			R.E(n);
-			R[p * n + p] =  c; R[p * n + q] = s;		// R
-			R[q * n + p] = -s; R[q * n + q] = c;
+			R(p, p) =  c; R(p, q) = s;		// R
+			R(q, p) = -s; R(q, q) = c;
 			R.transpose(RT);
 			eigvalue.mult(RT,eigvalue);					// Dj = RjT Dj-1 Rj
 			eigvalue.mult(eigvalue, R);
