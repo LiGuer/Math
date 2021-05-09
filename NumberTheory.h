@@ -20,6 +20,19 @@ limitations under the License.
 typedef unsigned long long INT64U;
 typedef long long INT64S;
 namespace NumberTheory {
+/******************************************************************************
+*                    Factorial  阶乘
+*	[定义]:
+		n! = Π_(i=0)^n  i
+		0! = 1
+	[算法]:
+		欧拉积分: Γ(s) = ∫_0^+inf  x^(s-1)·e^-x  dx
+		在整数点处取值: Γ(n + 1) = n!
+******************************************************************************/
+inline INT64S Factorial(INT64S n){
+	return tgamma(n + 1);
+	// return n == 0 ? 1 : n * Factorial(n - 1);
+}
 /*********************************************************************************
 						组合 / 排列 
 *	[定义]: 组合: 从n个不同元素中任取m个,不管其顺序合成一组的,所有组合的个数.记C_n^m.
@@ -27,9 +40,6 @@ namespace NumberTheory {
 *	[公式]: C_n^m = n! / ((n - m)!·m!)
 			A_n^m = n! / (n - m)!
 			杨辉恒等式: C_n^m = C_(n-1)^(m-1) + C_(n-1)^m
-*	[算法]:
-		欧拉积分: Γ(s) = ∫_0^+inf  x^(s-1)·e^-x  dx
-		在整数点处取值: Γ(n + 1) = n!
 ---------------------------------------------------------------------------------
 *	[问题]: 求解C_n^m mod p
 *	[公式]: Lucas定理: C_n^m mod p = C_(n/p)^(m/p)·C_(n mod p)^(m mod p) mod p
@@ -37,10 +47,10 @@ namespace NumberTheory {
 			则 C_n^m = Π_(i=0)^k  C_ni^mi mod p
 *********************************************************************************/
 INT64S C(INT64S n, INT64S m) {
-	return (INT64S)round(tgamma(n + 1) / tgamma(m + 1) / tgamma(n - m + 1));
+	return (INT64S)round(Factorial(n) / Factorial(m) / Factorial(n - m));
 }
 INT64S A(INT64S n, INT64S m) {
-	return (INT64S)round(tgamma(n + 1) / tgamma(n - m + 1));
+	return (INT64S)round(Factorial(n) / Factorial(n - m));
 }
 INT64S C_Lucas(INT64S n, INT64S m, INT64S p) {
 	INT64S ans = 1;

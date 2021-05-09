@@ -12,7 +12,6 @@ limitations under the License.
 ==============================================================================*/
 #ifndef BASIC_MACHINE_LEARNING_H
 #define BASIC_MACHINE_LEARNING_H
-
 #include "Mat.h"
 #include <float.h>
 #include <algorithm>
@@ -22,7 +21,6 @@ namespace BasicMachineLearning {
 	void K_Mean(Mat<>& x, int K, Mat<>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax = 0x7FFFFFFF);
 	void MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance);
 	void PrincipalComponentsAnalysis(Mat<>& x, Mat<>& y, int yDim);
-	void SupportVectorMachines(Mat<> X, Mat<int> Y);
 }
 
 /******************************************************************************
@@ -48,35 +46,41 @@ namespace BasicMachineLearning {
 *******************************************************************************/
 class QLearning {
 public:
-	double learnRate = 0.6, Gamma = 0.8, greedy = 0.9; //奖励递减值# 贪婪度
-	int actionNum = 0, stateNum = 0;
+	/*---------------- 核心数据 ----------------*/
 	Mat<> QTable;
-	double preState = 0;
+	double learnRate  = 0.6, 
+		   forgetRate = 0.8, 
+		   greedy     = 0.9;
 	/*---------------- 初始化 ----------------*/
+	QLearning() { ; }
 	QLearning(int _stateNum, int _actionNum) { init(_stateNum, _actionNum); }
 	void init(int _stateNum, int _actionNum) {
-		actionNum = _actionNum;
-		stateNum = _stateNum;
 		QTable.zero(_stateNum, _actionNum);
 	}
-	/*---------------- 选择行为 ----------------*/
+	/*---------------- 选择行为 ----------------
+	*	[1] 探索模式(随机)	[2] 利用模式(最优)
+	-------------------------------------------*/
+	int operator()  (int state) { return chooseAction(state); }
 	int chooseAction(int state) {
 		int action = 0;
-		bool flag = 1;
-		for (int i = 0; i < actionNum; i++)
-			if (QTable(state, i) != 0) { flag = 0; break; }
-		if (rand() / double(RAND_MAX) < greedy || flag) return rand() % actionNum;
-		double t = -DBL_MAX;
-		for (int i = 0; i < actionNum; i++)
-			if (QTable(state, i) > t) { t = QTable(state, i); action = i; }
+		double maxQ = -DBL_MAX,
+			   minQ =  DBL_MAX;
+		for (int i = 0; i < QTable.cols; i++) {
+			maxQ = QTable(state, i) > maxQ ? action = i, QTable(state, i) : maxQ;
+			minQ = QTable(state, i) < minQ ?             QTable(state, i) : minQ;
+		}
+		//[1]
+		if ((minQ == 0 && maxQ == 0) || rand() / double(RAND_MAX) < greedy)
+			return rand() % QTable.cols;
+		//[2]
 		return action;
 	}
 	/*---------------- 反馈学习 ----------------*/
-	void feedback(int state, int action, double R) {
-		double t = -DBL_MAX;
-		for (int i = 0; i < actionNum; i++)
-			t = QTable(state, i) > t ? QTable(state, i) : t;
-		QTable(preState, action) = (1 - learnRate) * QTable(preState, action) + learnRate * (R + Gamma * t);
+	void backward(int state, int action, double reward, int& preState) {
+		double maxQ = -DBL_MAX;
+		for (int i = 0; i < QTable.cols; i++)
+			maxQ = QTable(state, i) > maxQ ? QTable(state, i) : maxQ;
+		QTable(preState, action) = (1 - learnRate) * QTable(preState, action) + learnRate * (reward + forgetRate * maxQ);
 		preState = state;
 	}
 };
@@ -104,14 +108,59 @@ public:
 ******************************************************************************/
 class DeepQNetwork {
 public:
-	int stateNum, actionNum;
-	double greedy = 1;
+	double learnRate  = 0.6,
+		   forgetRate = 0.8,
+		   greedy     = 0.9;
+	int actionNum = 0,
+		stateNum  = 0;
+	/*---------------- 选择行为 ----------------*/
+	int operator()  (int state) { return chooseAction(state); }
 	int chooseAction(int state) {
 		int action = 0;
-		if (rand() / double(RAND_MAX) < greedy) return rand() % actionNum;
-		Mat<float> ans;// = evalNet(state);
+		if (rand() / double(RAND_MAX) < greedy) 
+			return action = rand() % actionNum;
+		Mat<> ans;// = evalNet(state);
 		ans.max(action);
 		return action;
 	}
+	/*---------------- 反馈学习 ----------------*/
+	void backward(int state, int action, double reward, int& preState) {
+	}
 };
+/******************************************************************************
+*                    Support Vector Machines 支持向量机
+*	[定义]: 特征空间上, [间隔最大]的线性分类器.
+		[超平面]: y = w x + b
+		[间隔]: 样本点, 到超平面的距离.
+				γi = 1/||w||·|w x + b|	(点到面距离公式)
+		[样本点]: {(xi,yi)} i=1toN    xi∈R_n 实向量    yi∈{-1,1}
+*	[目标]: 找到目标超平面, 使得[所有样本点间隔最小值γmin = min γi]最大.
+			max_wb( min_i 1/||w||·|w xi + b| )
+			st.  w x + b > 0 , yi = +1  and  w x + b < 0 , yi = -1  (分类)
+		[推导]:
+		=>	|w xi + b| = yi(w xi + b)		//去绝对值
+		=>	max_wb( 1/||w||·min_i yi(w xi + b) )    st. yi(w x + b) > 0
+		转化为:
+			min_wb 1/2·||w||²    st. yi (W x + b) ≥ 1
+			凸二次规划问题, 用拉格朗日乘子法, 得其对偶问题.
+*	[结论]:
+		min 1/2·Σi Σj αi αj yi yj K(xi,xj) - Σi αi	//线性时 K(xi,xj)即内积
+		st. Σi αi yi = 0    0≤αi≤C
+*	[Kernal Trick]: 升到高维, 实现非线性分类
+		[Classical Kernal Function]:
+		* 高斯核函数: K(x,z) = exp( -||x - z||² / 2σ² )
+*	[二次规划优化问题]:
+		[算法]: Sequential Minimal Optimization 算法
+		[思路]: 若所有变量解都满足此最优化问题的KKT条件，则得到最优化问题解
+		[Karush Kuhn Tucker条件]: 非线性规划最佳解的必要条件
+*	[流程]:
+		[1] 选择惩罚参数 C > 0, 构造并求解凸二次规划问题, 得到最优解α
+		[2] w = Σi αi yi xi    b = yj - Σαi yi (xi·xj)
+		[3] 得到分离超平面 w x + b = 0
+			分类决策函数: f(x) = sign( w x + b )
+******************************************************************************/
+//void SupportVectorMachines(Mat<> X, Mat<int> Y) {
+
+//};
+
 #endif

@@ -115,13 +115,13 @@ void swap(Mat& a);							//交换数据 [ swap ]
 /******************************************************************************
 *                    基础运算
 -------------------------------------------------------------------------------
-T& operator[](int i);					// 索引元素
-T& operator()(int i, int j);
-T& operator()(int i);
-T max();								// max/min
-T max(int& index);
-T min();
-T min(int& index);
+T&	 operator[](int i);					// 索引元素
+T&	 operator()(int i, int j);
+T&	 operator()(int i);
+T	 max();								// max/min
+T	 max(int& index);
+T	 min();
+T	 min(int& index);
 bool operator==	(const Mat& a);			//判断相等 [==]
 Mat& operator=	(const Mat& a);			//赋矩阵 [=] //不能赋值自己
 Mat& getData	(T* a);
@@ -136,8 +136,8 @@ Mat& operator*=	(const Mat& a);
 Mat& operator*=	(const double a);			//数乘 [mult ×]
 Mat& mult		(const double a, Mat& b);
 Mat& div		(const double a, Mat& b);	//数除 [div /]
-static T dot	(Mat& a, Mat& b);			//点乘 [dot ·]
-T dot			(Mat& a);
+T	 dot		(Mat& a, Mat& b);			//点乘 [dot ·]
+T	 dot		(Mat& a);
 Mat& crossProduct	(Mat& a, Mat& b);		//叉乘 [crossProduct ×]
 Mat& crossProduct_	(Mat& a, Mat& b);
 Mat& elementMult(Mat& a, Mat& b);			//元素乘 [elementMult ×]
@@ -146,15 +146,15 @@ Mat& elementDiv	(Mat& a, Mat& b);			//元素除 [elementDiv /]
 Mat& elementDiv	(Mat& a);
 Mat& negative	(Mat& ans);					//负 [negative -]
 Mat& transpose	(Mat& ans);					//转置 [transpose T]
-T sum			();							//求和 [sum Σ]
-T sum			(Mat& a);
+T	 sum		();							//求和 [sum Σ]
+T	 sum		(Mat& a);
 Mat& sum		(Mat& ans,int dim);
-T product		();							//求积 [product Π]
-T norm			();							//范数 [norm ||x||]
+T	 product	();							//求积 [product Π]
+T	 norm		();							//范数 [norm ||x||]
 Mat& normalized	();							//归一化 [normalized]
-T comi			(int i0, int j0);			//余子式 [comi]
+T	 comi		(int i0, int j0);			//余子式 [comi]
 Mat& inv		(Mat& ans);					//取逆 [inv x~¹]
-T abs			();							//行列式 [abs |x|]
+T	 abs		();							//行列式 [abs |x|]
 Mat& adjugate	(Mat& ans);					//伴随矩阵 [adjugate A*]
 void eig		(T esp, Mat& eigvec, Mat& eigvalue);		//特征值特征向量 [eig]
 Mat& solveEquations		(Mat& b, Mat& x);					//解方程组 [solveEquations]
@@ -226,6 +226,11 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		data[0] = x;
 		data[1] = y;
 		data[2] = z;
+		return *this;
+	}
+	Mat& getData(const char* fileName) {
+		FILE* fin = fopen(fileName, "r");
+		for (int i = 0; i < size(); i++) fscanf(fin, "%lf", &data[i]);
 		return *this;
 	}
 	/*----------------加法 [ add + ]----------------*/
@@ -778,6 +783,7 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 		for (int i = 0; i <   size(); i++) data[i] = fun(data[i]);
 		return *this;
 	}
+	//
 	Mat& function_(Mat& x, std::function<T(T)> fun) {
 		alloc(x.rows, x.cols);
 		for (int i = 0; i < x.size(); i++) data[i] = fun(x[i]);
@@ -785,6 +791,26 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 	}
 	Mat& function_(std::function<T(T)> fun) {
 		for (int i = 0; i <   size(); i++) data[i] = fun(data[i]);
+		return *this;
+	}
+	//
+	Mat& functionIndex(Mat& x, T(*fun)(T, int index)) {
+		alloc(x.rows, x.cols);
+		for (int i = 0; i < x.size(); i++) data[i] = fun(x[i], i);
+		return *this;
+	}
+	Mat& functionIndex(T(*fun)(T, int index)) {
+		for (int i = 0; i <   size(); i++) data[i] = fun(data[i], i);
+		return *this;
+	}
+	//
+	Mat& functionIndex_(Mat& x, std::function<T(T, int index)> fun) {
+		alloc(x.rows, x.cols);
+		for (int i = 0; i < x.size(); i++) data[i] = fun(x[i], i);
+		return *this;
+	}
+	Mat& functionIndex_(std::function<T(T, int index)> fun) {
+		for (int i = 0; i < size(); i++) data[i] = fun(data[i], i);
 		return *this;
 	}
 };

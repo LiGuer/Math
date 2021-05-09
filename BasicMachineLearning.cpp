@@ -348,38 +348,3 @@ void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<>& x, Mat<>& y, int y
 	//[5]
 	y.mult(W.transpose(y), x);
 }
-/******************************************************************************
-*                    Support Vector Machines 支持向量机
-*	[定义]: 特征空间上, [间隔最大]的线性分类器.
-		[超平面]: y = w x + b
-		[间隔]: 样本点, 到超平面的距离.
-				γi = 1/||w||·|w x + b|	(点到面距离公式)
-		[样本点]: {(xi,yi)} i=1toN    xi∈R_n 实向量    yi∈{-1,1}
-*	[目标]: 找到目标超平面, 使得[所有样本点间隔最小值γmin = min γi]最大.
-			max_wb( min_i 1/||w||·|w xi + b| )
-			st.  w x + b > 0 , yi = +1  and  w x + b < 0 , yi = -1  (分类)
-		[推导]:
-		=>	|w xi + b| = yi(w xi + b)		//去绝对值
-		=>	max_wb( 1/||w||·min_i yi(w xi + b) )    st. yi(w x + b) > 0
-		转化为:
-			min_wb 1/2·||w||²    st. yi (W x + b) ≥ 1
-			凸二次规划问题, 用拉格朗日乘子法, 得其对偶问题.
-*	[结论]:
-		min 1/2·Σi Σj αi αj yi yj K(xi,xj) - Σi αi	//线性时 K(xi,xj)即内积
-		st. Σi αi yi = 0    0≤αi≤C
-*	[Kernal Trick]: 升到高维, 实现非线性分类
-		[Classical Kernal Function]:
-		* 高斯核函数: K(x,z) = exp( -||x - z||² / 2σ² )
-*	[二次规划优化问题]:
-		[算法]: Sequential Minimal Optimization 算法
-		[思路]: 若所有变量解都满足此最优化问题的KKT条件，则得到最优化问题解
-		[Karush Kuhn Tucker条件]: 非线性规划最佳解的必要条件
-*	[流程]:
-		[1] 选择惩罚参数 C > 0, 构造并求解凸二次规划问题, 得到最优解α
-		[2] w = Σi αi yi xi    b = yj - Σαi yi (xi·xj)
-		[3] 得到分离超平面 w x + b = 0
-			分类决策函数: f(x) = sign( w x + b )
-******************************************************************************/
-void BasicMachineLearning::SupportVectorMachines(Mat<> X, Mat<int> Y) {
-
-};

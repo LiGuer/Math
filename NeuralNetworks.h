@@ -12,6 +12,7 @@ limitations under the License.
 ==============================================================================*/
 #ifndef NEURAL_NETWORKS_H
 #define NEURAL_NETWORKS_H
+#include <iostream>
 #include "Mat.h"
 #include "Tensor.h"
 /*################################################################################################
@@ -127,8 +128,8 @@ public:
 		fprintf(file, "\n");
 	}
 	void load(FILE* file) {
-		for (int i = 0; i < weight.size(); i++) fscanf(file, "%f", &weight[i]);
-		for (int i = 0; i < bias.rows;     i++) fscanf(file, "%f", &bias  [i]);
+		for (int i = 0; i < weight.size(); i++) fscanf(file, "%lf", &weight[i]);
+		for (int i = 0; i < bias.rows;     i++) fscanf(file, "%lf", &bias  [i]);
 	}
 };
 /*************************************************************************************************
@@ -197,8 +198,8 @@ public:
 		fprintf(file, "\n");
 	}
 	void load(FILE* file) {
-		for (int i = 0; i < kernel.dim.product();      i++) fscanf(file, "%f", &kernel[i]);
-		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fscanf(file, "%f", &bias  [i]);
+		for (int i = 0; i < kernel.dim.product();      i++) fscanf(file, "%lf", &kernel[i]);
+		if (biasSwitch) for (int i = 0; i < bias.rows; i++) fscanf(file, "%lf", &bias  [i]);
 	}
 };
 /*************************************************************************************************
@@ -291,11 +292,11 @@ public:
 	LstmLayer(int inputSize, int outputSize) { init(inputSize, outputSize); }
 	void init(int inputSize, int outputSize) {
 		for (int i = 0; i < 4; i++) {
-			gate[i].	zero (outputSize);
-			weights[i].	rands(outputSize, outputSize + inputSize, -0.1, 0.1);
-			bias[i].	rands(outputSize, 1, -0.1, 0.1);
-			diffWeights[i].zero(weights[i]);
-			diffBias[i].   zero(bias[i]);
+			gate		[i].zero (outputSize);
+			weights		[i].rands(outputSize, outputSize + inputSize, -0.1, 0.1);
+			bias		[i].rands(outputSize, 1, -0.1, 0.1);
+			diffWeights	[i].zero (weights[i]);
+			diffBias	[i].zero (bias	 [i]);
 		}
 	}
 	/*-------------------------------- 正向传播 --------------------------------*/
@@ -317,6 +318,8 @@ public:
 			prevHSet.push_back(h);
 			xcSet.   push_back(xc);
 		}
+		s_prev = s;
+		h_prev = h;
 		return &prevHSet;
 	}
 	Mat<>* forward(Mat<>& input, Mat<>& prevS, Mat<>& prevH) {
@@ -388,13 +391,13 @@ public:
 	void save(FILE* file) {
 		for (int k = 0; k < 4; k++) {
 			for (int i = 0; i < weights[k].size(); i++) fprintf(file, "%f ", weights[k][i]);
-			for (int i = 0; i < bias[k].rows;      i++) fprintf(file, "%f ", bias   [k][i]);
+			for (int i = 0; i < bias   [k].rows;   i++) fprintf(file, "%f ", bias   [k][i]);
 		} fprintf(file, "\n");
 	}
 	void load(FILE* file) {
 		for (int k = 0; k < 4; k++) {
-			for (int i = 0; i < weights[k].size(); i++) fscanf(file, "%f", &weights[k][i]);
-			for (int i = 0; i < bias[k].rows;      i++)	fscanf(file, "%f", &bias   [k][i]);
+			for (int i = 0; i < weights[k].size(); i++) fscanf(file, "%lf", &weights[k][i]);
+			for (int i = 0; i < bias   [k].rows;   i++)	fscanf(file, "%lf", &bias   [k][i]);
 		}
 	}
 };
@@ -640,10 +643,7 @@ public:
 	std::vector<Mat<>>& operator()(std::vector<Mat<>>& input) { return forward(input); }
 	std::vector<Mat<>>& forward   (std::vector<Mat<>>& input) {
 		*lstm(input, prevLstmS, prevLstmH);
-		prevLstmS = lstm.s;
-		prevLstmH = lstm.h;
 		output.clear();
-		Mat<> tmp;
 		for (int i = 0; i < input.size(); i++)
 			output.push_back(*nn(lstm.prevHSet[i + 1]));
 		return output;
@@ -664,13 +664,13 @@ public:
 	}
 	/*----------------[ save/load ]----------------*/
 	void save(const char* saveFile) {
-		FILE* file = fopen(saveFile, "w+");
+		FILE* file = fopen(saveFile, "w");
 		lstm.save(file);
 		nn.  save(file);
 		fclose(file);
 	}
 	void load(const char* loadFile) {
-		FILE* file = fopen(loadFile, "r+");
+		FILE* file = fopen(loadFile, "r");
 		lstm.load(file);
 		nn.  load(file);
 		fclose(file);
