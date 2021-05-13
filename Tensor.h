@@ -1,5 +1,5 @@
 /*
-Copyright 2020 LiGuer. All Rights Reserved.
+Copyright 2020,2021 LiGuer. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -12,10 +12,11 @@ limitations under the License.
 [Reference]
 [1]Introduction Algorithms.THOMAS H.CORMEN,CHARLES E.LEISERSON,RONALD L.RIVEST,CLIFFORD STEIN
 ==============================================================================*/
+#ifndef TENSOR_H
+#define TENSOR_H
 #include "Mat.h"
-template<class T>
-class Tensor
-{
+template<class T = double>
+class Tensor {
 public:
 /******************************************************************************
 *                    核心数据
@@ -39,6 +40,7 @@ public:
 		data = a.data; a.data = NULL;
 		dim  = a.dim;  a.dim.zero(1);
 	}
+	inline int size() { return dim.product(); }
 	/*---------------- 分配空间 ----------------*/
 	Tensor& alloc(int dimNum, int* dimLength) {
 		if (dim.rows != dimNum || memcmp(dim.data, dimLength, dimNum * sizeof(int)) != 0) {
@@ -49,10 +51,10 @@ public:
 		return *this;
 	}
 	Tensor& alloc(Mat<int> _dim) {
-		alloc(_dim.rows, _dim.data);
+		alloc(_dim.rows, _dim.data); return *this;
 	}
 	/*---------------- 零元/清零 ----------------*/
-	Tensor& zero() { memset(data, 0, sizeof(T) * dim.product()); }	//清零 
+	Tensor& zero() { memset(data, 0, sizeof(T) * dim.product()); return *this; }	//清零 
 	Tensor& zero(int dimNum, int* dimLength) {
 		alloc(dimNum, dimLength); zero();
 		return *this;
@@ -78,20 +80,22 @@ public:
 	*	[坐标]: { x, y, z, ...} = data[ x + y·X0 + z·X0·Y0 + ... ]
 	*	[Data堆叠方向]: 满x,一列 => 满xy,一矩阵 => 满xyz,一方块 => ....
 	**-------------------------------------------*/
-	T& operator[](int i) { return data[i]; }
-	T& operator()(int i) { return data[i]; }
-	T& operator()(int x, int y) { return data[y * dim[0] + x]; }
-	T& operator()(int x, int y, int z) { return data[z * dim[1] * dim[0] + y * dim[0] + x]; }
+	T& operator[](int i)				{ return data[i]; }
+	T& operator()(int i)				{ return data[i]; }
+	T& operator()(int x, int y)			{ return data[y * dim[0] + x]; }
+	T& operator()(int x, int y, int z)	{ return data[z * dim[1] * dim[0] + y * dim[0] + x]; }
 	T& operator()(int* dimIndex) {
 		int index = 0, step = 1;
 		for (int i = 0; i < dim.rows; i++) {
 			index += step * dimIndex[i];
 			step  *= dim[i];
-		}
-		return data[index];
+		} return data[index];
 	}
+	inline int  i2x(int i) { return i % dim[0]; }
+	inline int  i2y(int i) { return i %(dim[1] * dim[0]) / dim[0]; }
+	inline int  i2z(int i) { return i %(dim[2] * dim[1] * dim[0]) / (dim[1] * dim[0]); }
 	/*----------------赋值 [ = ]----------------*/ //不能赋值自己
-	Tensor& operator=(const Tensor& a) {
+	Tensor& operator=(Tensor& a) {
 		if (a.data == NULL) error();
 		alloc(a.dim);
 		memcpy(data, a.data, dim.product() * sizeof(T));
@@ -152,3 +156,4 @@ public:
 		eat(ansTemp); return *this;
 	}
 };
+#endif

@@ -62,10 +62,11 @@ void swap(Mat& a);							//交换数据 [ swap ]
 		return *this;
 	}
 	/*----------------交换数据 [ swap ]----------------*/
-	void swap(Mat& a) {
+	Mat& swap(Mat& a) {
 		T* tmp = a.data; a.data = data; data = tmp;
 		int t  = a.rows; a.rows = rows; rows = t;
 			t  = a.cols; a.cols = cols; cols = t;
+		return *this;
 	}
 /******************************************************************************
 *                    基础矩阵
@@ -774,43 +775,43 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 	}
 	/*----------------函数操作 []----------------*/
 	//Function Pointer
-	Mat& function(Mat& x, T (*fun)(T)) {
+	Mat& function(Mat& x, T (*f)(T)) {
 		alloc(x.rows, x.cols);
-		for (int i = 0; i < x.size(); i++) data[i] = fun(x[i]);
+		for (int i = 0; i < x.size(); i++) data[i] = f(x[i]);
 		return *this;
 	}
-	Mat& function(T (*fun)(T)) {
-		for (int i = 0; i <   size(); i++) data[i] = fun(data[i]);
+	Mat& function(T (*f)(T)) {
+		for (int i = 0; i <   size(); i++) data[i] = f(data[i]);
 		return *this;
 	}
 	//
-	Mat& function_(Mat& x, std::function<T(T)> fun) {
+	Mat& function_(Mat& x, std::function<T(T)> f) {
 		alloc(x.rows, x.cols);
-		for (int i = 0; i < x.size(); i++) data[i] = fun(x[i]);
+		for (int i = 0; i < x.size(); i++) data[i] = f(x[i]);
 		return *this;
 	}
-	Mat& function_(std::function<T(T)> fun) {
-		for (int i = 0; i <   size(); i++) data[i] = fun(data[i]);
+	Mat& function_(std::function<T(T)> f) {
+		for (int i = 0; i <   size(); i++) data[i] = f(data[i]);
 		return *this;
 	}
 	//
-	Mat& functionIndex(Mat& x, T(*fun)(T, int index)) {
+	Mat& functionIndex(Mat& x, T(*f)(T, int index)) {
 		alloc(x.rows, x.cols);
-		for (int i = 0; i < x.size(); i++) data[i] = fun(x[i], i);
+		for (int i = 0; i < x.size(); i++) data[i] = f(x[i], i);
 		return *this;
 	}
-	Mat& functionIndex(T(*fun)(T, int index)) {
-		for (int i = 0; i <   size(); i++) data[i] = fun(data[i], i);
+	Mat& functionIndex(T(*f)(T, int index)) {
+		for (int i = 0; i <   size(); i++) data[i] = f(data[i], i);
 		return *this;
 	}
 	//
-	Mat& functionIndex_(Mat& x, std::function<T(T, int index)> fun) {
+	Mat& functionIndex_(Mat& x, std::function<T(T, int index)> f) {
 		alloc(x.rows, x.cols);
-		for (int i = 0; i < x.size(); i++) data[i] = fun(x[i], i);
+		for (int i = 0; i < x.size(); i++) data[i] = f(x[i], i);
 		return *this;
 	}
-	Mat& functionIndex_(std::function<T(T, int index)> fun) {
-		for (int i = 0; i < size(); i++) data[i] = fun(data[i], i);
+	Mat& functionIndex_(std::function<T(T, int index)> f) {
+		for (int i = 0; i < size()  ; i++) data[i] = f(data[i], i);
 		return *this;
 	}
 };

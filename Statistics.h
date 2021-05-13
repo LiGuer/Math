@@ -13,22 +13,67 @@ limitations under the License.
 #ifndef STATISTICS_H
 #define STATISTICS_H
 #include "Mat.h"
+#include <math.h>
 #include <vector>
 #include <algorithm>
 #define PI 3.141592653589
 
 namespace Statistics {
 	/*--------------------------------[ 基础参数 ]--------------------------------*/
-	double		 Mean(Mat<>& x);													//平均值
+	double Mean(Mat<>& x);											//平均值
 	Mat<>& Mean(Mat<>& x, Mat<>& ans);								//平均值
-	double		 Variance(Mat<>& x);												//方差
+	double Variance(Mat<>& x);										//方差
 	Mat<>& Variance(Mat<>& x, Mat<>& ans);							//方差
 	/*--------------------------------[ 概率分布、检验 ]--------------------------------*/
-	Mat<>& NormalDistribution(double mean, double variance, double min, double max, double delta, Mat<>& output);	//正态分布
-	bool SkewnessKurtosisTest(Mat<>& x, double SignificanceLevel);														//正态分布-偏度峰度检验
-	double X2Test(Mat<>& x, double delta, int N, double (*F)(double));
+	bool SkewnessKurtosisTest(Mat<>& x, double SignificanceLevel);
 	/*--------------------------------[ 统计图表 ]--------------------------------*/
 	Mat<int>& Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow = NULL, double underFlow = NULL);			//直方图
 	void BoxPlot(Mat<>& input, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex);						//箱形图
+/***************************************************************************
+*								常见分布  密度函数
+*	[公式]: 
+		正态分布: f(x) = 1 / sqrt(2πσ²)·exp(-(x-μ)² / (2σ²))
+		指数分布: f(x) = 1 / μ· exp(-x/μ)
+/***************************************************************************/
+inline double NormalDistribFunc	(double x, double mean = 0, double var = 1) {
+	return 1 / sqrt(2 * PI * var) * exp(-pow(x - mean, 2) / (2 * var));
+}
+inline double ExpDensityFunc	(double x, double mean) {
+	return x <= 0 ? 0.0 : 1.0 / mean * exp(-x / mean);
+}
+inline double ExpDistribFunc	(double x, double mean) {
+	return x < 0 ? 0.0 : 1 - exp(-x / mean);
+}
+/***************************************************************************
+*								X²拟合检验
+*	[公式]: X² = Σ_(i=0)^N  fi² / (n pi) - n
+*	[流程]:
+		[1] 频数统计
+		[2] X²拟合检验
+/***************************************************************************/
+template<typename F>
+double X2Test(Mat<>& x, double St, double Ed, int N, F&& DistribFunc) {
+	//[1]
+	double delta = (Ed - St) / N, n = x.size();
+	Mat<int> freq(N + 2);
+	for (int i = 0; i < x.size(); i++) {
+		int index = ceil((x[i] - St) / delta);
+		if (x[i] < St) index = 0;
+		if (x[i] > Ed) index = freq.size() - 1;
+		if (x[i] ==St) index = 1;
+		freq[index]++;
+	}
+	//[2]
+	double p, X2 = 0;
+	for (int i = 0; i < freq.size(); i++) {
+		p = (i == 0) ? DistribFunc(St) : (
+			(i == freq.size() - 1) ? (1 - DistribFunc(Ed)) :
+			DistribFunc(St + i * delta) - DistribFunc(St + (i - 1) * delta)
+			);
+		printf("[%f,%f] %d %f %f\n", St + (i - 1) * delta, St + i * delta, freq[i], n * p, p);
+		if (p == 0) continue;
+		X2 += pow(freq[i], 2) / (n * p);
+	} return X2 -= n;
+}
 }
 #endif
