@@ -17,15 +17,17 @@ limitations under the License.
 #include "Tensor.h"
 /*################################################################################################
 核心类:
-class NeuralLayer(int inputSize, int outputSize)	//神经网络层
-class ConvLayer(int _inChannelNum, int _outChannelNum,int kernelSize,int _padding,int _stride)	//卷积层
-class PoolLayer(int _kernelSize, int _padding, int _stride, int _poolType)						//下采样层
+class NeuralLayer	(int inputSize, int outputSize)	//神经网络层
+class ConvLayer		(int inChannelNum, int outChannelNum,int kernelSize,int padding,int stride)	//卷积层
+class PoolLayer		(int kernelSize,   int padding, int stride, int poolType)					//下采样层
+class LstmLayer		(int inputSize, int outputSize)	//长短期记忆层
 --------------------------------------------------------------------------------------------------
 经典结构:
 class BackPropagation_NeuralNetworks()				//反向传播神经网络 : 1986.Rumelhart,McClelland
 class LeNet_NeuralNetworks()						//LeNet卷积神经网络 : 1998.Yann LeCun
 class Inception()									//Inception模块 : 2014.Google
 class GoogLeNet_NeuralNetworks()					//GoogLeNet卷积神经网络 : 2014.Google
+class LstmNetwork()									//LSTM长短期记忆网络
 ################################################################################################*/
 /*----------------[ ReLU ]----------------*/
 double relu		(double x) { return x < 0 ? x : 0; }
@@ -99,7 +101,7 @@ public:
 	*-------------------------------------------*/
 	Mat<>* operator()(Mat<>& input) { return forward(input); }
 	Mat<>* forward   (Mat<>& input) {
-		output.add(output.mult(weight, input), bias);
+		output.add(output.mul(weight, input), bias);
 		return &output.function(output, actFunc);
 	}
 	/*----------------[ backward ]----------------
@@ -116,10 +118,10 @@ public:
 		delta = error;	
 		//delta[i].elementMult(tmp.function(outputLiner[i], actDerivFunc) :	//σ'(z_outL) 激活函数导数
 		Mat<> t;
-		error.mult(weight.transpose(t), delta);
+		error.mul(weight.transpose(t), delta);
 		//[2]
-		weight += t.mult(-learnRate, t.mult(delta, preInput.transpose(t)));
-		bias   += t.mult(-learnRate, delta);
+		weight += t.mul(-learnRate, t.mul(delta, preInput.transpose(t)));
+		bias   += t.mul(-learnRate, delta);
 	}
 	/*----------------[ save / load ]----------------*/
 	void save(FILE* file) {
@@ -247,7 +249,7 @@ public:
 				}
 			}
 		}
-		if (poolType == A) output.mult(1.0 / (kernelSize * kernelSize), output);
+		if (poolType == A) output.mul(1.0 / (kernelSize * kernelSize), output);
 		return &output;
 	}
 	/*----------------[ backward ]----------------*/
@@ -326,7 +328,7 @@ public:
 		// G F I O
 		xc.rowsStack(input, prevH);														//[h_(t-1), xt]
 		for (int i = 0; i < 4; i++) { 													
-			gate[i].add(gate[i].mult(weights[i], xc), bias[i]);
+			gate[i].add(gate[i].mul(weights[i], xc), bias[i]);
 			i == 0 ?
 				gate[i].function([](double x) { return tanh(x); }):						//gt = tanh(Wg×[h_(t-1), xt] + bg) 	
 				gate[i].function([](double x) { return 1 / (1 + exp(-x)); });			//Ft, It, Ot = Sigmoid( W_ifo×[h_(t-1), xt] + b_ifo )
@@ -380,9 +382,9 @@ public:
 		//diffs w.r.t. inputs & compute bottom diff
 		Mat<> diffXc(xc.rows);												//Δgfio_W += Δgfio×xc^T //Δgfio_b += Δgfio //Δxc = ΣW^T×Δ_gfio
 		for (int i = 0; i < 4; i++) {
-			diffWeights[i] += tmp.mult(diffGate[i], xc.transpose(tmp));
+			diffWeights[i] += tmp.mul(diffGate[i], xc.transpose(tmp));
 			diffBias   [i] += diffGate[i];
-			diffXc += tmp.mult(weights[i].transpose(tmp), diffGate[i]);
+			diffXc += tmp.mul(weights[i].transpose(tmp), diffGate[i]);
 		}
 		diffS.elementMult(gate[1]);													//Δs = Δs·ft
 		diffXc.block_(diffXc.rows - diffH.rows, diffXc.rows - 1, 0, 0, diffH);		//Δh
@@ -655,7 +657,7 @@ public:
 		for (int i = 0; i < target.size(); i++) {
 			nn.backward(
 				lstm.prevHSet[i + 1],
-				error.mult(-2, error.sub(target[i], output[i])),
+				error.mul(-2, error.sub(target[i], output[i])),
 				learnRate
 			);
 			errorSet.push_back(error);

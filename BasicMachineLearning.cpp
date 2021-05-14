@@ -79,7 +79,7 @@ void Apriori_Filter(std::vector<Mat<int>>& dataSet, std::vector<Mat<int>>& froze
 			if (cur == frozenSet[i].cols) frozenSet_Count[i]++;
 		}
 	}
-	frozenSet_Count.mult(1.0 / dataSet.size(), frozenSet_Count);
+	frozenSet_Count.mul(1.0 / dataSet.size(), frozenSet_Count);
 	//[3.2]删除小于支持度的集合.
 	std::vector<Mat<int>> frozenSet_Tmp;
 	for (int i = 0; i < frozenSet.size(); i++) {
@@ -282,15 +282,15 @@ void BasicMachineLearning::MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance)
 	mahalanobisDistance.alloc(1, x.cols);
 	// mean, diff, cov
 	Mat<> mean, diff, covMat, tmp;
-	mean.  mult(1.0 / x.cols, x.sum(mean, 1));
-	covMat.mult(x, x.transpose(covMat));
+	mean.  mul(1.0 / x.cols, x.sum(mean, 1));
+	covMat.mul(x, x.transpose(covMat));
 	// mahalanobis distance
 	covMat.inv(covMat);
 	Mat<> xt;
 	for (int i = 0; i < x.cols; i++) {
 		x.getCol(i, xt);
 		diff.sub(xt, mean);
-		tmp.mult(tmp.mult(diff.transpose(tmp), covMat), diff);
+		tmp.mul(tmp.mul(diff.transpose(tmp), covMat), diff);
 		mahalanobisDistance[i] = tmp[0];
 	}
 }
@@ -318,14 +318,14 @@ void BasicMachineLearning::MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance)
 void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<>& x, Mat<>& y, int yDim) {
 	//[1] 数据中心化
 	Mat<> mean;
-	mean.mult(1.0 / x.cols, x.sum(mean, 1));		//得到均值
+	mean.mul(1.0 / x.cols, x.sum(mean, 1));		//得到均值
 	Mat<> x2(x);
 	for (int i = 0; i < x.rows; i++)
 		for (int j = 0; j < x.cols; j++)
 			x2(i, j) -= mean[i];
 	//[2] 计算协方差矩阵
 	Mat<> Cov;
-	Cov.mult(x2, x2.transpose(Cov));		//X*XT
+	Cov.mul(x2, x2.transpose(Cov));		//X*XT
 	//[3] 对协方差特征值分解
 	Mat<> eigVec, eigValue;
 	Cov.eig(1e-5, eigVec, eigValue);
@@ -346,5 +346,5 @@ void BasicMachineLearning::PrincipalComponentsAnalysis(Mat<>& x, Mat<>& y, int y
 		}
 	}
 	//[5]
-	y.mult(W.transpose(y), x);
+	y.mul(W.transpose(y), x);
 }

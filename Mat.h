@@ -132,10 +132,10 @@ Mat& operator+=	(Mat& a);					//加法 [add +]
 Mat& add		(Mat& a, Mat& b);
 Mat& operator-=	(Mat& a);					//减法 [sub -]
 Mat& sub		(Mat& a, Mat& b);
-Mat& mult		(Mat& a, Mat& b);			//乘法 [mult ×]
+Mat& mul		(Mat& a, Mat& b);			//乘法 [mul ×]
 Mat& operator*=	(const Mat& a);
-Mat& operator*=	(const double a);			//数乘 [mult ×]
-Mat& mult		(const double a, Mat& b);
+Mat& operator*=	(const double a);			//数乘 [mul ×]
+Mat& mul		(const double a, Mat& b);
 Mat& div		(const double a, Mat& b);	//数除 [div /]
 T	 dot		(Mat& a, Mat& b);			//点乘 [dot ·]
 T	 dot		(Mat& a);
@@ -163,7 +163,7 @@ void LUPdecomposition	(Mat& U, Mat& L, Mat<int>& P);		//LUP分解 [LUPdecomposit
 Mat& diag		(Mat& ans);									//构造对角矩阵 [diag]
 Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 -------------------------------------------------------------------------------
-*	运算嵌套注意,Eg: b.add(b.mult(a, b), a.mult(-1, a));
+*	运算嵌套注意,Eg: b.add(b.mul(a, b), a.mul(-1, a));
 		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
 * 	加减乘，即使是自己也不会影响，效率也不影响
 ******************************************************************************/
@@ -258,8 +258,8 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		for (int i = 0; i < a.size(); i++) data[i] = a[i] - b[i];
 		return *this;
 	}
-	/*----------------乘法 [ mult × ]----------------*/
-	Mat& mult(Mat& a, Mat& b) {
+	/*----------------乘法 [ mul × ]----------------*/
+	Mat& mul(Mat& a, Mat& b) {
 		if (a.cols != b.rows) error();
 		Mat ansTmp(a.rows, b.cols);
 		for (int i = 0; i < a.rows; i++)
@@ -277,11 +277,11 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 					ansTmp(i, j) += (*this)(i, k) * a(k, j);
 		return eatMat(ansTmp);
 	}
-	/*----------------数乘 [ mult × ]----------------*/
+	/*----------------数乘 [ mul × ]----------------*/
 	Mat& operator*=(const double a) {
 		for (int i = 0; i < size(); i++) data[i] *= a; return *this;
 	}
-	Mat& mult(const double a, Mat& b) {
+	Mat& mul(const double a, Mat& b) {
 		alloc(b.rows, b.cols);
 		for (int i = 0; i < size(); i++) data[i] = a * b[i];
 		return *this;
@@ -567,9 +567,9 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 			R(p, p) =  c; R(p, q) = s;		// R
 			R(q, p) = -s; R(q, q) = c;
 			R.transpose(RT);
-			eigvalue.mult(RT,eigvalue);					// Dj = RjT Dj-1 Rj
-			eigvalue.mult(eigvalue, R);
-			eigvec.  mult(eigvec,   R);					// X = R Y
+			eigvalue.mul(RT,eigvalue);					// Dj = RjT Dj-1 Rj
+			eigvalue.mul(eigvalue, R);
+			eigvec.  mul(eigvec,   R);					// X = R Y
 		}
 	}
 	/*----------------解方程组 [ solveEquations ]----------------
@@ -711,11 +711,13 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 /******************************************************************************
 *                    特殊操作
 -------------------------------------------------------------------------------
-Mat& getCol	(int _col, Mat& a)               //读/写一列 [getCol/setCol]
+Mat& getCol	(int _col, Mat& a)				//读/写一列 [getCol/setCol]
 Mat& setCol	(int _col, Mat& a)
-Mat& getRow	(int _row, Mat& a)               //读/写一行 [getRow/setRow]
+Mat& getRow	(int _row, Mat& a)				//读/写一行 [getRow/setRow]
 Mat& block	(int rowSt, int rowEd, int colSt, int colEd, Mat& ans)	//子矩阵 [block]
-Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
+Mat& horizStack	(Mat& a, Mat& b)            //水平向拼接 [horizStack ]
+Mat& function	(Mat& x, T (*f)(T))			//函数操作
+Mat& function	(T (*f)(T))	
 ******************************************************************************/
 	/*----------------读/写一列 [getCol/setCol]----------------*/
 	Mat& getCol(int _col, Mat& a) {
@@ -774,44 +776,26 @@ Mat& horizStack(Mat& a, Mat& b)             //水平向拼接 [horizStack ]
 		return ans.eatMat(ansTmp);
 	}
 	/*----------------函数操作 []----------------*/
-	//Function Pointer
-	Mat& function(Mat& x, T (*f)(T)) {
+	template<typename F>
+	Mat& function(Mat& x, F&& f) {
 		alloc(x.rows, x.cols);
 		for (int i = 0; i < x.size(); i++) data[i] = f(x[i]);
 		return *this;
 	}
-	Mat& function(T (*f)(T)) {
+	template<typename F>
+	Mat& function(F&& f) {
 		for (int i = 0; i <   size(); i++) data[i] = f(data[i]);
 		return *this;
 	}
-	//
-	Mat& function_(Mat& x, std::function<T(T)> f) {
-		alloc(x.rows, x.cols);
-		for (int i = 0; i < x.size(); i++) data[i] = f(x[i]);
-		return *this;
-	}
-	Mat& function_(std::function<T(T)> f) {
-		for (int i = 0; i <   size(); i++) data[i] = f(data[i]);
-		return *this;
-	}
-	//
-	Mat& functionIndex(Mat& x, T(*f)(T, int index)) {
+	template<typename F>
+	Mat& functionIndex(Mat& x, F&& f) {
 		alloc(x.rows, x.cols);
 		for (int i = 0; i < x.size(); i++) data[i] = f(x[i], i);
 		return *this;
 	}
-	Mat& functionIndex(T(*f)(T, int index)) {
+	template<typename F>
+	Mat& functionIndex(F&& f) {
 		for (int i = 0; i <   size(); i++) data[i] = f(data[i], i);
-		return *this;
-	}
-	//
-	Mat& functionIndex_(Mat& x, std::function<T(T, int index)> f) {
-		alloc(x.rows, x.cols);
-		for (int i = 0; i < x.size(); i++) data[i] = f(x[i], i);
-		return *this;
-	}
-	Mat& functionIndex_(std::function<T(T, int index)> f) {
-		for (int i = 0; i < size()  ; i++) data[i] = f(data[i], i);
 		return *this;
 	}
 };

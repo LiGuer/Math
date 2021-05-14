@@ -20,7 +20,7 @@ limitations under the License.
 /******************************************************************************
 *                    概率统计
 -------------------------------------------------------------------------------
----------------- 基础统计特征 ----------------
+基础统计特征:
 double Mean		(Mat<>& x);					//均值
 Mat<>& Mean		(Mat<>& x, Mat<>& ans);
 double Variance	(Mat<>& x);					//方差
@@ -28,10 +28,10 @@ Mat<>& Variance	(Mat<>& x, Mat<>& ans);
 double NormalDistrib	(double x, double mean = 0, double var = 1);	//常见分布: 分布函数、密度函数
 double    ExpDensity	(double x, double mean);
 double    ExpDistrib	(double x, double mean);
----------------- 假设检验 ----------------
+假设检验:
 double	X2Test	(Mat<>& x, double St, double Ed, int N, F&& DistribFunc);	//X²拟合检验
 bool	SkewnessKurtosisTest	(Mat<>& x, double SignificanceLevel);		//偏度-峰度
----------------- 其他 ----------------
+其他:
 Mat<int>& Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow, double underFlow);	//直方图
 void BoxPlot(Mat<>& x, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex)	//箱形图
 ******************************************************************************/
@@ -49,7 +49,7 @@ namespace Statistics {
 /***************************************************************************/
 //均值
 double Mean(Mat<>& x) { return x.sum() / x.size(); }
-Mat<>& Mean(Mat<>& x, Mat<>& ans) { return ans.mult(1.0 / x.cols, x.sum(ans, 1)); }
+Mat<>& Mean(Mat<>& x, Mat<>& ans) { return ans.mul(1.0 / x.cols, x.sum(ans, 1)); }
 //方差
 double Variance(Mat<>& x) {
 	double var = 0, mean = Mean(x);
@@ -80,6 +80,31 @@ inline double ExpDensity	(double x, double mean) {
 }
 inline double ExpDistrib	(double x, double mean) {
 	return x <= 0 ? 0.0 : 1 - exp(-x / mean);
+}
+/***************************************************************************
+*								偏度峰度
+*	[定义]:
+		偏度: 样本标准化变量Y = [X - E(X)] / sqrt D(X)的三阶矩E(Y³)=E[(X-E(X))³]/D(X)³`²
+		峰度: 样本标准化变量Y = [X - E(X)] / sqrt D(X)的四阶矩E(Y⁴)=E[(X-E(X))⁴]/D(X)²
+*	[过程]:
+		[1] 计算样本中心矩 D(X), E[(X-E(X))³], E[(X-E(X))⁴]
+		[2] 计算偏度、峰度 E[(X-E(X))³]/D(X)³`², E[(X-E(X))⁴]/D(X)²
+/***************************************************************************/
+double Skewness(Mat<>& x) {
+	double mean = Mean(x), B[5] = { 0 };
+	for (int k = 2; k <= 4; k++) {
+		for (int i = 0; i < x.size(); i++) B[k] += pow(x[i] - mean, k);
+		B[k] /= x.size();
+	}
+	return B[3] / pow(B[2], 1.5);
+}
+double Kurtosis(Mat<>& x) {
+	double mean = Mean(x), B[5] = { 0 };
+	for (int k = 2; k <= 4; k++) {
+		for (int i = 0; i < x.size(); i++) B[k] += pow(x[i] - mean, k);
+		B[k] /= x.size();
+	}
+	return B[4] / pow(B[2], 2);
 }
 /*#############################################################################
 
@@ -124,33 +149,6 @@ double X2Test(Mat<>& x, double St, double Ed, int N, F&& DistribFunc) {
 	} return X2 -= n;
 }
 /***************************************************************************
-*								偏度峰度
-*	[定义]:
-		偏度: 样本标准化变量Y = [X - E(X)] / sqrt D(X)的三阶矩E(Y³)=E[(X-E(X))³]/D(X)³`²
-		峰度: 样本标准化变量Y = [X - E(X)] / sqrt D(X)的四阶矩E(Y⁴)=E[(X-E(X))⁴]/D(X)²
-*	[过程]:
-		[1] 计算样本中心矩 D(X), E[(X-E(X))³], E[(X-E(X))⁴]
-		[2] 计算偏度、峰度 E[(X-E(X))³]/D(X)³`², E[(X-E(X))⁴]/D(X)²
-/***************************************************************************/
-double Skewness(Mat<>& x) {
-	int N = x.cols;
-	double mean = Mean(x), B[5] = { 0 };
-	for (int k = 2; k <= 4; k++) {
-		for (int i = 0; i < N; i++) B[k] += pow(x[i] - mean, k);
-		B[k] /= N;
-	}
-	return B[3] / pow(B[2], 1.5);
-}
-double Kurtosis(Mat<>& x) {
-	int N = x.cols;
-	double mean = Mean(x), B[5] = { 0 };
-	for (int k = 2; k <= 4; k++) {
-		for (int i = 0; i < N; i++) B[k] += pow(x[i] - mean, k);
-		B[k] /= N;
-	}
-	return B[4] / pow(B[2], 2);
-}
-/***************************************************************************
 *								正态分布 - 偏度峰度检验
 *	[定义]:
 		偏度: 样本标准化变量Y = [X - E(X)] / sqrt D(X)的三阶矩E(Y³)=E[(X-E(X))³]/D(X)³`²
@@ -163,7 +161,7 @@ double Kurtosis(Mat<>& x) {
 /***************************************************************************/
 bool SkewnessKurtosisTest(Mat<>& x, double SignificanceLevel) {
 	//[1]
-	int N = x.cols;
+	int N = x.size();
 	double mean = Mean(x), B[5] = { 0 };
 	for (int k = 2; k <= 4; k++) {
 		for (int i = 0; i < N; i++) B[k] += pow(x[i] - mean, k);

@@ -119,8 +119,8 @@ public:
 		for (int i = 0; i < dim.product(); i++) data[i] += a[i];
 		return *this;
 	}
-	/*----------------Êý³Ë [ mult ¡Á ]----------------*/
-	Tensor& mult(const double a, Tensor& b) {
+	/*----------------Êý³Ë [ mul ¡Á ]----------------*/
+	Tensor& mul(const double a, Tensor& b) {
 		alloc(b.dim);
 		for (int i = 0; i < b.dim.product(); i++) data[i] = a * b[i];
 		return *this;
