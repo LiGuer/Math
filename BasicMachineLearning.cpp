@@ -42,7 +42,7 @@ limitations under the License.
 //[2] 生成K项所有可以组合的集合.
 void Apriori_GenCandidate(std::vector<Mat<int>>& frozenSet, int K, std::vector<Mat<int>>& newfrozenSet) {
 	std::vector<Mat<int>> newfrozenSet_Tmp;
-	Mat<int> tmp(1, K);
+	Mat<int> tmp(K);
 	for (int i = 0; i < frozenSet.size(); i++) {
 		for (int j = i + 1; j < frozenSet.size(); j++) {
 			bool flag = true;
@@ -54,7 +54,7 @@ void Apriori_GenCandidate(std::vector<Mat<int>>& frozenSet, int K, std::vector<M
 				tmp[K - 2] = frozenSet[i][K - 2];
 				tmp[K - 1] = frozenSet[j][K - 2];
 				//频繁项集每一项内排列有序
-				std::sort(tmp.data, tmp.data + tmp.cols);
+				std::sort(tmp.data, tmp.data + tmp.size());
 				//频繁项集每一项各不相同
 				bool flag2 = true;
 				for (int k = 0; k < newfrozenSet_Tmp.size(); k++)
@@ -62,24 +62,24 @@ void Apriori_GenCandidate(std::vector<Mat<int>>& frozenSet, int K, std::vector<M
 				if (flag2) newfrozenSet_Tmp.push_back(tmp);
 			}
 		}
-	}
-	newfrozenSet = newfrozenSet_Tmp;
+	}newfrozenSet = newfrozenSet_Tmp;
 }
 //[3] 过滤小于支持度的集合.
 void Apriori_Filter(std::vector<Mat<int>>& dataSet, std::vector<Mat<int>>& frozenSet, double minSupport, std::vector<double>& frozenSet_Support) {
 	//[3.1]计算支持度P(AB) ≌ num(AB) / num(all)
 	frozenSet_Support.clear();
-	Mat<> frozenSet_Count(1, frozenSet.size());
+	Mat<> frozenSet_Count(frozenSet.size());
 	for (int i = 0; i < frozenSet.size(); i++) {
 		for (int j = 0; j < dataSet.size(); j++) {
 			// if frozenSet[i] is dataSet[j]'s subset
 			int cur = 0;
-			for (int k = 0; k < dataSet[j].cols; k++)
+			for (int k = 0; k < dataSet[j].size(); k++) {
 				if (frozenSet[i][cur] == dataSet[j][k]) cur++;
-			if (cur == frozenSet[i].cols) frozenSet_Count[i]++;
+				if (cur == frozenSet[i].size()) { frozenSet_Count[i]++; break; }
+			}
 		}
 	}
-	frozenSet_Count.mul(1.0 / dataSet.size(), frozenSet_Count);
+	frozenSet_Count *= 1.0 / dataSet.size();
 	//[3.2]删除小于支持度的集合.
 	std::vector<Mat<int>> frozenSet_Tmp;
 	for (int i = 0; i < frozenSet.size(); i++) {
@@ -90,62 +90,63 @@ void Apriori_Filter(std::vector<Mat<int>>& dataSet, std::vector<Mat<int>>& froze
 	}frozenSet = frozenSet_Tmp;
 }
 // 对关系规则进行评估 获得满足最小可信度的关联规则
-void Apriori_RulesFromConseqence(std::vector < std::vector<Mat<int>>>& frozenSet, std::vector < std::vector<double>>& frozenSet_Support, int K, std::vector<Mat<int>>& BSet, double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence) {
+void Apriori_RulesFromConseqence(std::vector < std::vector<Mat<int>>>& frozenSet, std::vector<std::vector<double>>& frozenSet_Support, int K, std::vector<Mat<int>>& BSet, 
+	double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence
+) {
 	if (K == 2) {
 		// 关系评估
-		Mat<int> A(1, K - BSet[0].cols);
+		Mat<int> A(K - BSet[0].size());
 		for (int i = 0; i < frozenSet[K].size(); i++) {
 			for (int j = 0; j < BSet.size(); j++) {
-				// 计算可信度P(A→B) = P(B|A) = P(AB) / P(A)
-				// 构建 A
+				// 计算可信度P(A→B) = P(B|A) = P(AB) / P(A)// 构建 A
 				int B_cur = 0, A_cur = 0;
 				for (int k = 0; k < K; k++) {
-					if (frozenSet[K][i][k] == BSet[j][B_cur])B_cur++;
-					else if (A_cur < K - BSet[0].cols)A[A_cur++] = frozenSet[K][i][k];
+					if (B_cur < BSet[j].size() && frozenSet[K][i][k] == BSet[j][B_cur]) B_cur++;
+					else if (A_cur < A.size()) A[A_cur++] = frozenSet[K][i][k];
 				}
-				if (A_cur + B_cur != K)continue;
+				if (A_cur + B_cur != K) continue;
 				// 查找 P(A)
 				int A_index = -1;
-				for (int k = 0; k < frozenSet[A.cols].size(); k++)if (frozenSet[A.cols][k] == A) { A_index = k; break; }
+				for (int k = 0; k < frozenSet[A.size()].size(); k++)
+					if (frozenSet[A.size()][k] == A) { A_index = k; break; }
 				if (A_index == -1) continue;
-				double confidence = frozenSet_Support[K][i] / frozenSet_Support[A.cols][A_index];
+				double confidence = frozenSet_Support[K][i] / frozenSet_Support[A.size()][A_index];
 				// 保存满足可信度的关联规则
 				if (confidence >= minConfidence) {
-					RuleSet_A.push_back(A);
-					RuleSet_B.push_back(BSet[j]);
-					RuleSet_confidence.push_back(confidence);
+					RuleSet_A.			push_back(A);
+					RuleSet_B.			push_back(BSet[j]);
+					RuleSet_confidence.	push_back(confidence);
 				}
 			}
-		}
-		return;
+		} return;
 	}
-	if (K > BSet[0].cols) {
+	if (K > BSet[0].size()) {
 		// 组合得到 new B 集
-		Apriori_GenCandidate(BSet, BSet[0].cols + 1, BSet);
+		Apriori_GenCandidate(BSet, BSet[0].size() + 1, BSet);
 		std::vector<Mat<int>> BSet_Tmp;
 		// 关系评估
-		Mat<int> A(1, K - BSet[0].cols);
+		Mat<int> A(K - BSet[0].size());
 		for (int i = 0; i < frozenSet[K].size(); i++) {
 			for (int j = 0; j < BSet.size(); j++) {
-				// 计算可信度P(A→B) = P(B|A) = P(AB) / P(A)
-				// 构建 A
+				// 计算可信度P(A→B) = P(B|A) = P(AB) / P(A) // 构建 A
 				int B_cur = 0, A_cur = 0;
 				for (int k = 0; k < K; k++) {
-					if (frozenSet[K][i][k] == BSet[j][B_cur])B_cur++;
-					else if (A_cur < K - BSet[0].cols)A[A_cur++] = frozenSet[K][i][k];
+					if (B_cur < BSet[j].size() && frozenSet[K][i][k] == BSet[j][B_cur]) B_cur++;
+					else if (A_cur < A.size()) A[A_cur++] = frozenSet[K][i][k];
 				}
-				if (A_cur + B_cur != K)continue;
+				if (A_cur + B_cur != K) continue;
 				// 查找 P(A)
 				int A_index = -1;
-				for (int k = 0; k < frozenSet[A.cols].size(); k++)if (frozenSet[A.cols][k] == A) { A_index = k; break; }
+				for (int k = 0; k < frozenSet[A.size()].size(); k++)
+					if (frozenSet[A.size()][k] == A) { A_index = k; break; }
 				if (A_index == -1) continue;
-				double confidence = frozenSet_Support[K][i] / frozenSet_Support[A.cols][A_index];
 				// 保存满足可信度的关联规则
+				double confidence = frozenSet_Support[K][i] / frozenSet_Support[A.size()][A_index];
 				if (confidence >= minConfidence) {
-					RuleSet_A.push_back(A);
-					RuleSet_B.push_back(BSet[j]);
-					RuleSet_confidence.push_back(confidence);
-					BSet_Tmp.push_back(BSet[j]);
+					RuleSet_A.			push_back(A);
+					RuleSet_B.			push_back(BSet[j]);
+					RuleSet_confidence.	push_back(confidence);
+					BSet_Tmp.			push_back(BSet[j]);
 				}
 			}
 		}
@@ -162,22 +163,25 @@ void Apriori_RulesFromConseqence(std::vector < std::vector<Mat<int>>>& frozenSet
 	}
 }
 //Main
-void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence) {
-	std::vector<std::vector<Mat<int>>> frozenSet;
-	std::vector<std::vector<double>>   frozenSet_Support;
-	std::vector<Mat<int>> frozenSet_K;
-	std::vector<double>   frozenSet_Support_K;
-	frozenSet.push_back(frozenSet_K); 
+void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfidence, 
+	std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence
+) {
+	std::vector<std::vector<Mat<int>>>	frozenSet;
+	std::vector<std::vector<double>>	frozenSet_Support;
+	std::vector<Mat<int>>				frozenSet_K;
+	std::vector<double>					frozenSet_Support_K;
+	frozenSet		 .push_back(frozenSet_K); 
 	frozenSet_Support.push_back(frozenSet_Support_K);	//故意填占 frozenSet[0]位置
-	//[2] 初始一个元素的频繁项集，Frozen Set[{ 1 }, { 2 }, { 3 }, { 4 }, { 5 }]
-	{
-		Mat<int> tmp(1);
+	Mat<int> tmp;
+	{//[2] 初始一个元素的频繁项集，Frozen Set[{ 1 }, { 2 }, { 3 }, { 4 }, { 5 }]
+		tmp.zero(1);
 		for (int i = 0; i < dataSet.size(); i++) {
-			for (int item = 0; item < dataSet[i].cols; item++) {
+			for (int j = 0; j < dataSet[i].size(); j++) {
+				int item = dataSet[i][j];
 				bool flag = true;
-				for (int j = 0; j < frozenSet_K.size(); j++)
-					if (dataSet[i][item] == frozenSet_K[j][0]) { flag = false; break; }
-				if (flag) { tmp[0] = dataSet[i][item]; frozenSet_K.push_back(tmp); }
+				for (int k = 0; k < frozenSet_K.size(); k++)
+					if (item == frozenSet_K[k][0]) { flag = false; break; }
+				if (flag) frozenSet_K.push_back(tmp.getData(item));
 			}
 		}
 	}
@@ -185,22 +189,32 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 	for (int k = 1; frozenSet_K.size() > 0; k++) {
 		//[3]
 		Apriori_Filter(dataSet, frozenSet_K, minSupport, frozenSet_Support_K);
-		frozenSet.push_back(frozenSet_K);
+		frozenSet.		  push_back(frozenSet_K);
 		frozenSet_Support.push_back(frozenSet_Support_K);
 		//[2]
 		Apriori_GenCandidate(frozenSet_K, k + 1, frozenSet_K);
 	}
+	FILE* fo = fopen("D:/frozenSet.txt", "w");
+	for (int k = 1; k < frozenSet.size(); k++) {
+		for (int i = 0; i < frozenSet[k].size(); i++) {
+			for (int j = 0; j < frozenSet[k][i].size(); j++) {
+				fprintf(fo, "%d ", frozenSet[k][i][j]);
+			}fprintf(fo, ": %f\n", frozenSet_Support[k][i]);
+		}
+	}
 	//[4]
-	for (int k = 2; k < frozenSet.size(); k++) {
+	//for (int k = 2; k < frozenSet.size(); k++) {
+	for (int k = 2; k < 5; k++) {
 		std::vector<Mat<int>> OneElementSet;
 		{
-			Mat<int> tmp(1,1);
+			tmp.zero(1);
 			for (int i = 0; i < frozenSet[k].size(); i++) {
-				for (int j = 0; j < frozenSet[k][i].cols; j++) {
+				for (int j = 0; j < frozenSet[k][i].size(); j++) {
+					int item = frozenSet[k][i][j];
 					bool flag = true;
-					for (int j2 = 0; j2 < OneElementSet.size(); j2++)
-						if (frozenSet[k][i][j] == OneElementSet[j2][0]) { flag = false; break; }
-					if (flag) { tmp[0] = frozenSet[k][i][j]; OneElementSet.push_back(tmp); }
+					for (int u = 0; u < OneElementSet.size(); u++)
+						if (item == OneElementSet[u][0]) { flag = false; break; }
+					if (flag) OneElementSet.push_back(tmp.getData(item));
 				}
 			}
 		}
@@ -279,17 +293,16 @@ void BasicMachineLearning::K_Mean(Mat<>& x, int K, Mat<>& Center, Mat<int>& Clus
 * Mahalanobis Distance
 *******************************************************************************/
 void BasicMachineLearning::MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance) {
-	mahalanobisDistance.alloc(1, x.cols);
+	mahalanobisDistance.alloc(x.size());
 	// mean, diff, cov
 	Mat<> mean, diff, covMat, tmp;
-	mean.  mul(1.0 / x.cols, x.sum(mean, 1));
+	mean.  mul(1.0 / x.size(), x.sum(mean, 1));
 	covMat.mul(x, x.transpose(covMat));
 	// mahalanobis distance
 	covMat.inv(covMat);
 	Mat<> xt;
-	for (int i = 0; i < x.cols; i++) {
-		x.getCol(i, xt);
-		diff.sub(xt, mean);
+	for (int i = 0; i < x.size(); i++) {
+		diff.sub(x.getCol(i, xt), mean);
 		tmp.mul(tmp.mul(diff.transpose(tmp), covMat), diff);
 		mahalanobisDistance[i] = tmp[0];
 	}

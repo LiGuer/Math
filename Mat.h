@@ -216,14 +216,19 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		memcpy(data, a, sizeof(T) * size());
 		return *this;
 	}
+	Mat& getData(T x) {
+		if (size() != 1) error();
+		data[0] = x;
+		return *this;
+	}
 	Mat& getData(T x, T y) {
-		if (rows != 2 || cols != 1) error();
+		if (size() != 2) error();
 		data[0] = x;
 		data[1] = y;
 		return *this;
 	}
 	Mat& getData(T x, T y, T z) {
-		if (rows != 3 || cols != 1) error();
+		if (size() != 3) error();
 		data[0] = x;
 		data[1] = y;
 		data[2] = z;
