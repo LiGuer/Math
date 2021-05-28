@@ -200,6 +200,43 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 			if (mindata > data[i]) { mindata = data[i]; index = i; }
 		return mindata;
 	}
+	// 行/列
+	Mat& max(int index, Mat& ans) {
+		if (index == 0) {
+			ans.alloc(rows);
+			for (int x = 0; x < rows; x++) ans[x] = (*this)(x, 0);
+			for (int x = 0; x < rows; x++)
+				for (int y = 0; y < cols; y++)
+					ans(x) = ans(x) >= (*this)(x, y) ? ans(x) : (*this)(x, y);
+			return ans;
+		}
+		else {
+			ans.alloc(1, cols);
+			for (int y = 0; y < cols; y++) ans[y] = (*this)(0, y);
+			for (int x = 0; x < rows; x++)
+				for (int y = 0; y < cols; y++)
+					ans(y) = ans(y) >= (*this)(x, y) ? ans(y) : (*this)(x, y);
+			return ans;
+		}
+	}
+	Mat& min(int index, Mat& ans) {
+		if (index == 0) {
+			ans.alloc(rows);
+			for (int x = 0; x < rows; x++) ans[x] = (*this)(x, 0);
+			for (int x = 0; x < rows; x++)
+				for (int y = 0; y < cols; y++)
+					ans(x) = ans(x) <= (*this)(x, y) ? ans(x) : (*this)(x, y);
+			return ans;
+		}
+		else {
+			ans.alloc(1, cols);
+			for (int y = 0; y < cols; y++) ans[y] = (*this)(0, y);
+			for (int x = 0; x < rows; x++)
+				for (int y = 0; y < cols; y++)
+					ans(y) = ans(y) <= (*this)(x, y) ? ans(y) : (*this)(x, y);
+			return ans;
+		}
+	}
 	/*----------------判断相等 [ ==/!= ]----------------*/
 	bool operator==(const Mat& a) {
 		if (rows != a.rows || cols != a.cols)return false;
@@ -737,7 +774,7 @@ Mat& function	(T (*f)(T))
 	}
 	Mat& setCol(int _col, Mat& a) {
 		for (int i = 0; i < rows; i++) (*this)(i, _col) = a[i];
-		return a;
+		return *this;
 	}
 	/*----------------子矩阵 [block]----------------*/
 	Mat& block(int rowSt, int rowEd, int colSt, int colEd, Mat& ans) {

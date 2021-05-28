@@ -115,14 +115,19 @@ class LstmNetwork()									//LSTM长短期记忆网络
 ## <Statistics.h> 统计学类
 ```
 基础统计特征:
-double Mean		(Mat<>& x);					//均值
-Mat<>& Mean		(Mat<>& x, Mat<>& ans);
-double Variance	(Mat<>& x);					//方差
-Mat<>& Variance	(Mat<>& x, Mat<>& ans);
-double NormalDistrib	(double x, double mean = 0, double var = 1);	//常见分布: 分布函数、密度函数
-double    ExpDensity	(double x, double mean);
-double    ExpDistrib	(double x, double mean);
+double Mean	(Mat<>& x);							//均值
+Mat<>& Mean	(Mat<>& x, Mat<>& ans, int index);
+double Var	(Mat<>& x);							//方差
+Mat<>& Var	(Mat<>& x, Mat<>& ans, int index);
+double PoissonDistrib	(int x, double mean);		//常见分布: 分布函数、密度函数
+double  NormalDensity	(double x, double mean = 0, double var = 1);
+double	NormalDistrib	(double x, double mean = 0, double var = 1);
+double     ExpDensity	(double x, double mean);
+double     ExpDistrib	(double x, double mean);
+double   GammaDensity	(double x, double mean, double var);
+double   GammaDistrib	(double x, double mean, double var);
 假设检验:
+double  X2Test	(Mat<>& x, Mat<>& expect);			//X²检验
 double	X2Test	(Mat<>& x, double St, double Ed, int N, F&& DistribFunc);	//X²拟合检验
 bool	SkewnessKurtosisTest	(Mat<>& x, double SignificanceLevel);		//偏度-峰度
 其他:

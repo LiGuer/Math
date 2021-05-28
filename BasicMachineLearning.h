@@ -18,9 +18,84 @@ limitations under the License.
 #include <vector>
 namespace BasicMachineLearning {
 	void Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfidence, std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence);
-	void K_Mean(Mat<>& x, int K, Mat<>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax = 0x7FFFFFFF);
 	void MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance);
 	void PrincipalComponentsAnalysis(Mat<>& x, Mat<>& y, int yDim);
+/******************************************************************************
+*								K Mean 聚类
+*	* 对N维分布的数据点，可以将其聚类在 K 个关键簇内
+*	*[流程]:
+		[1] 随机选择 K 个簇心点 Center
+		[2] 迭代开始
+			[3] 归零 Cluster , Cluster: 簇,记录ith簇内的数据指针。
+			[4] 计算每个xi到簇心μj的距离
+				[5] 选择距离最小的簇心, 将该点加入其簇内
+			[6] 对每个簇,计算其质心 Center'
+			[7] Center≠Center' , 则更正Center为 Center'
+			[8] 迭代重新开始
+		[9] 一轮无更正时，迭代结束
+*******************************************************************************/
+static void K_Mean(Mat<>& x, int K, Mat<>& Center, std::vector<int>* Cluster, int TimeMax = 0x7FFFFFFF) {
+	int Dim = x.rows, N = x.cols;
+	Center.zero(Dim, K);
+	//[1] 随机选择 K 个簇心点 
+	for (int i = 0; i < K; i++) {
+		int index = rand() % N;
+		for (int dim = 0; dim < Dim; dim++) Center(dim, i) = x(dim, index);
+	}
+	//[2]
+	for (int times = 0; times < TimeMax; times++) {
+		//[3]
+		for (int k = 0; k < K; k++) Cluster[k].clear();
+		//[4] 计算每个xi到Center_j的距离
+		for (int i = 0; i < N; i++) {
+			Mat<> d(1, K);
+			for (int k = 0; k < K; k++)
+				for (int dim = 0; dim < Dim; dim++)
+					d[k] += pow(x(dim, i) - Center(dim, k), 2);
+			//[5]
+			int index; d.min(index);
+			Cluster[index].push_back(i);
+		}
+		//[6] 对每个簇,计算其质心 Center'
+		Mat<> CenterTmp(Dim, K);
+		for (int k = 0; k < K; k++) {
+			for (int dim = 0; dim < Dim; dim++) {
+				for (int j = 0; j < Cluster[k].size(); j++)
+					CenterTmp(dim, k) += x(dim, Cluster[k][j]);
+				CenterTmp(dim, k) /= Cluster[k].size();
+			}
+		}
+		//[7] 更正簇心//[9]
+		if (CenterTmp == Center) return;						
+		Center.swap(CenterTmp);
+	}
+}
+/******************************************************************************
+*				Mahalanobis Distance
+* Mahalanobis Distance
+*******************************************************************************/
+static void MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance) {
+	mahalanobisDistance.alloc(x.size());
+	// mean, diff, cov
+	Mat<> mean, diff, covMat, tmp;
+	mean.mul(1.0 / x.size(), x.sum(mean, 1));
+	covMat.mul(x, x.transpose(covMat));
+	// mahalanobis distance
+	covMat.inv(covMat);
+	Mat<> xt;
+	for (int i = 0; i < x.size(); i++) {
+		diff.sub(x.getCol(i, xt), mean);
+		tmp.mul(tmp.mul(diff.transpose(tmp), covMat), diff);
+		mahalanobisDistance[i] = tmp[0];
+	}
+}
+static double MahalanobisDist(Mat<>& x1, Mat<>& x2, Mat<>& covMat) {
+	double ans;
+	Mat<> diff, _covMat, tmp;
+	diff.sub(x1, x2);
+	covMat.inv(_covMat);
+	return ((diff.transpose(tmp) *= _covMat) *= diff)[0];
+}
 }
 
 /******************************************************************************

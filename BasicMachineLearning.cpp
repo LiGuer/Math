@@ -228,85 +228,8 @@ void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSup
 		);
 	}
 }
-/******************************************************************************
-*								K Mean 聚类
-*	* 对N维分布的数据点，可以将其聚类在 K 个关键簇内
-*	*[流程]:
-		[1] 随机选择 K 个簇心点 Center
-		[2] 迭代开始
-			[3] 归零 Cluster , Cluster: 簇,记录ith簇内的数据指针。
-			[4] 计算每个xi到簇心μj的距离
-				[5] 选择距离最小的簇心, 将该点加入其簇内
-			[6] 对每个簇,计算其质心 Center'
-			[7] Center≠Center' , 则更正Center为 Center'
-			[8] 迭代重新开始
-		[9] 一轮无更正时，迭代结束
-*******************************************************************************/
-void BasicMachineLearning::K_Mean(Mat<>& x, int K, Mat<>& Center, Mat<int>& Cluster, Mat<int>& ClusterKthNum, int TimeMax) {
-	int Dimension = x.rows, N = x.cols;
-	Center. zero(Dimension, K);
-	Cluster.zero(K, N); 
-	ClusterKthNum.zero(K);
-	//[1] 随机选择 K 个簇心点 
-	for (int i = 0; i < K; i++) {
-		int index = rand() % N;
-		for (int dim = 0; dim < Dimension; dim++) Center(dim, i) = x(dim, index);
-	}
-	//[2]
-	int times = 0;
-	while (times++ < TimeMax) {
-		//[3]
-		Cluster.      zero(); 
-		ClusterKthNum.zero();
-		//[4] 计算每个xi到Center_j的距离
-		for (int i = 0; i < N; i++) {
-			Mat<> d(1, K);
-			for (int j = 0; j < K; j++)
-				for (int dim = 0; dim < Dimension; dim++)
-					d[j] += pow(x(dim, i) - Center(dim, j), 2);
-			//[5]
-			int index; d.min(index);
-			Cluster(index, ClusterKthNum[index]++) = i;
-		}
-		//[6] 对每个簇,计算其质心 Center'
-		Mat<> CenterTemp(Dimension, K);
-		for (int i = 0; i < K; i++) {
-			for (int dim = 0; dim < Dimension; dim++) {
-				for (int j = 0; j < ClusterKthNum[i]; j++)
-					CenterTemp(dim, i) += x(dim, Cluster(i, j));
-				CenterTemp(dim, i) /= ClusterKthNum[i];
-			}
-		}
-		//[7] 更正簇心
-		bool flag = 1;
-		for (int i = 0; i < Dimension * K; i++) {
-			if (CenterTemp[i] != Center[i]) { flag = 0; break; }
-		}
-		if (flag)return;								//[9]
-		else {
-			free(Center.data); Center.data = CenterTemp.data; CenterTemp.data = NULL;
-		}
-	}
-}
-/******************************************************************************
-*				Mahalanobis Distance
-* Mahalanobis Distance
-*******************************************************************************/
-void BasicMachineLearning::MahalanobisDist(Mat<>& x, Mat<>& mahalanobisDistance) {
-	mahalanobisDistance.alloc(x.size());
-	// mean, diff, cov
-	Mat<> mean, diff, covMat, tmp;
-	mean.  mul(1.0 / x.size(), x.sum(mean, 1));
-	covMat.mul(x, x.transpose(covMat));
-	// mahalanobis distance
-	covMat.inv(covMat);
-	Mat<> xt;
-	for (int i = 0; i < x.size(); i++) {
-		diff.sub(x.getCol(i, xt), mean);
-		tmp.mul(tmp.mul(diff.transpose(tmp), covMat), diff);
-		mahalanobisDistance[i] = tmp[0];
-	}
-}
+
+
 /******************************************************************************
 *				Principal Components Analysis 主成分分析
 *	输入: [1] x: 待处理矩阵

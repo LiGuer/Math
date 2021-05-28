@@ -22,14 +22,19 @@ limitations under the License.
 *                    概率统计
 -------------------------------------------------------------------------------
 基础统计特征:
-double Mean		(Mat<>& x);					//均值
-Mat<>& Mean		(Mat<>& x, Mat<>& ans);
-double Variance	(Mat<>& x);					//方差
-Mat<>& Variance	(Mat<>& x, Mat<>& ans);
-double NormalDistrib	(double x, double mean = 0, double var = 1);	//常见分布: 分布函数、密度函数
-double    ExpDensity	(double x, double mean);
-double    ExpDistrib	(double x, double mean);
+double Mean	(Mat<>& x);								//均值
+Mat<>& Mean	(Mat<>& x, Mat<>& ans, int index);
+double Var	(Mat<>& x);								//方差
+Mat<>& Var	(Mat<>& x, Mat<>& ans, int index);
+double PoissonDistrib	(int x, double mean);		//常见分布: 分布函数、密度函数
+double  NormalDensity	(double x, double mean = 0, double var = 1);
+double	NormalDistrib	(double x, double mean = 0, double var = 1);
+double     ExpDensity	(double x, double mean);
+double     ExpDistrib	(double x, double mean);
+double   GammaDensity	(double x, double mean, double var);
+double   GammaDistrib	(double x, double mean, double var);
 假设检验:
+double  X2Test	(Mat<>& x, Mat<>& expect);			//X²检验
 double	X2Test	(Mat<>& x, double St, double Ed, int N, F&& DistribFunc);	//X²拟合检验
 bool	SkewnessKurtosisTest	(Mat<>& x, double SignificanceLevel);		//偏度-峰度
 其他:
@@ -49,22 +54,23 @@ namespace Statistics {
 		Var  = Σ(x_i - x_mean)² / (N - 1)
 /***************************************************************************/
 //均值
-double Mean(Mat<>& x) { return x.sum() / x.size(); }
-Mat<>& Mean(Mat<>& x, Mat<>& ans) { return ans.mul(1.0 / x.cols, x.sum(ans, 1)); }
+double Mean	(Mat<>& x) { return x.sum() / x.size(); }
+Mat<>& Mean	(Mat<>& x, Mat<>& ans, int index) { 
+	return x.sum(ans, index) *= 1.0 / (index == 0 ? x.cols : x.rows);
+}
 //方差
-double Variance(Mat<>& x) {
-	double var = 0, mean = Mean(x);
+double Var	(Mat<>& x) {
+	double mean = Mean(x), var = 0;
 	for (int i = 0; i < x.size(); i++) var += pow(x[i] - mean, 2);
 	return var / (x.size() - 1);
 }
-Mat<>& Variance(Mat<>& x, Mat<>& ans) {
-	Mat<> mean; Mean(x, mean);
+Mat<>& Var	(Mat<>& x, Mat<>& ans, int index) {
+	Mat<> mean; Mean(x, mean, index);
 	ans.alloc(x.rows);
-	for (int i = 0; i < x.rows; i++) {
+	for (int i = 0; i < x.rows; i++) 
 		for (int j = 0; j < x.cols; j++)
 			ans[i] += pow(x(i, j) - mean[i], 2);
-		ans[i] /= x.cols - 1;
-	} return ans;
+	return ans *= 1.0 / (x.cols - 1);
 }
 /***************************************************************************
 *						常见分布: 分布函数、密度函数
@@ -140,8 +146,10 @@ double Kurtosis(Mat<>& x) {
 
 #############################################################################*/
 /***************************************************************************
-*								X²拟合检验
-*	[公式]: X² = Σ_(i=0)^N  fi² / (n pi) - n
+*								X²检验 / X²拟合检验
+*	[公式]: 
+		X²检验: X² = ∑( (y-x)² / x )
+		X² = Σ_(i=0)^N  fi² / (n pi) - n
 *	[流程]:
 		[1] 频数统计
 		[2] X²拟合检验
@@ -152,6 +160,11 @@ double Kurtosis(Mat<>& x) {
 			[&mean](double x) { return Statistics::ExpDistrib(x, mean); }
 		);
 /***************************************************************************/
+double X2Test(Mat<>& x, Mat<>& expect) {
+	double X2 = 0;
+	for (int i = 0; i < x.size(); i++) X2 += pow(expect[i] - x[i], 2) / x[i];
+	return X2;
+}
 template<typename F>
 double X2Test(Mat<>& x, double St, double Ed, int N, F&& DistribFunc) {
 	//[1]
@@ -171,7 +184,7 @@ double X2Test(Mat<>& x, double St, double Ed, int N, F&& DistribFunc) {
 			(i == freq.size() - 1) ? (1 - DistribFunc(Ed)) :
 			DistribFunc(St + i * delta) - DistribFunc(St + (i - 1) * delta)
 			);
-		//printf("[%.0f,%.0f] %d %.3f %.3f\n", St + (i - 1) * delta, St + i * delta, freq[i], n * p, p);
+		printf("[%.2f,%.2f] %d %.3f %.3f\n", St + (i - 1) * delta, St + i * delta, freq[i], n * p, p);
 		if (p == 0) continue;
 		X2 += pow(freq[i], 2) / (n * p);
 	} return X2 -= n;
@@ -219,9 +232,9 @@ bool SkewnessKurtosisTest(Mat<>& x, double SignificanceLevel) {
 *	[注]: 区间规定"左开右闭"
 /***************************************************************************/
 Mat<int>& Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow, double underFlow) {
-	double max = overFlow == NULL ? x.max() : overFlow,
-		min = underFlow == NULL ? x.min() : underFlow,
-		delta = (max - min) / N;
+	double max =  overFlow == NULL ? x.max() :  overFlow,
+		   min = underFlow == NULL ? x.min() : underFlow,
+		   delta = (max - min) / N;
 	frequency.zero(1, N + (overFlow == NULL ? 1 : 0) + (underFlow == NULL ? 1 : 0));
 	for (int i = 0; i < x.cols; i++) {
 		int index = (x[i] - min) / delta + (overFlow == NULL ? 1 : 0);

@@ -58,7 +58,6 @@ INT64U ConvCode(INT64U x, ConvCodeTrellis* trellis) {
 			for (INT64U k = 0; k < trellis->memNum[j]; k++)
 				t ^= (memtmp & (1 << k)) ? 1 : 0;
 		}
-		
 		code<<= 1;
 		code += t;
 	}return code;
