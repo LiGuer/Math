@@ -65,8 +65,8 @@ static T dot	(Mat& a, Mat& b);			//点乘 [dot ·]
 T dot			(Mat& a);
 Mat& crossProduct	(Mat& a, Mat& b);		//叉乘 [crossProduct ×]
 Mat& crossProduct_	(Mat& a, Mat& b);
-Mat& elementMult	(Mat& a, Mat& b);		//元素乘 [elementMult ×]
-Mat& elementMult	(Mat& a);
+Mat& elementMul	(Mat& a, Mat& b);		//元素乘 [elementMul ×]
+Mat& elementMul	(Mat& a);
 Mat& elementDiv	(Mat& a, Mat& b);			//元素除 [elementDiv /]
 Mat& elementDiv	(Mat& a);
 Mat& negative	(Mat& ans);					//负 [negative -]
