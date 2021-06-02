@@ -169,7 +169,7 @@ void Apriori_RulesFromConseqence(std::vector < std::vector<Mat<int>>>& frozenSet
 	}
 }
 //Main
-void BasicMachineLearning::Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfidence, 
+void Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfidence, 
 	std::vector<Mat<int>>& RuleSet_A, std::vector<Mat<int>>& RuleSet_B, std::vector<double>& RuleSet_confidence
 ) {
 	std::vector<std::vector<Mat<int>>>	frozenSet;

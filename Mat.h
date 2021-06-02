@@ -47,6 +47,7 @@ void swap(Mat& a);							//交换数据 [ swap ]
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
 	Mat(const int _rows) { zero(_rows, 1); }
 	Mat(const Mat& a) { *this = a; }
+	Mat(const int _rows, const int _cols, T* _data) { zero(_rows, _cols); getData(_data); }
 	~Mat() { delete data; }
 	/*---------------- 报错  ----------------*/
 	static void error() { exit(-1); }
