@@ -83,38 +83,7 @@ Mat<>& Var	(Mat<>& x, Mat<>& ans, int index) {
 	   Gamma分布: f(x) = β^α/Γ(α)·x^(α-1)·exp(-βx)
 				  F(x) = 1/Γ(α)·γ(α,βx)
 /***************************************************************************/
-inline double igamma_low(double x, double s, int N = 200) {
-	double ans = 0;
-	for (int i = 0; i < N; i++)ans += pow(s, i) / tgamma(x + i + 1);
-	return ans * tgamma(x) * pow(s, x) * exp(-s);
-}
-inline double PoissonDistrib(int x, double mean) {
-	double ans = 0;
-	for (int i = 0; i < x; i++) ans += pow(mean, i) / NumberTheory::Factorial(i);
-	return ans * exp(-mean);
-}
-inline double NormalDensity(double x, double mean = 0, double var = 1) {
-	return 1 / sqrt(2 * PI * var) * exp(-pow(x - mean, 2) / (2 * var));
-}
-inline double NormalDistrib(double x, double mean = 0, double var = 1) {
-	return 1.0 / 2 * (1 + erf((x - mean) / sqrt(2 * var)));
-}
-inline double ExpDensity	(double x, double mean) {
-	return x <= 0 ? 0.0 : 1.0 / mean * exp(-x / mean);
-}
-inline double ExpDistrib	(double x, double mean) {
-	return x <= 0 ? 0.0 : 1 - exp(-x / mean);
-}
-inline double GammaDensity	(double x, double mean, double var) {
-	double a = mean * mean / var,
-		   b = mean / var;
-	return pow(b, a) / tgamma(a) * pow(x, a - 1) * exp(-b * x);
-}
-inline double GammaDistrib	(double x, double mean, double var) {
-	double a = mean * mean / var,
-		   b = mean / var;
-	return 1.0 / tgamma(a) * igamma_low(a, b * x);
-}
+
 /***************************************************************************
 *								偏度峰度
 *	[定义]:

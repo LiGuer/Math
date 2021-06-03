@@ -35,55 +35,36 @@ public:
 	~Tensor() { delete data; }
 	/*---------------- 基础函数 ----------------*/
 	void error() { exit(-1); }
-	void eat(Tensor& a) {									//吃掉另一个矩阵的数据 (指针操作)
-		if (data != NULL)delete data;
-		data = a.data; a.data = NULL;
-		dim  = a.dim;  a.dim.zero(1);
-	}
 	inline int size() { return dim.product(); }
 	/*---------------- 分配空间 ----------------*/
 	Tensor& alloc(int dimNum, int* dimLength) {
 		if (dim.rows != dimNum || memcmp(dim.data, dimLength, dimNum * sizeof(int)) != 0) {
 			dim.alloc(dimNum); 
 			dim.getData(dimLength);
-			data = (T*)malloc(dim.product() * sizeof(T));
-		}
-		return *this;
+			data = (T*)malloc(size() * sizeof(T));
+		} return *this;
 	}
-	Tensor& alloc(Mat<int> _dim) {
-		alloc(_dim.rows, _dim.data); return *this;
-	}
+	Tensor& alloc(Mat<int> _dim)			{ alloc(_dim.rows, _dim.data);			 return *this; }
+	Tensor& alloc(int x0, int y0, int z0)	{ int t[] = { x0, y0, x0 }; alloc(3, t); return *this; }
 	/*---------------- 零元/清零 ----------------*/
-	Tensor& zero() { memset(data, 0, sizeof(T) * dim.product()); return *this; }	//清零 
-	Tensor& zero(int dimNum, int* dimLength) {
-		alloc(dimNum, dimLength); zero();
-		return *this;
-	}
-	Tensor& zero(int x0, int y0, int z0) {
-		int t[] = { x0, y0, x0 }; zero(3, t);
-		return *this;
-	}
+	Tensor& zero() { memset(data, 0, sizeof(T) * size()); return *this; }	//清零 
+	Tensor& zero(int dimNum, int* dimLength)	{ alloc(dimNum, dimLength); zero(); return *this; }
+	Tensor& zero(int x0, int y0, int z0)		{ alloc(x0, y0, z0);		zero(); return *this; }
 	/*---------------- 随机元 ----------------*/
-	Tensor& rands(int dimNum, int* dimLength, T st, T ed) {
-		alloc(dimNum, dimLength);
-		for (int i = 0; i < dim.product(); i++)
-			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
+	Tensor& rands(T st, T ed) {	//[st,ed)
+		for (int i = 0; i < size(); i++)
+			data[i] = rand() / (double)RAND_MAX * (ed - st) + st;
 		return *this;
 	}
-	Tensor& rands(int x0, int y0, int z0, T st, T ed) {
-		zero(x0, y0, z0);
-		for (int i = 0; i < dim.product(); i++)
-			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
-		return *this;
-	}
+	Tensor& rands(int dimNum, int* dimLength, T st, T ed) { alloc(dimNum, dimLength); rands(st, ed); return *this; }
 	/*---------------- "[]"取元素 ----------------
 	*	[坐标]: { x, y, z, ...} = data[ x + y·X0 + z·X0·Y0 + ... ]
 	*	[Data堆叠方向]: 满x,一列 => 满xy,一矩阵 => 满xyz,一方块 => ....
 	**-------------------------------------------*/
 	T& operator[](int i)				{ return data[i]; }
 	T& operator()(int i)				{ return data[i]; }
-	T& operator()(int x, int y)			{ return data[y * dim[0] + x]; }
-	T& operator()(int x, int y, int z)	{ return data[z * dim[1] * dim[0] + y * dim[0] + x]; }
+	T& operator()(int x, int y)			{ return data[x + y * dim[0]]; }
+	T& operator()(int x, int y, int z)	{ return data[x + y * dim[0] + z * dim[1] * dim[0]]; }
 	T& operator()(int* dimIndex) {
 		int index = 0, step = 1;
 		for (int i = 0; i < dim.rows; i++) {
@@ -91,43 +72,61 @@ public:
 			step  *= dim[i];
 		} return data[index];
 	}
-	inline int  i2x(int i) { return i % dim[0]; }
-	inline int  i2y(int i) { return i %(dim[1] * dim[0]) / dim[0]; }
-	inline int  i2z(int i) { return i %(dim[2] * dim[1] * dim[0]) / (dim[1] * dim[0]); }
+	inline int i2x(int i) { return i % dim[0]; }
+	inline int i2y(int i) { return i %(dim[1] * dim[0]) / dim[0]; }
+	inline int i2z(int i) { return i %(dim[2] * dim[1] * dim[0]) / (dim[1] * dim[0]); }
 	/*----------------赋值 [ = ]----------------*/ //不能赋值自己
 	Tensor& operator=(Tensor& a) {
 		if (a.data == NULL) error();
 		alloc(a.dim);
-		memcpy(data, a.data, dim.product() * sizeof(T));
+		memcpy(data, a.data, size() * sizeof(T));
 		return *this;
 	}
 	Tensor& eat(const Tensor& a) {
 		if (a.data == NULL) error();
-		data = a.data; a.data = NULL;
-		dim.eatMat(a.dim);
+		if (  data != NULL) delete data;
+		data = a.data; a.data = NULL; dim.eatMat(a.dim);
 		return *this;
 	}
 	/*----------------加法 [ add + ]----------------*/
 	Tensor& add(Tensor& a, Tensor& b) {
 		if (!(a.dim == b.dim)) error();
 		alloc(a.dim);
-		for (int i = 0; i < b.dim.product(); i++) data[i] = a[i] + b[i];
+		for (int i = 0; i < b.size(); i++) data[i] = a[i] + b[i];
 		return *this;
 	}
 	Tensor& operator+=(Tensor& a) {
 		if (!(dim == a.dim)) error();
-		for (int i = 0; i < dim.product(); i++) data[i] += a[i];
+		for (int i = 0; i < size(); i++) data[i] += a[i];
 		return *this;
 	}
 	/*----------------数乘 [ mul × ]----------------*/
 	Tensor& mul(const double a, Tensor& b) {
 		alloc(b.dim);
-		for (int i = 0; i < b.dim.product(); i++) data[i] = a * b[i];
+		for (int i = 0; i < b.size(); i++) data[i] = a * b[i];
 		return *this;
 	}
 	Tensor& operator*=(const double a) {
-		for (int i = 0; i < dim.product(); i++) data[i] *= a;
+		for (int i = 0; i < size(); i++) data[i] *= a;
 		return *this;
+	}
+	/*----------------卷积----------------*/
+	Tensor& conv(Tensor& in, Tensor& kernel, int padding, int stride) {
+		alloc(
+			(in.dim[0] - kernel.dim[0] + 2 * padding) / stride + 1,
+			(in.dim[1] - kernel.dim[1] + 2 * padding) / stride + 1,
+			kernel.dim[2]
+		);
+		// for each element of out
+		for (int i = 0; i < size(); i++)							// for each element of kernel
+			for (int ky = 0; ky < kernel.dim[1]; ky++) 
+				for (int kx = 0; kx < kernel.dim[0]; kx++) {			// get the corresponding element of in
+					int xt = -padding + i2x(i) * stride + kx,
+						yt = -padding + i2y(i) * stride + ky;
+					if (xt < 0 || xt >= in.dim[0] || yt < 0 || yt >= in.dim[1]) continue;
+					for (int z = 0; z < in.dim[2]; z++)
+						data[i] += in(xt, yt, z) * kernel(kx, ky, i2z(i));
+				}
 	}
 	/*----------------合并 [ merge ]----------------
 	*	比 dimIndex 阶数低级的，作为元素块，整体进行内存复制
@@ -154,6 +153,18 @@ public:
 			}
 		}
 		eat(ansTemp); return *this;
+	}
+	/*----------------函数操作 []----------------*/
+	template<typename F>
+	Tensor& function(Tensor& x, F&& f) {
+		alloc(x.dim);
+		for (int i = 0; i < x.size(); i++) data[i] = f(x[i]);
+		return *this;
+	}
+	template<typename F>
+	Tensor& function(F&& f) {
+		for (int i = 0; i <   size(); i++) data[i] = f(data[i]);
+		return *this;
 	}
 };
 #endif
