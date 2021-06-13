@@ -30,22 +30,30 @@ public:
 	/*---------------- 构造/析构函数 ----------------*/
 	Tensor() { ; }
 	Tensor(int dimNum, int* dimLength) { zero(dimNum, dimLength); }
-	Tensor(int x0, int y0, int z0) { zero(x0, y0, z0); }
+	Tensor(int x0, int y0, int z0)     { zero(x0, y0, z0); }
 	Tensor(Tensor& a) { *this = a; }
 	~Tensor() { delete data; }
 	/*---------------- 基础函数 ----------------*/
 	void error() { exit(-1); }
 	inline int size() { return dim.product(); }
+	inline int size(int _dim) { 
+		if (_dim == 1) return dim[0];
+		if (_dim == 2) return dim[0] * dim[1];
+		if (_dim == 3) return dim[0] * dim[1] * dim[2];
+		int ans = 1; for(int i = 0; i < _dim; i++) ans *= dim[i]; return ans; 
+	}
 	/*---------------- 分配空间 ----------------*/
 	Tensor& alloc(int dimNum, int* dimLength) {
 		if (dim.rows != dimNum || memcmp(dim.data, dimLength, dimNum * sizeof(int)) != 0) {
-			dim.alloc(dimNum); 
-			dim.getData(dimLength);
-			data = (T*)malloc(size() * sizeof(T));
+			dim.alloc(dimNum).getData(dimLength);
+			if (data != NULL) delete data; data = (T*)malloc(size() * sizeof(T));
 		} return *this;
 	}
-	Tensor& alloc(Mat<int> _dim)			{ alloc(_dim.rows, _dim.data);			 return *this; }
-	Tensor& alloc(int x0, int y0, int z0)	{ int t[] = { x0, y0, x0 }; alloc(3, t); return *this; }
+	Tensor& alloc(Mat<int> _dim)					{ alloc(_dim.rows, _dim.data);				 return *this; }
+	Tensor& alloc(int x0)							{ int t[] = { x0 };				alloc(1, t); return *this; }
+	Tensor& alloc(int x0, int y0)					{ int t[] = { x0, y0 };			alloc(2, t); return *this; }
+	Tensor& alloc(int x0, int y0, int z0)			{ int t[] = { x0, y0, z0 };		alloc(3, t); return *this; }
+	Tensor& alloc(int x0, int y0, int z0, int w0)	{ int t[] = { x0, y0, z0, w0 }; alloc(4, t); return *this; }
 	/*---------------- 零元/清零 ----------------*/
 	Tensor& zero() { memset(data, 0, sizeof(T) * size()); return *this; }	//清零 
 	Tensor& zero(int dimNum, int* dimLength)	{ alloc(dimNum, dimLength); zero(); return *this; }
@@ -62,7 +70,7 @@ public:
 	*	[Data堆叠方向]: 满x,一列 => 满xy,一矩阵 => 满xyz,一方块 => ....
 	**-------------------------------------------*/
 	T& operator[](int i)				{ return data[i]; }
-	T& operator()(int i)				{ return data[i]; }
+	T& operator()(int x)				{ return data[x]; }
 	T& operator()(int x, int y)			{ return data[x + y * dim[0]]; }
 	T& operator()(int x, int y, int z)	{ return data[x + y * dim[0] + z * dim[1] * dim[0]]; }
 	T& operator()(int* dimIndex) {
@@ -73,8 +81,9 @@ public:
 		} return data[index];
 	}
 	inline int i2x(int i) { return i % dim[0]; }
-	inline int i2y(int i) { return i %(dim[1] * dim[0]) / dim[0]; }
-	inline int i2z(int i) { return i %(dim[2] * dim[1] * dim[0]) / (dim[1] * dim[0]); }
+	inline int i2y(int i) { return dim.rows == 2 ? i / dim[0]          : i %(dim[1] * dim[0])/ dim[0]; }
+	inline int i2z(int i) { return dim.rows == 3 ? i /(dim[1] * dim[0]): i %(dim[2] * dim[1] * dim[0])/(dim[1] * dim[0]); }
+	inline int xyz2i(int x, int y, int z) { return x + y * dim[0] + z * dim[1] * dim[0]; }
 	/*----------------赋值 [ = ]----------------*/ //不能赋值自己
 	Tensor& operator=(Tensor& a) {
 		if (a.data == NULL) error();
@@ -82,7 +91,7 @@ public:
 		memcpy(data, a.data, size() * sizeof(T));
 		return *this;
 	}
-	Tensor& eat(const Tensor& a) {
+	Tensor& eat(Tensor& a) {
 		if (a.data == NULL) error();
 		if (  data != NULL) delete data;
 		data = a.data; a.data = NULL; dim.eatMat(a.dim);

@@ -2,7 +2,6 @@
 LiGu's Basic Algorithm Library.  
 *  框架 (算法 + 数据结构)
 * <Mat.h>						矩阵类
-* <NeuralNetworks.h>			神经网络类(+长短期记忆网络)
 * <BasicMachineLearning.h>		基础机器学习类
 * <BigNum.h>					大数类
 *  算法 Algorithm
@@ -94,22 +93,6 @@ Mat& block	(int rowSt, int rowEd, int colSt, int colEd, Mat& ans)	//子矩阵 [b
 Mat& horizStack	(Mat& a, Mat& b)            //水平向拼接 [horizStack ]
 Mat& function	(Mat& x, T (*f)(T))			//函数操作
 Mat& function	(T (*f)(T))	
-```
-
-## <NeuralNetworks.h> 神经网络类
-```
-核心类:
-class NeuralLayer	(int inputSize, int outputSize)	//神经网络层
-class ConvLayer		(int inChannelNum, int outChannelNum,int kernelSize,int padding,int stride)	//卷积层
-class PoolLayer		(int kernelSize,   int padding, int stride, int poolType)					//下采样层
-class LstmLayer		(int inputSize, int outputSize)	//长短期记忆层
---------------------------------------------------------------------------------------------------
-经典结构:
-class BackPropagation_NeuralNetworks()				//反向传播神经网络 : 1986.Rumelhart,McClelland
-class LeNet_NeuralNetworks()						//LeNet卷积神经网络 : 1998.Yann LeCun
-class Inception()									//Inception模块 : 2014.Google
-class GoogLeNet_NeuralNetworks()					//GoogLeNet卷积神经网络 : 2014.Google
-class LstmNetwork()									//LSTM长短期记忆网络
 ```
 
 ## <Statistics.h> 统计学类

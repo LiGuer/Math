@@ -172,8 +172,8 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 	* 索引方向: 先纵再横.
 	---------------------------------------------*/
 	T& operator[](int i)		{ return data[i]; }
+	T& operator()(int x)		{ return data[x]; }
 	T& operator()(int x, int y) { return data[x * cols + y]; }
-	T& operator()(int i)		{ return data[i]; }
 	inline void i2xy(int& i, int& x, int& y) { x = i / cols ; y = i % cols; }
 	inline int  i2x (int i)			{ return i / cols; }
 	inline int  i2y (int i)			{ return i % cols; }
@@ -272,6 +272,7 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		data[2] = z;
 		return *this;
 	}
+	Mat& getData_(const int _rows, const int _cols, T* _data) { rows = _rows; cols = _cols; data = _data; return *this; }
 	Mat& getData(const char* fileName) {
 		FILE* fin = fopen(fileName, "r");
 		for (int i = 0; i < size(); i++) fscanf(fin, "%lf", &data[i]);
