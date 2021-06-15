@@ -18,7 +18,7 @@ limitations under the License.
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <functional>
+#include <initializer_list>
 template<class T = double>
 class Mat
 {
@@ -254,6 +254,11 @@ Mat& function	(T (*f)(T))
 	}
 	Mat& operator=(T* a) { memcpy(data, a, sizeof(T) * size()); return *this; }
 	Mat& operator=(T  x) { return fill(x); }
+	Mat& operator=(std::initializer_list<T> list) { 
+		int i = 0;
+		for (auto& item : list) data[i++] = item;
+		return *this;
+	}
 	Mat& set(T x, T y) {
 		if (size() != 2) error();
 		data[0] = x;
