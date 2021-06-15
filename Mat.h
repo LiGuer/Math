@@ -47,7 +47,7 @@ void swap(Mat& a);							//交换数据 [ swap ]
 	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
 	Mat(const int _rows) { zero(_rows, 1); }
 	Mat(const Mat& a) { *this = a; }
-	Mat(const int _rows, const int _cols, T* _data) { zero(_rows, _cols); getData(_data); }
+	Mat(const int _rows, const int _cols, T* _data) { zero(_rows, _cols); set(_data); }
 	~Mat() { delete data; }
 	/*---------------- 报错  ----------------*/
 	static void error() { exit(-1); }
@@ -126,9 +126,9 @@ T	 min();
 T	 min(int& index);
 bool operator==	(const Mat& a);			//判断相等 [==]
 Mat& operator=	(const Mat& a);			//赋矩阵 [=] //不能赋值自己
-Mat& getData	(T* a);
-Mat& getData	(T x, T y);
-Mat& getData	(T x, T y, T z);
+Mat& set	(T* a);
+Mat& set	(T x, T y);
+Mat& set	(T x, T y, T z);
 Mat& operator+=	(Mat& a);					//加法 [add +]
 Mat& add		(Mat& a, Mat& b);
 Mat& operator-=	(Mat& a);					//减法 [sub -]
@@ -163,6 +163,8 @@ Mat& solveEquations		(Mat& b, Mat& x);					//解方程组 [solveEquations]
 void LUPdecomposition	(Mat& U, Mat& L, Mat<int>& P);		//LUP分解 [LUPdecomposition]
 Mat& diag		(Mat& ans);									//构造对角矩阵 [diag]
 Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
+Mat& function	(Mat& x, T (*f)(T))			//函数操作
+Mat& function	(T (*f)(T))
 -------------------------------------------------------------------------------
 *	运算嵌套注意,Eg: b.add(b.mul(a, b), a.mul(-1, a));
 		不管括号第一二项顺序,都是数乘,乘法,加法, 问题原因暂不了解，别用该形式。
@@ -250,34 +252,27 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		memcpy(data, a.data, sizeof(T) * size());
 		return *this;
 	}
-	Mat& getData(T* a) {
-		memcpy(data, a, sizeof(T) * size());
-		return *this;
-	}
-	Mat& getData(T x) {
-		if (size() != 1) error();
-		data[0] = x;
-		return *this;
-	}
-	Mat& getData(T x, T y) {
+	Mat& operator=(T* a) { memcpy(data, a, sizeof(T) * size()); return *this; }
+	Mat& operator=(T  x) { return fill(x); }
+	Mat& set(T x, T y) {
 		if (size() != 2) error();
 		data[0] = x;
 		data[1] = y;
 		return *this;
 	}
-	Mat& getData(T x, T y, T z) {
+	Mat& set(T x, T y, T z) {
 		if (size() != 3) error();
 		data[0] = x;
 		data[1] = y;
 		data[2] = z;
 		return *this;
 	}
-	Mat& getData_(const int _rows, const int _cols, T* _data) { rows = _rows; cols = _cols; data = _data; return *this; }
-	Mat& getData(const char* fileName) {
+	Mat& set(const char* fileName) {
 		FILE* fin = fopen(fileName, "r");
 		for (int i = 0; i < size(); i++) fscanf(fin, "%lf", &data[i]);
 		return *this;
 	}
+	Mat& set_(const int _rows, const int _cols, T* _data) { rows = _rows; cols = _cols; data = _data; return *this; }
 	/*----------------加法 [ add + ]----------------*/
 	Mat& operator+=(Mat& a) {
 		if (a.rows != rows || a.cols != cols) error();
@@ -752,6 +747,29 @@ Mat& conv		(Mat& a, Mat& b, int padding = 0, int stride = 1);	//卷积 [conv]
 		}
 		return eatMat(ansTmp);
 	}
+	/*----------------函数操作 [ function ]----------------*/
+	template<typename F>
+	Mat& function(Mat& x, F&& f) {
+		alloc(x.rows, x.cols);
+		for (int i = 0; i < x.size(); i++) data[i] = f(x[i]);
+		return *this;
+	}
+	template<typename F>
+	Mat& function(F&& f) {
+		for (int i = 0; i <   size(); i++) data[i] = f(data[i]);
+		return *this;
+	}
+	template<typename F>
+	Mat& functionIndex(Mat& x, F&& f) {
+		alloc(x.rows, x.cols);
+		for (int i = 0; i < x.size(); i++) data[i] = f(x[i], i);
+		return *this;
+	}
+	template<typename F>
+	Mat& functionIndex(F&& f) {
+		for (int i = 0; i <   size(); i++) data[i] = f(data[i], i);
+		return *this;
+	}
 /******************************************************************************
 *                    特殊操作
 -------------------------------------------------------------------------------
@@ -760,8 +778,6 @@ Mat& setCol	(int _col, Mat& a)
 Mat& getRow	(int _row, Mat& a)				//读/写一行 [getRow/setRow]
 Mat& block	(int rowSt, int rowEd, int colSt, int colEd, Mat& ans)	//子矩阵 [block]
 Mat& horizStack	(Mat& a, Mat& b)            //水平向拼接 [horizStack ]
-Mat& function	(Mat& x, T (*f)(T))			//函数操作
-Mat& function	(T (*f)(T))	
 ******************************************************************************/
 	/*----------------读/写一列 [getCol/setCol]----------------*/
 	Mat& getCol(int _col, Mat& a) {
@@ -818,29 +834,6 @@ Mat& function	(T (*f)(T))
 			for (int j = 0; j < repeatNum; j++)
 				ansTmp(i, j) = data[i];
 		return ans.eatMat(ansTmp);
-	}
-	/*----------------函数操作 []----------------*/
-	template<typename F>
-	Mat& function(Mat& x, F&& f) {
-		alloc(x.rows, x.cols);
-		for (int i = 0; i < x.size(); i++) data[i] = f(x[i]);
-		return *this;
-	}
-	template<typename F>
-	Mat& function(F&& f) {
-		for (int i = 0; i <   size(); i++) data[i] = f(data[i]);
-		return *this;
-	}
-	template<typename F>
-	Mat& functionIndex(Mat& x, F&& f) {
-		alloc(x.rows, x.cols);
-		for (int i = 0; i < x.size(); i++) data[i] = f(x[i], i);
-		return *this;
-	}
-	template<typename F>
-	Mat& functionIndex(F&& f) {
-		for (int i = 0; i <   size(); i++) data[i] = f(data[i], i);
-		return *this;
 	}
 };
 #endif

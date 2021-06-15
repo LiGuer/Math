@@ -45,7 +45,7 @@ public:
 	/*---------------- ∑÷≈‰ø’º‰ ----------------*/
 	Tensor& alloc(int dimNum, int* dimLength) {
 		if (dim.rows != dimNum || memcmp(dim.data, dimLength, dimNum * sizeof(int)) != 0) {
-			dim.alloc(dimNum).getData(dimLength);
+			dim.alloc(dimNum).get(dimLength);
 			if (data != NULL) delete data; data = (T*)malloc(size() * sizeof(T));
 		} return *this;
 	}

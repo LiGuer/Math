@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 typedef long long int64;
-template<class T>
 /***************************************************************************
 *	HashTable 
 *	[运算复杂度]:
 		* Search: O(1)	* Insert: O(1)	* Delete: O(1)
 ****************************************************************************/
+template<class T>
 class HashTable {
 	/*-------------------------------- 基础量 --------------------------------*/
 	int64 MaxSize, deltaMemSize = 1e3, memSize = deltaMemSize, size = 0;

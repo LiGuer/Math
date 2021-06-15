@@ -187,7 +187,7 @@ void Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfid
 				bool flag = true;
 				for (int k = 0; k < frozenSet_K.size(); k++)
 					if (item == frozenSet_K[k][0]) { flag = false; break; }
-				if (flag) frozenSet_K.push_back(tmp.getData(item));
+				if (flag) frozenSet_K.push_back(tmp.get(item));
 			}
 		}
 	}
@@ -212,7 +212,7 @@ void Apriori(std::vector<Mat<int>>& dataSet, double minSupport, double minConfid
 					bool flag = true;
 					for (int u = 0; u < OneElementSet.size(); u++)
 						if (item == OneElementSet[u][0]) { flag = false; break; }
-					if (flag) OneElementSet.push_back(tmp.getData(item));
+					if (flag) OneElementSet.push_back(tmp.get(item));
 				}
 			}
 		}
@@ -355,8 +355,6 @@ double MahalanobisDist(Mat<>& x1, Mat<>& x2, Mat<>& covMat) {
 	covMat.inv(_covMat);
 	return ((diff.transpose(tmp) *= _covMat) *= diff)[0];
 }
-}
-
 /******************************************************************************
 *								QLearning
 *	[定义]:Q(s,a) = (1 + lr)·Q(s,a) + lr·( R + g·max Q(s',:) )
@@ -388,14 +386,12 @@ public:
 	/*---------------- 初始化 ----------------*/
 	QLearning() { ; }
 	QLearning(int _stateNum, int _actionNum) { init(_stateNum, _actionNum); }
-	void init(int _stateNum, int _actionNum) {
-		QTable.zero(_stateNum, _actionNum);
-	}
+	void init(int _stateNum, int _actionNum) { QTable.zero(_stateNum, _actionNum); }
 	/*---------------- 选择行为 ----------------
 	*	[1] 探索模式(随机)	[2] 利用模式(最优)
 	-------------------------------------------*/
-	int operator()  (int state) { return chooseAction(state); }
-	int chooseAction(int state) {
+	int operator()(int state) { return forward(state); }
+	int forward   (int state) {
 		int action = 0;
 		double maxQ = -DBL_MAX,
 			   minQ =  DBL_MAX;
@@ -446,10 +442,10 @@ public:
 		   forgetRate = 0.8,
 		   greedy     = 0.9;
 	int actionNum = 0,
-		stateNum  = 0;
+		 stateNum = 0;
 	/*---------------- 选择行为 ----------------*/
-	int operator()  (int state) { return chooseAction(state); }
-	int chooseAction(int state) {
+	int operator()(int state) { return forward(state); }
+	int forward   (int state) {
 		int action = 0;
 		if (rand() / double(RAND_MAX) < greedy) 
 			return action = rand() % actionNum;
@@ -496,5 +492,5 @@ public:
 //void SupportVectorMachines(Mat<> X, Mat<int> Y) {
 
 //};
-
+}
 #endif

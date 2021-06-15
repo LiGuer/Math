@@ -27,7 +27,7 @@ typedef unsigned int INT64U;
 -------------------------------------------------------------------------------
 *	[Example]:
 		Mat<unsigned int> memSize(1), ploy(1, 3);
-		InformationTheory::ConvCodeTrellis trellis(memSize.getData(3), ploy.getData(7, 5, 1));
+		InformationTheory::ConvCodeTrellis trellis(memSize.get(3), ploy.get(7, 5, 1));
 		int t[] = { 1, 0, 1 }, ans[3];
 		for (int i = 0; i < 3; i++) ans[i] = InformationTheory::ConvCode(t[i], &trellis);
 ******************************************************************************/
