@@ -114,6 +114,13 @@ void swap(Mat& a);							//交换数据 [ swap ]
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
 	}
+	/*---------------- 线性间距向量全页 ----------------*/
+	Mat& linspace(T xs, T xe, int n = 100) {
+		T dx = (xe - xs) / (n - 1);
+		alloc(n);
+		for (int i = 0; i < size(); i++) data[i] = xs + dx * i; data[size() - 1] = xe;
+		return *this;
+	}
 /******************************************************************************
 *                    基础运算
 -------------------------------------------------------------------------------
@@ -815,7 +822,7 @@ Mat& horizStack	(Mat& a, Mat& b)            //水平向拼接 [horizStack ]
 		return ans;
 	}
 	/*----------------拼接 [rows/colsStack]----------------*/
-	Mat& rowsStack(Mat& a, Mat& b) {
+	Mat& rowStack(Mat& a, Mat& b) {
 		if (a.cols != b.cols)error();
 		Mat ansTmp(a.rows + b.rows, a.cols);
 		for (int i = 0; i < ansTmp.rows; i++)
@@ -823,13 +830,19 @@ Mat& horizStack	(Mat& a, Mat& b)            //水平向拼接 [horizStack ]
 				ansTmp(i, j) = i < a.rows ? a(i, j) : b(i - a.rows, j);
 		return eatMat(ansTmp);
 	}
-	Mat& colsStack(Mat& a, Mat& b) {
+	Mat& rowStack(std::initializer_list<Mat&> list) {
+		return *this;
+	}
+	Mat& colStack(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
 		Mat ansTmp(a.rows, a.cols + b.cols);
 		for (int i = 0; i < ansTmp.rows; i++)
 			for (int j = 0; j < ansTmp.cols; j++)
 				ansTmp(i, j) = j < a.cols ? a(i, j) : b(i, j - a.cols);
 		return eatMat(ansTmp);
+	}
+	Mat& colStack(std::initializer_list<Mat&> list) {
+		return *this;
 	}
 	/*----------------复制拓展 [repeatCol]----------------*/
 	Mat& repeatCol(int repeatNum, Mat& ans) {

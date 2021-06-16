@@ -13,6 +13,7 @@ limitations under the License.
 #ifndef INFORMATION_THEORY_H
 #define INFORMATION_THEORY_H
 #include "Mat.h"
+
 namespace InformationTheory {
 typedef unsigned int INT64U;
 /******************************************************************************

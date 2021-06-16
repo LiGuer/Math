@@ -80,6 +80,13 @@ public:
 			step  *= dim[i];
 		} return data[index];
 	}
+	T& operator()(std::initializer_list<T> list) {
+		int index = 0, step = 1, i = 0;
+		for (auto& item : list) {
+			index += step * item;
+			step  *= dim[i++];
+		} return data[index];
+	}
 	inline int i2x(int i) { return i % dim[0]; }
 	inline int i2y(int i) { return dim.rows == 2 ? i / dim[0]          : i %(dim[1] * dim[0])/ dim[0]; }
 	inline int i2z(int i) { return dim.rows == 3 ? i /(dim[1] * dim[0]): i %(dim[2] * dim[1] * dim[0])/(dim[1] * dim[0]); }
