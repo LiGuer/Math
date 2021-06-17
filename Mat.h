@@ -119,7 +119,9 @@ void swap(Mat& a);							//交换数据 [ swap ]
 		return *this;
 	}
 	Mat& rands(const int _rows, const int _cols, T st, T ed) {
-		alloc(_rows, _cols); rands(st, ed);
+		alloc(_rows, _cols); 
+		rands(st, ed); 
+		return *this;
 	}
 	/*---------------- 线性间距向量全页 ----------------*/
 	Mat& linspace(T xs, T xe, int n = 100) {
@@ -295,6 +297,7 @@ Mat& function	(T (*f)(T))
 	/*----------------加法 [ add + ]----------------*/
 	Mat& operator+=(Mat& a) {
 		if (a.rows != rows || a.cols != cols) error();
+#pragma omp parallel for
 		for (int i = 0; i < a.size(); i++) data[i] += a[i];
 		return *this;
 	}
