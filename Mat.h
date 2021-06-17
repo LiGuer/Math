@@ -19,6 +19,7 @@ limitations under the License.
 #include <string.h>
 #include <math.h>
 #include <initializer_list>
+#include "omp.h"
 template<class T = double>
 class Mat
 {
@@ -54,7 +55,10 @@ void swap(Mat& a);							//交换数据 [ swap ]
 	/*---------------- Size  ----------------*/
 	inline int size() const { return rows * cols; }
 	/*---------------- 填充  ----------------*/
-	inline Mat& fill(T a) { for (int i = 0; i < size(); i++) data[i] = a; return *this; }
+	inline Mat& fill(const T& a) { 
+		for (int i = 0; i < size(); i++) data[i] = a; 
+		return *this;
+	}
 	/*---------------- 吃掉另一个矩阵(指针操作)  ----------------*/
 	inline Mat& eatMat(Mat& a) {
 		if (data != NULL) delete data;
@@ -108,11 +112,14 @@ void swap(Mat& a);							//交换数据 [ swap ]
 		return *this;
 	}
 	/*---------------- 随机元 ----------------*/
-	Mat& rands(const int _rows, const int _cols, T st, T ed) {
-		alloc(_rows, _cols);
+	Mat& rands(T st, T ed) {
+#pragma omp parallel for
 		for (int i = 0; i < size(); i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
+	}
+	Mat& rands(const int _rows, const int _cols, T st, T ed) {
+		alloc(_rows, _cols); rands(st, ed);
 	}
 	/*---------------- 线性间距向量全页 ----------------*/
 	Mat& linspace(T xs, T xe, int n = 100) {
@@ -338,6 +345,9 @@ Mat& function	(T (*f)(T))
 		return *this;
 	}
 	/*----------------数除 [ div / ]----------------*/
+	Mat& operator/=(const double a) {
+		for (int i = 0; i < size(); i++) data[i] /= a; return *this;
+	}
 	Mat& div(const double a, Mat& b) {
 		alloc(b.rows, b.cols);
 		for (int i = 0; i < size(); i++) data[i] = a / b[i];
