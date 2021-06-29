@@ -16,10 +16,14 @@ limitations under the License.
 #include <float.h>
 #include <algorithm>
 #include <vector>
+#include <array>
 #include <queue>
 namespace GraphTheory {
 /*--------------------------------[ 边 Edge ]--------------------------------*/
-struct Edge { int u, v; double w; };
+struct Edge { 
+	int u, v; double w; 
+	void set(int _u, int _v, double _w) { u = _u; v = _v; w = _w; }
+};
 /*********************************************************************************
 						构建  邻接图 / 邻接链表
 *********************************************************************************/
@@ -44,17 +48,18 @@ Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<Gra
 		[输入]: 图的邻接链表[Graph], 节点数量[n]
 		[输出]: 最小生成树,每一条有向边的 起点[TreeU],终点[TreeV],总边数[TreeCur]
 		[原理]: 按点贪心, 每次加入已搜索点集u的最短边(u,v)，其中v不属于已搜索点集的点v
+		[时间复杂度]: O(E·logV)
 		[流程]:
-			[1] 初始化[VertexNew]: 已搜索点集的存储数组
+			[1] 初始化[已搜点集 VertexNew]
 			[2] 将第一个图的节点, 加入VertexNew
 			[3] 开始迭代, 直至所有节点均已搜索完成, 即VertexNew已满
-				[4] 在已搜索点集, 寻找最短边(u,v), 其中u∈VertexNew, v不属于VertexNew
-				[5] 将边(u,v)加入最小生成树， 将v加入已搜索点集VertexNew
+				[4] 在已搜点集, 寻找最短边(u,v), 其中u∈VertexNew, v ∉ VertexNew
+				[5] 将边(u,v)加入最小生成树， 将v加入VertexNew
 ----------------------------------------------------------------------------------
 *	[算法]: Kruskal
 		[输入]: 图的边数据 起点[u] 终点[v] 权值[w] 边数[n]
 		[输出]: 最小生成树,每一条有向边的 起点[TreeU],终点[TreeV],总边数[TreeCur]
-		[时间复杂度] O(E logE)
+		[时间复杂度] O(E·logV)
 		[流程]:
 			[1] 初始化未搜索边集EdgeNew = E0图边集
 			[2] 开始迭代,直至未搜索边集为空集
@@ -67,31 +72,58 @@ Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<Gra
 *********************************************************************************/
 void Prim(Mat<GraphListNode*>& GraphList, std::vector<int> TreeU[], std::vector<int> TreeV[])
 {
-	Mat<bool> flag     (GraphList.rows);
-	Mat<int>  VertexNew(GraphList.rows);
-	int TreeNum = 0;
+	bool* flag      = (bool*)calloc(GraphList.size(), sizeof(bool));
+	int * VertexSet = (int *)calloc(GraphList.size(), sizeof(int ));
+	int VertexNum = 0;
+	VertexSet[VertexNum++] = 0; flag[0] = 1;
 	//[3]
 	while (true) {
 		//[4]
 		Edge minEdge = { -1, -1, DBL_MAX };
-		for (int i = 0; i < TreeNum + 1; i++) {
-			int u = VertexNew[i];
+		for (int i = 0; i < VertexNum; i++) {
+			int u = VertexSet[i];
 			GraphListNode* ptr = GraphList[u];
 			while (ptr != NULL) {
-				if (ptr->w < minEdge.w && flag[ptr->v] == 0) {
-					minEdge.w = ptr->w;
-					minEdge.u = u;
-					minEdge.v = ptr->v;
-				}ptr = ptr->next;
+				if (ptr->w < minEdge.w && !flag[ptr->v])
+					minEdge.set(u, ptr->v, ptr->w);
+				ptr = ptr->next;
 			}
 		}
-		if (minEdge.u == -1)break;								//[3]
+		if (minEdge.u == -1) break;//[3]
 		//[5]
 		TreeU->push_back(minEdge.u);
-		TreeU->push_back(minEdge.v);
-		VertexNew[++TreeNum] = minEdge.v;						//v加入已搜索点集VertexNew
+		TreeV->push_back(minEdge.v);
+		VertexSet[VertexNum++] = minEdge.v;
 		flag[minEdge.v] = 1;
 	}
+	free(flag);
+	free(VertexSet);
+}
+void Prim(Mat<>& graph, std::vector<int>& TreeU, std::vector<int>& TreeV)
+{
+	int N = graph.rows;
+	bool* flag     = (bool*)calloc(N, sizeof(bool));
+	int * visitSet = (int *)calloc(N, sizeof(int ));
+	int visitNum = 0;
+	visitSet[visitNum++] = 0; flag[0] = 1;
+	//[3]
+	while (true) {
+		//[4]
+		Edge minEdge = { -1, -1, DBL_MAX };
+		for (int i = 0; i < visitNum; i++) {
+			int u = visitSet[i];
+			for (int v = 0; v < N; v++) 
+				if (!flag[v] && graph(u, v) < minEdge.w)
+					minEdge.set(u, v, graph(u, v));
+		}
+		if (minEdge.u == -1) break;//[3]
+		//[5]
+		TreeU.push_back(minEdge.u);
+		TreeV.push_back(minEdge.v);
+		visitSet[visitNum++] = minEdge.v;
+		flag[minEdge.v] = 1;
+	} printf("%d", visitNum);
+	free(flag); free(visitSet);
 }
 void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV)
 {
@@ -146,20 +178,23 @@ void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV
 			Dijkstra一次只能算出给定两点间的最短路径。
 			Floyd   一次可以算出任意两点间的最短路径。
 *********************************************************************************/
-void Floyd(Mat<>& GraphMat, Mat<>& Distance, Mat<>& Path)
+void Dijkstra(Mat<>& GraphMat, Mat<>& Distance, Mat<>& Path) {
+
+}
+void Floyd(Mat<>& GraphMat, Mat<>& Distance, Mat<int>& Path)
 {
 	//[1]
-	int N = GraphMat.cols;
+	int N = GraphMat.rows;
 	Distance = GraphMat;
-	Path.zero(N, N);
+	Path.zero(GraphMat.rows, GraphMat.cols);
 	for (int i = 0; i < Path.size(); i++) Path[i] = i % N;
 	//[2]
-	for (int k = 1; k <= N; k++) 
-		for (int i = 1; i <= N; i++) 
-			for (int j = 1; j <= N; j++) 
-				if (Distance(i, j) > Distance(i, k) + Distance(k, j)) {
-					Distance(i, j) = Distance(i, k) + Distance(k, j); Path(i, j) = k;
-				}
+	for (int k = 0; k < N; k++)
+		for (int i = 0; i < N; i++)
+			for (int j = 0; j < N; j++)
+				Distance(i, j) = Distance(i, j) > Distance(i, k) + Distance(k, j) ?
+					Path(i, j) = k, Distance(i, k) + Distance(k, j) :
+					Distance(i, j);
 }
 /*********************************************************************************
 						网络最大流

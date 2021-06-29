@@ -113,7 +113,7 @@ void swap(Mat& a);							//交换数据 [ swap ]
 	}
 	/*---------------- 随机元 ----------------*/
 	Mat& rands(T st, T ed) {
-#pragma omp parallel for
+//#pragma omp parallel for schedule(dynamic, 1)
 		for (int i = 0; i < size(); i++)
 			data[i] = rand() / double(RAND_MAX) * (ed - st) + st;	//[st,ed)
 		return *this;
@@ -297,7 +297,7 @@ Mat& function	(T (*f)(T))
 	/*----------------加法 [ add + ]----------------*/
 	Mat& operator+=(Mat& a) {
 		if (a.rows != rows || a.cols != cols) error();
-#pragma omp parallel for
+//#pragma omp parallel for
 		for (int i = 0; i < a.size(); i++) data[i] += a[i];
 		return *this;
 	}
@@ -332,6 +332,7 @@ Mat& function	(T (*f)(T))
 	Mat& operator*=(Mat& a) {
 		if (cols != a.rows) error();
 		Mat ansTmp(rows, a.cols);
+//#pragma omp parallel for schedule(dynamic, 1)
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < a.cols; j++) 
 				for (int k = 0; k < cols; k++)
@@ -393,8 +394,7 @@ Mat& function	(T (*f)(T))
 		data[2] = a[0] * b[1] - a[1] * b[0];
 		return *this;
 	}
-	/*----------------元素乘 [ elementMul × ]----------------
-	**------------------------------------------------*/
+	/*----------------元素乘 [ elementMul × ]----------------*/
 	Mat& elementMul(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols) error();
 		alloc(a.rows, a.cols);
@@ -403,11 +403,11 @@ Mat& function	(T (*f)(T))
 	}
 	Mat& elementMul(Mat& a) {
 		if (rows != a.rows || cols != a.cols) error();
+//#pragma omp parallel for schedule(dynamic, 1)
 		for (int i = 0; i < size(); i++) data[i] *= a[i];
 		return *this;
 	}
-	/*----------------元素除 [ elementDiv / ]----------------
-	**------------------------------------------------*/
+	/*----------------元素除 [ elementDiv / ]----------------*/
 	Mat& elementDiv(Mat& a, Mat& b) {
 		if (a.rows != b.rows || a.cols != b.cols) error();
 		alloc(a.rows, a.cols);

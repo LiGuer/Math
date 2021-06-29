@@ -78,7 +78,7 @@ struct UdpHeader {
 	unsigned short SourPort;	// 源端口(Source port)(16b)
 	unsigned short DestPort;	// 目的端口(Destination port)(16b)
 	unsigned short Length;		// UDP数据包长度(Datagram length)(16b)
-	unsigned short CRC;			// 校验和(Checksum)(16b)
+	unsigned short Checksum;	// 校验和(Checksum)(16b)
 };
 UdpHeader UdpDecode(char* input, char*& data, int& dataLen) {
 	UdpHeader head;
