@@ -122,7 +122,7 @@ void Prim(Mat<>& graph, std::vector<int>& TreeU, std::vector<int>& TreeV)
 		TreeV.push_back(minEdge.v);
 		visitSet[visitNum++] = minEdge.v;
 		flag[minEdge.v] = 1;
-	} printf("%d", visitNum);
+	}
 	free(flag); free(visitSet);
 }
 void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV)
@@ -253,6 +253,51 @@ double Dinic(Mat<>& GraphMat, Mat<>& Path,int s, int t, int N) {
 		Dinic_DFS(s, t, N);
 	}
 	return ans;
+}
+/*********************************************************************************
+*						商旅问题	Traveling Salesman Problem
+*	[问题]: 遍历所有给定点的最短闭合路径.
+*	[算法]: 蚁群算法
+		[0] 距离矩阵 Dis, 信息素矩阵 S
+		[1] 选择: P(x,y) = S(x,y)^α / Dis(x,y)^β
+		[2] 信息素更新: S = S_t / DisSum_t
+*********************************************************************************/
+#define RAND_DBL rand() / (double)RAND_MAX
+void TravelingSalesmanProblem_AntGound(Mat<>& Dis, Mat<int>& ansY,
+	int antNum, int iterNum, double lossS_p = 0.2, double alpha = 1, double beta = 2.3, double Sq = 10
+) {
+	int N = Dis.cols;
+	double disSumMin = DBL_MAX;
+	Mat<> S(N, N); S = 1; ansY.zero(N);
+	for (int iter = 0; iter < iterNum; iter++) {
+		static Mat<> dS(N, N), dSk(N, N); dS.zero();
+		for (int ant = 0; ant < antNum; ant++) {
+			static Mat<bool> isVisit(N);  isVisit.zero(); dSk.zero();
+			static Mat<int>  yT(N);
+			int x = 0;
+			//Path
+			for (int i = 1; i < N; i++) {
+				isVisit[x] = 1;
+				int y;
+				static Mat<> P(N);
+				for (int j = 0; j < P.size(); j++)
+					P[j] = isVisit[j] ? 0 : pow(S(x, j), alpha) / pow(Dis(x, j), beta);
+				P /= P.sum();
+				double rands = RAND_DBL;
+				for (int j = 0; j < P.size(); j++)
+					if (isVisit[j] == 0 && (rands -= P[j]) <= 0) { y = j; break; };
+				dSk(x, y) = Sq; x = y; isVisit[y] = 1; yT[i] = y;
+			}
+			//Distance
+			double disSum = Dis(yT[0], yT[yT.size() - 1]);
+			for (int i = 0; i < yT.size() - 1; i++)
+				disSum += Dis(yT[i], yT[i + 1]);
+			if (disSum < disSumMin) { ansY = yT; disSumMin = disSum; }
+			dS += (dSk /= disSum);
+		}
+		(S *= (1 - lossS_p)) += dS;
+		//if (iter % 1 == 0)printf("> %d %f\n", iter, disSumMin);
+	}
 }
 }
 #endif
