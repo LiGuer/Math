@@ -105,6 +105,11 @@ void swap(Mat& a);							//交换数据 [ swap ]
 		for (int i = 0; i < rows; i++) (*this)(i, i) = 1;
 		return *this;
 	}
+	Mat& E() {
+		zero();
+		for (int i = 0; i < rows; i++) (*this)(i, i) = 1;
+		return *this;
+	}
 	/*---------------- 全1元 ----------------*/
 	Mat& ones(const int _rows, const int _cols = 1) {
 		alloc(_rows, _cols); 

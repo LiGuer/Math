@@ -263,7 +263,7 @@ double Dinic(Mat<>& GraphMat, Mat<>& Path,int s, int t, int N) {
 		[2] 信息素更新: S = S_t / DisSum_t
 *********************************************************************************/
 #define RAND_DBL rand() / (double)RAND_MAX
-void TravelingSalesmanProblem_AntGound(Mat<>& Dis, Mat<int>& ansY,
+void TravelingSalesmanProblem_AntGroup(Mat<>& Dis, Mat<int>& ansY,
 	int antNum, int iterNum, double lossS_p = 0.2, double alpha = 1, double beta = 2.3, double Sq = 10
 ) {
 	int N = Dis.cols;
