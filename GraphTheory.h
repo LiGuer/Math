@@ -153,6 +153,9 @@ void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV
 /*********************************************************************************
 						最短路径
 *	[算法]: Dijkstra
+		[步骤]:
+			[1] init dis[]
+			[2] 
 ----------------------------------------------------------------------------------
 *	[算法]: Floyd
 		[输入]:	[1] 图的邻接矩阵Graph
@@ -178,8 +181,35 @@ void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV
 			Dijkstra一次只能算出给定两点间的最短路径。
 			Floyd   一次可以算出任意两点间的最短路径。
 *********************************************************************************/
-void Dijkstra(Mat<>& GraphMat, Mat<>& Distance, Mat<>& Path) {
-
+double* Dijkstra(Mat<GraphListNode*>& GraphList, int st, Mat<GraphListNode*>& Path) {
+	int N = GraphList.rows;
+	//init Dis[]
+	double* Dis = (double*)malloc(N * sizeof(double));
+	bool  * flag= (bool  *)calloc(N,  sizeof(bool)  );
+	Path.alloc(N);
+	for (int i = 0; i < N; i++) Dis[i] = DBL_MAX;
+	GraphListNode* ptr = GraphList[st];
+	while (ptr != NULL) {
+		Dis[ptr->v] = ptr->w;
+		ptr = ptr->next;
+	}
+	//[2]
+	while (true) {
+		//[2.1]
+		double minW = DBL_MAX;
+		int    minP;
+		for (int i = 0; i < N; i++) 
+			if(!flag[i]) minW = minW > Dis[i] ? minP = i, Dis[i] : minW;
+		if (minW == DBL_MAX) break;
+		flag[minP] = 1;
+		//[2.2]
+		GraphListNode* ptr = GraphList[minP];
+		while (ptr != NULL) {
+			Dis[ptr->v] = Dis[ptr->v] <= (Dis[minP] + ptr->w) ? Dis[ptr->v] : (Dis[minP] + ptr->w);
+			ptr = ptr->next;
+		}
+	}
+	return Dis;
 }
 void Floyd(Mat<>& GraphMat, Mat<>& Distance, Mat<int>& Path)
 {

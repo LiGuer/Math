@@ -161,8 +161,8 @@ Mat& mul		(const double a, Mat& b);
 Mat& div		(const double a, Mat& b);	//数除 [div /]
 T	 dot		(Mat& a, Mat& b);			//点乘 [dot ·]
 T	 dot		(Mat& a);
-Mat& crossProduct	(Mat& a, Mat& b);		//叉乘 [crossProduct ×]
-Mat& crossProduct_	(Mat& a, Mat& b);
+Mat& cross	(Mat& a, Mat& b);		//叉乘 [cross ×]
+Mat& cross_	(Mat& a, Mat& b);
 Mat& elementMul(Mat& a, Mat& b);			//元素乘 [elementMul ×]
 Mat& elementMul(Mat& a);
 Mat& elementDiv	(Mat& a, Mat& b);			//元素除 [elementDiv /]
@@ -174,7 +174,7 @@ T	 sum		(Mat& a);
 Mat& sum		(Mat& ans,int dim);
 T	 product	();							//求积 [product Π]
 T	 norm		();							//范数 [norm ||x||]
-Mat& normalized	();							//归一化 [normalized]
+Mat& normalize	();							//归一化 [normalize]
 T	 comi		(int i0, int j0);			//余子式 [comi]
 Mat& inv		(Mat& ans);					//取逆 [inv x~¹]
 T	 abs		();							//行列式 [abs |x|]
@@ -377,13 +377,13 @@ Mat& function	(T (*f)(T))
 		for (int i = 1; i < size(); i++) ans += data[i] * a[i];
 		return ans;
 	}
-	/*----------------叉乘 [ crossProduct × ]----------------
+	/*----------------叉乘 [ cross × ]----------------
 	//####################### 暂时只三维
 	*	𝑎 × 𝑏 ⃑ = | 𝑥		𝑦	 𝑧  |
 					| 𝑥𝑎	𝑦𝑎	 za |
 					| 𝑥𝑏	𝑦𝑏	 zb |
 	**------------------------------------------------*/
-	Mat& crossProduct(Mat& a, Mat& b) {
+	Mat& cross(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
 		Mat ansTmp(a.rows, a.cols);
 		ansTmp[0] = a[1] * b[2] - a[2] * b[1];
@@ -391,7 +391,7 @@ Mat& function	(T (*f)(T))
 		ansTmp[2] = a[0] * b[1] - a[1] * b[0];
 		return eatMat(ansTmp);
 	}
-	Mat& crossProduct_(Mat& a, Mat& b) {
+	Mat& cross_(Mat& a, Mat& b) {
 		if (a.rows != b.rows)error();
 		alloc(a.rows, a.cols);
 		data[0] = a[1] * b[2] - a[2] * b[1];
@@ -476,10 +476,10 @@ Mat& function	(T (*f)(T))
 	*	||a|| = sqrt(a·a)
 	**-------------------------------------------*/
 	T norm() { return sqrt(dot(*this, *this)); }
-	/*----------------归一化 [ normalized ]----------------
+	/*----------------归一化 [ normalize ]----------------
 	*	[定义]: 使得|| x || = 1
 	**------------------------------------------------------*/
-	Mat& normalized() {
+	Mat& normalize() {
 		T t = norm();
 		if (t == 0)return *this;
 		for (int i = 0; i < size(); i++) data[i] /= t;
