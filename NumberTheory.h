@@ -1,5 +1,5 @@
 /*
-Copyright 2020 LiGuer. All Rights Reserved.
+Copyright 2020-2021 LiGuer. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -19,6 +19,19 @@ limitations under the License.
 #include <math.h>
 typedef unsigned long long INT64U;
 typedef long long INT64S;
+/*################################################################################################
+[数论 Number Theory]
+INT64S Factorial(INT64S n);										//阶乘
+INT64S*FibonacciSequence(int N);								//Fibonacci数列
+INT64S C		(INT64S n, INT64S m);							//组合
+INT64S A		(INT64S n, INT64S m);							//排列
+INT64S GCD		(INT64S a, INT64S b);							//最大公约数
+INT64S LCM		(INT64S a, INT64S b);							//最小公倍数
+INT64S GCDex	(INT64S a, INT64S b, INT64S& x, INT64S& y)		//拓展Euclid算法
+bool   isPrime	(INT64S a)										//素数判断
+INT64S PowMod	(INT64S a, INT64S k, INT64S m);					//幂次模
+INT64S RSAPrivateKey(INT64S p, INT64S q, INT64S a);				//RSA密码
+################################################################################################*/
 namespace NumberTheory {
 /******************************************************************************
 *                    Factorial  阶乘
@@ -58,7 +71,7 @@ INT64S C_Lucas(INT64S n, INT64S m, INT64S p) {
 	return ans;
 }
 /*********************************************************************************
-						Fibonacci 数列
+						Fibonacci数列
 [定义]: F[n] = F[n-1] + F[n-2]		(n≥2, F[0]=0, F[1]=1)
 [算法]: 递推式
 *********************************************************************************/
@@ -78,16 +91,17 @@ INT64S* FibonacciSequence(int N) {
 INT64S GCD(INT64S a, INT64S b) { return a % b == 0 ? b : GCD(b, a % b); }
 INT64S LCM(INT64S a, INT64S b) { return a / GCD(a, b) * b; }
 /*********************************************************************************
-						拓展欧几里得算法
-[算法]: 辗转相除法 的 拓展
-		除计算a、b最大公约数, 还能找到x y（其中一个很可能是负数）满足 a x + b y = gcd(a ,b)
-[线性方程定理]: 非零正整数 a,b ,总存在 x,y 满足 a x + b y = gcd(a ,b)
-				其中, a,b 互质时, a x + b y = 1
+[拓展Euclid算法]
+	[算法]: 辗转相除法的拓展
+			除计算a、b最大公约数, 还能找到满足a x + b y = gcd(a,b)的(x,y)的一组解(其中一个很可能是负数)
+	[线性方程定理]: 
+		非零正整数a b, 总存在x y满足 a x + b y = gcd(a ,b)
+		若a b互质, 则 a x + b y = 1
 *********************************************************************************/
-INT64S GCDEx(INT64S a, INT64S b, INT64S& x, INT64S& y){
+INT64S GCDex(INT64S a, INT64S b, INT64S& x, INT64S& y){
 	if (!b) { x = 1, y = 0; return a; }
 	else{
-		INT64S r = GCDEx(b, a % b, y, x);
+		INT64S r = GCDex(b, a % b, y, x);
 		y -= a / b * x;
 		return r;
 	}
@@ -115,19 +129,19 @@ bool* getPrime(INT64S n) {
 	}
 }
 /*********************************************************************************
-						幂次模
-[问题]: 求 bi = ai^k  (mod m) ,  幂次模问题
-[算法]: 逐次平方法
-[步骤]:
-	[1] 将 k 二进制展开  k = u0·2⁰ + u1·2¹ + u2·2² + ... + ur·2^r
-			(计算机里, k内存天然是二进制)
-	[2] 逐次平方制作模m的a幂次表, i∈[0,r]
-			a^(2^0) = a ≡ A0 (mod m)
-			a^(2^i) ≡ (a^2^(i-1))² ≡ A²(i-1) ≡ Ai (mod m)
-	[3] 乘积  A0^u0·A1^u1·...·Ar^ur  (mod m)
-[证明]: a^k = a^(u0·2⁰ + u1·2¹ + u2·2² + ... + ur·2^r)
+[幂次模]
+	[问题]: 求 b = a^k (mod m)
+	[算法]: 逐次平方法
+	[步骤]:
+		[1] 将 k 二进制展开  k = u0·2⁰ + u1·2¹ + u2·2² + ... + ur·2^r
+				(计算机里, k内存天然是二进制)
+		[2] 逐次平方制作模m的a幂次表, i∈[0,r]
+				a^(2^0) = a ≡ A0 (mod m)
+				a^(2^i) ≡ (a^2^(i-1))² ≡ A²(i-1) ≡ Ai (mod m)
+		[3] 乘积  A0^u0·A1^u1·...·Ar^ur  (mod m)
+	[证明]: a^k = a^(u0·2⁰ + u1·2¹ + u2·2² + ... + ur·2^r)
 *********************************************************************************/
-INT64S PowersModulo(INT64S a, INT64S k, INT64S m) {
+INT64S PowMod(INT64S a, INT64S k, INT64S m) {
 	INT64S ans = 1;
 	for (int i = 0; i < sizeof(k) * 8; i++) {
 		if (k & ((INT64S)1 << i))ans = (ans * a) % m;
@@ -156,13 +170,17 @@ INT64S PowersModulo(INT64S a, INT64S k, INT64S m) {
 		(3) Euler公式: a n 互质 => a ^ φ(n) ≡ 1 (mod n)
 			=> 明 ^ (kφ(n) + 1) = 明 ^ (ab) ≡ 1 (mod n)
 			=> 若 密 = 明^a (mod n), 则 密^b = 明^(ab) = 明 (mod n)
+	[例]:
+		私钥: RSAPrivateKey(p, q, a)
+		加密: PowMod(message, a, n);
+		解密: PowMod(message, b, n);
 *********************************************************************************/
 INT64S RSAPrivateKey(INT64S p, INT64S q, INT64S a) {
 	INT64S
 		n   = p * q,
-		phi = (p - 1) * (q - 1);
-	INT64S b, c;
-	GCDEx(phi, a, b, c);
+		phi = (p - 1) * (q - 1),
+		b, c;
+	GCDex(phi, a, c, b);
 	return b;
 }
 }

@@ -117,3 +117,17 @@ bool	SkewnessKurtosisTest	(Mat<>& x, double SignificanceLevel);		//偏度-峰度
 Mat<int>& Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow, double underFlow);	//直方图
 void BoxPlot(Mat<>& x, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex)	//箱形图
 ```
+
+## <NumberTheory.h> 数论类
+```
+INT64S Factorial(INT64S n);										//阶乘
+INT64S*FibonacciSequence(int N);								//Fibonacci数列
+INT64S C		(INT64S n, INT64S m);							//组合
+INT64S A		(INT64S n, INT64S m);							//排列
+INT64S GCD		(INT64S a, INT64S b);							//最大公约数
+INT64S LCM		(INT64S a, INT64S b);							//最小公倍数
+INT64S GCDex	(INT64S a, INT64S b, INT64S& x, INT64S& y)		//拓展Euclid算法
+bool   isPrime	(INT64S a)										//素数判断
+INT64S PowMod	(INT64S a, INT64S k, INT64S m);					//幂次模
+INT64S RSAPrivateKey(INT64S p, INT64S q, INT64S a);				//RSA密码
+```
