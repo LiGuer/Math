@@ -26,7 +26,7 @@ namespace NumberTheory {
 		n! = Π_(i=0)^n  i
 		0! = 1
 	[算法]:
-		欧拉积分: Γ(s) = ∫_0^+inf  x^(s-1)·e^-x  dx
+		Euler积分: Γ(s) = ∫_0^+inf  x^(s-1)·e^-x  dx
 		在整数点处取值: Γ(n + 1) = n!
 ******************************************************************************/
 inline INT64S Factorial(INT64S n){
@@ -135,42 +135,35 @@ INT64S PowersModulo(INT64S a, INT64S k, INT64S m) {
 	}return ans;
 }
 /*********************************************************************************
-						RSA加密
-*	设. 选取大质数: q, p  则. m = p q , 选取 k 与 m 互质
-*	[加密]: bi = ai^k  (mod m) ,  幂次模问题
-		[算法]: 平方法
-*	[解密]: 解同余式 x^k  ≡ bi (mod m)	计算模m的k次根
-		[核心基础]:
-			[欧拉公式]: 若 a 与 m 互质,
-						则 a^Φ(m) ≡ 1 (mod n)
-						* Φ(x): [1,x)中,与x互质的数个数
-			[线性方程定理]
-		[步骤]: 若 b 与 m 互质, k 与 Φ(m) 互质,
-			[1] 计算Φ(m)
-				* Φ(m) = Φ(p)Φ(q)		* 当 m = p q,且p,q互质
-						= (p - 1)(q - 1)	* x质数,则Φ(x) = x - 1
-			[2] 求满足 k u - Φ(m) v = 1 的 u,v   * 线性方程定理
-				即. k u ≡ 1 (mod Φ(m))	即. u 是 k (mod Φ(m))的逆
-				[算法]: 拓展欧几里得算法
-			[3] x = b^u (mod m)
-		[证明]: 只要证, x = b^u 是 x^k  ≡ bi (mod m)的解
-			x^k = (b^u)^k = b^(1 + Φ(m) v) = b·b^Φ(m)^v
-			欧拉公式,有 b^Φ(m) = 1 (mod m)
-			x^k (mod m) = b (mod m)		得证
-	* k: 公钥		u: 私钥
-*	该算法简单，无显式程序
-		加密: PowersModulo(message, k, m);
-		解密: PowersModulo(message, u, m);
+[RSA 密码]
+	[特征]: 非对称密码. 公钥加密, 私钥解密.
+			大数质因数分解的时间复杂度极高.
+	[步骤]:
+		(1) 选2个大素数 p,q 
+		(2) n = p q
+			φ(n) = (p - 1)(q - 1)
+		(3) 选公钥 a	(大于1, 小于φ(n), 不等于p、q)
+		(4) 计算私钥 b	(a b = 1 mod φ(n))
+			利用拓展Euclid算法
+		(5) 公钥(n, a)		密文 = 明文^a (mod n)
+			私钥(n, b)		明文 = 密文^b (mod n)
+			加/解密, 利用幂次模算法
+	[原理]:
+		(1) Euler函数φ(n): 小于n且与n互质的数的数目
+			若n为素数, 则φ(n) = (n - 1)
+		(2) a b = 1 mod φ(n)  =>  a b + c φ(n) = 1
+			拓展Euclid算法, 可计算 a x + b y 的(x,y)的一组解
+		(3) Euler公式: a n 互质 => a ^ φ(n) ≡ 1 (mod n)
+			=> 明 ^ (kφ(n) + 1) = 明 ^ (ab) ≡ 1 (mod n)
+			=> 若 密 = 明^a (mod n), 则 密^b = 明^(ab) = 明 (mod n)
 *********************************************************************************/
-INT64S RSAdecrypt(INT64S k, INT64S p, INT64S q) {
-	INT64S mPhi = (p - 1)*(q - 1);
-	INT64S u, v;
-	GCDEx(mPhi, k, v, u);
-	printf("u:%lld\n", u);
-	u = 1;
-	while ((k * u) % mPhi != 1)u++;	//u:私钥,模逆元
-	printf("u:%lld\n", u);
-	return u;
+INT64S RSAPrivateKey(INT64S p, INT64S q, INT64S a) {
+	INT64S
+		n   = p * q,
+		phi = (p - 1) * (q - 1);
+	INT64S b, c;
+	GCDEx(phi, a, b, c);
+	return b;
 }
 }
 #endif
