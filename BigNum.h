@@ -27,42 +27,114 @@ public:
 *                    核心数据
 *	Data堆叠顺序: 小低大高
 ******************************************************************************/
-	bool sign = 0;
-	int8u* data;
-	int64 byte = 0;
+	bool	sign = 0;
+	int8u*	data = NULL;
+	int64	byte = 0;
 /******************************************************************************
 *                    基础函数
 -------------------------------------------------------------------------------
 ******************************************************************************/
-	BigNum() { zero(8); }
-	BigNum(int64 _byte) { zero(_byte); }
-	BigNum(const char* input) {
-		zero(8);
-		int8u t;
-		if (input[0] == '-') { sign = 1; input++; }
-		for (int i = 0; input[i]; i++) {
-			t = input[i] - '0';
-			((*this) *= 10) += t;
-		}
-	}
-	~BigNum() { delete data; }
-/******************************************************************************
-*                    基础操作
--------------------------------------------------------------------------------
-******************************************************************************/
-	int8u operator[] (int64 index) { return data[index]; }
-	/*----------------零----------------*/
+	/*----------------构造/析构----------------*/
+	BigNum()					{ zero(8); }
+	BigNum(int64 _byte)			{ zero(_byte); }
+	BigNum(const char* input)	{ zero(8); *this = input; }
+   ~BigNum()					{ delete data; }
+	/*----------------索引----------------*/
+	int8u& operator[] (int64 index) { return data[index]; }
+	int8u& operator() (int64 index) { return data[index]; }
+	/*----------------归零----------------*/
 	BigNum& alloc(int64 _byte){
-		_byte = byte;
-		data = (int8u*)malloc(byte * sizeof(int8u));
+		if(byte != _byte) data = (int8u*)malloc((byte = _byte) * sizeof(int8u)); 
+		return *this;
 	}
 	BigNum& Realloc() {
-		if (byte == 0)return alloc(8);
-		byte *= 2;
-		realloc(data, byte * sizeof(int8u));
+		if (byte == 0) return alloc(8);
+		realloc(data, (byte *= 2) * sizeof(int8u)); return *this;
 	}
-	BigNum& zero() { sign = 0; memset(data, 0, byte * sizeof(int8u)); }
-	BigNum& zero(int64 _byte) { alloc(_byte); zero(); }
+	BigNum& zero()				{ sign = 0; memset(data, 0, byte * sizeof(int8u)); return *this; }
+	BigNum& zero(int64 _byte)	{ alloc(_byte); zero(); return *this; }
+	/*----------------赋值----------------*/
+	BigNum& operator= (BigNum& input) {
+		sign = input.sign;
+		byte = input.byte; alloc(byte);
+		memcpy(data, input.data, sizeof(int8u) * byte);
+		return *this;
+	}
+	BigNum& operator= (int64 input) {
+		alloc(8);
+		memcpy(data, &input, sizeof(char) * 8);
+		return *this;
+	}
+	BigNum& operator= (const char* input) {
+		//符号
+		if (input[0] == '-') { sign = 1; input++; }
+		//进制
+		int8u base = 10;
+		if (input[0] == '0' && input[1] == 'x') { base = 16; input += 2; }
+		if (input[0] == '0' && input[1] == 'b') { base =  2; input += 2; }
+		//数
+		int8u t;
+		switch (base)
+		{
+		case  2: 
+			int64 len = strlen(input);
+			zero((len + 3) / 4);
+			for (int i = 0; i < byte; i++) {
+				t = 0;
+				for (int j = 0; j < 4; j++)
+					t += input[len - 1 - i * 4 - j] - '0';
+				data[i] += t;
+			}
+			break;
+		case 10:
+			zero(8);
+			for (int i = 0; input[i]; i++) {
+				t = input[i] - '0';
+			}
+			break;
+		case 16: 
+			int64 len = strlen(input);
+			zero((len + 1) / 2);
+			for (int i = len - 1; i >= 0; i--) {
+					 if(input[i] >= '0' && input[i] <= '9') t = input[i] - '0';
+				else if(input[i] >= 'A' && input[i] <= 'F') t = input[i] - 'A';
+				else if(input[i] >= 'a' && input[i] <= 'f') t = input[i] - 'a';
+				if (i % 2 == 1)t *= 16;
+				data[(i - len - 1) / 2] += t;
+			}
+			break;
+		}
+		return *this;
+	}
+	/*----------------转字符串----------------*/
+	char* toStr(int8u base = 10) {
+		char* ans;
+		switch (base)
+		{
+		case  2:
+			return ans;
+		case 10:		
+			ans = (char*)malloc(100 * sizeof(char));
+			int64 cur = byte - 1, ansCur = 0;
+			return ans;
+		case 16:
+			ans = (char*)malloc(byte * sizeof(char));
+			int64 cur = byte - 1, ansCur = 0;
+			while (cur >= 0 && *(data + cur) == 0)cur--;	//找到data的最高位
+			unsigned char t = 0;
+			while (cur >= 0) {
+				t = t * 2 + *(data + cur);
+				if (cur % 4 == 0) {							//2转16，是四位合一位
+					ans[ansCur++] = t;						//写16进制结果
+					t = 0;
+				}cur--;
+			}
+			for (int64 i = 0; i < ansCur; i++) 				//16进制转'0-9''A-F'的符号表示
+				ans[i] += ans[i] <= 9 ? '0' : 'A' - 10;
+			ans[ansCur] = '\0';
+			return ans;
+		}
+	}
 	/*----------------加 [add]----------------*/
 	BigNum& add(BigNum& a, BigNum& b) {
 		if (a.sign == 1 && b.sign == 0) { sign = 0; return subU(b, a); }
@@ -78,16 +150,9 @@ public:
 			c = t / 0xFF;
 		}return *this;
 	}
-	BigNum& operator+= (BigNum& a) {
-		int8u c = 0;	//进位标志
-		int t;
-		for (int64 i = 0; i < byte; i++) {
-			t = data[i] + a[i] + c;
-			data[i] = t % 0xFF;
-			c = t / 0xFF;
-		}return *this;
+	BigNum& operator+= (BigNum& a) { add(*this, a); return *this; }
+	BigNum& operator+= (int64& a) { 
 	}
-	BigNum& operator+= (int a) { }
 	/*----------------减 [sub]----------------*/
 	BigNum& sub(BigNum& a, BigNum& b) {
 		if (a.sign == 0 && b.sign == 1) { sign = 0; return addU(a, b); }
@@ -103,16 +168,8 @@ public:
 			c = t > 0 ? 0 : 1;
 		}return *this;
 	}
-	BigNum& operator-= (BigNum& a) {
-		int8u c = 0;		//借位标志
-		int t;
-		for (int64 i = 0; i < byte; i++) {
-			t = data[i] - a[i] - c;
-			data[i] = t > 0 ? t : t + 0xFF;
-			c = t > 0 ? 0 : 1;
-		}return *this;
-	}
-	BigNum& operator-= (int a) { }
+	BigNum& operator-= (BigNum& a) { sub(*this, a); return *this; }
+	BigNum& operator-= (int64 a) { }
 	/*----------------乘 [mul]----------------*/
 	BigNum& mul(BigNum& b) {
 		BigNum t("0"), ans("0");
@@ -125,11 +182,11 @@ public:
 		return *this;
 	}
 	BigNum& operator*= (BigNum& a){ }
-	BigNum& operator*= (int a){ }
+	BigNum& operator*= (int64 a){ }
 	/*----------------除 [div]----------------*/
 	BigNum& div(BigNum& b) { }
 	BigNum& operator/= (BigNum& a){ }
-	BigNum& operator/= (int a) { }
+	BigNum& operator/= (int64 a) { }
 	/*----------------余 [mod]----------------*/
 	BigNum& mod(BigNum& b) { }
 	/*----------------乘方 [pow]----------------*/
@@ -156,32 +213,6 @@ public:
 			data[i] /= 2;
 		}
 	}
-	/*----------------十六进制输出 ----------------*/
-	char* hex() {
-		char* ans = (char*)malloc(byte);		//新建存储十六进制结果的内存块
-		int64 cur = byte - 1, ansCur = 0;
-		while (cur >= 0 && *(data + cur) == 0)cur--;	//找到data的最高位
-		unsigned char t = 0;
-		while (cur >= 0) {
-			t = t * 2 + *(data + cur);
-			if (cur % 4 == 0) {		//二转十六，是四位合一位
-				ans[ansCur++] = t;	//写十六进制结果
-				t = 0;
-			}cur--;
-		}
-		for (int64 i = 0; i < ansCur; i++) {	//十六进制转'0-9''A-F'的符号表示
-			if (ans[i] <= 9)ans[i] += '0';
-			else ans[i] += 'A' - 10;
-		}
-		ans[ansCur] = '\0';	//尾'\0'
-		return ans;
-	}
-	/*----------------十进制输出 ----------------*/
-	char* dec() {
-		char ans[100];
-		int64 cur = byte - 1, ansCur = 0;
-		return ans;
-	}
 };
 /*********************************************************************************
 						大浮点数类
@@ -190,16 +221,19 @@ class BigFloat {
 public:
 	typedef long long		int64;
 	typedef unsigned char	int8u;
-	/******************************************************************************
-	*                    核心数据
-	******************************************************************************/
-	BigNum num, index;
-	BigFloat() { ; }
-	BigFloat(double x) {
+/******************************************************************************
+*                    核心数据
+******************************************************************************/
+BigNum num, index;
+/******************************************************************************
+*                    核心操作
+******************************************************************************/
+BigFloat() { ; }
+BigFloat(double x) {
 
-	}
-	BigFloat(const char* x) {
+}
+BigFloat(const char* x) {
 
-	}
+}
 };
 #endif

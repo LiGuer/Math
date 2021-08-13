@@ -127,7 +127,7 @@ INT64S A		(INT64S n, INT64S m);							//排列
 INT64S GCD		(INT64S a, INT64S b);							//最大公约数
 INT64S LCM		(INT64S a, INT64S b);							//最小公倍数
 INT64S GCDex	(INT64S a, INT64S b, INT64S& x, INT64S& y)		//拓展Euclid算法
-bool   isPrime	(INT64S a)										//素数判断
+bool   isPrime	(INT64S a);										//素数判断
 INT64S PowMod	(INT64S a, INT64S k, INT64S m);					//幂次模
 INT64S RSAPrivateKey(INT64S p, INT64S q, INT64S a);				//RSA密码
 ```

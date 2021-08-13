@@ -28,7 +28,7 @@ INT64S A		(INT64S n, INT64S m);							//排列
 INT64S GCD		(INT64S a, INT64S b);							//最大公约数
 INT64S LCM		(INT64S a, INT64S b);							//最小公倍数
 INT64S GCDex	(INT64S a, INT64S b, INT64S& x, INT64S& y)		//拓展Euclid算法
-bool   isPrime	(INT64S a)										//素数判断
+bool   isPrime	(INT64S a);										//素数判断
 INT64S PowMod	(INT64S a, INT64S k, INT64S m);					//幂次模
 INT64S RSAPrivateKey(INT64S p, INT64S q, INT64S a);				//RSA密码
 ################################################################################################*/
@@ -156,14 +156,14 @@ INT64S PowMod(INT64S a, INT64S k, INT64S m) {
 		(1) 选2个大素数 p,q 
 		(2) n = p q
 			φ(n) = (p - 1)(q - 1)
-		(3) 选公钥 a	(大于1, 小于φ(n), 不等于p、q)
+		(3) 选公钥 a	(>1, 小于且互质于φ(n), ≠p、q)
 		(4) 计算私钥 b	(a b = 1 mod φ(n))
 			利用拓展Euclid算法
 		(5) 公钥(n, a)		密文 = 明文^a (mod n)
 			私钥(n, b)		明文 = 密文^b (mod n)
 			加/解密, 利用幂次模算法
 	[原理]:
-		(1) Euler函数φ(n): 小于n且与n互质的数的数目
+		(1) Euler函数φ(n): 小于且互质于n的数的数目
 			若n为素数, 则φ(n) = (n - 1)
 		(2) a b = 1 mod φ(n)  =>  a b + c φ(n) = 1
 			拓展Euclid算法, 可计算 a x + b y 的(x,y)的一组解
@@ -176,10 +176,7 @@ INT64S PowMod(INT64S a, INT64S k, INT64S m) {
 		解密: PowMod(message, b, n);
 *********************************************************************************/
 INT64S RSAPrivateKey(INT64S p, INT64S q, INT64S a) {
-	INT64S
-		n   = p * q,
-		phi = (p - 1) * (q - 1),
-		b, c;
+	INT64S phi = (p - 1) * (q - 1), b, c;
 	GCDex(phi, a, c, b);
 	return b;
 }
