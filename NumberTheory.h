@@ -17,6 +17,7 @@ limitations under the License.
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "BigNum.h"
 typedef unsigned long long INT64U;
 typedef long long INT64S;
 /*################################################################################################

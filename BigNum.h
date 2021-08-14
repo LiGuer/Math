@@ -17,14 +17,20 @@ limitations under the License.
 #include <string.h>
 #include <math.h>
 #include <algorithm>
-/*********************************************************************************
-						大数类
-*********************************************************************************/
+/*################################################################################################
+[大数类 Big Number]
+	[核心数据]
+bool	sign = 1;
+int8u*	data = NULL;
+int64	byte = 0;
+	[基础函数]
+################################################################################################*/
 class BigNum
 {
 public:
 	typedef long long int64;
 	typedef unsigned char int8u;
+#define BIGNUM_AUTOREALLOC 0
 /******************************************************************************
 *                    核心数据
 *	特征: 堆叠顺序小低大高, 补码
@@ -49,16 +55,15 @@ public:
 		if(byte != _byte) data = (int8u*)malloc((byte = _byte) * sizeof(int8u)); 
 		return *this;
 	}
-	BigNum& Realloc() {
-		if (byte == 0) return alloc(8);
-		realloc(data, (byte *= 2) * sizeof(int8u)); return *this;
+	BigNum& Realloc(int64 _byte) {
+		realloc(data, (byte = _byte) * sizeof(int8u)); return *this;
 	}
 	BigNum& zero()				{ memset(data, 0, byte * sizeof(int8u)); return *this; }
 	BigNum& zero(int64 _byte)	{ alloc(_byte); zero(); return *this; }
 	/*----------------赋值----------------*/
 	BigNum& operator= (BigNum& input) {
 		sign = input.sign;
-		byte = input.byte; alloc(byte);
+		alloc(input.byte);
 		memcpy(data, input.data, sizeof(int8u) * byte);
 		return *this;
 	}
@@ -81,7 +86,7 @@ public:
 		switch (base)
 		{
 		case  2: 
-			zero((len + 3) / 4);
+			zero(std::max(byte, (len + 3) / 4));
 			for (int i = 0; i < byte; i++) {
 				t = 0;
 				for (int j = 0; j < 4 && len - 1 - i * 4 - j >= 0; j++)
@@ -91,24 +96,24 @@ public:
 			break;
 		case 10:
 			int64 t;
-			zero(len * log(10) / log(256) + 1);
+			zero(std::max(byte, (int64)(len * log(10) / log(256)) + 1));
 			for (int i = 0; input[i]; i++) {
 				t = input[i] - '0';
 				(*this *= 10) += t;
 			}
 			break;
 		case 16: 
-			zero((len + 1) / 2);
+			zero(std::max(byte, (len + 1) / 2));
 			for (int i = len - 1; i >= 0; i--) {
 					 if(input[i] >= '0' && input[i] <= '9') t = input[i] - '0';
 				else if(input[i] >= 'A' && input[i] <= 'F') t = input[i] - 'A';
 				else if(input[i] >= 'a' && input[i] <= 'f') t = input[i] - 'a';
-				if ((len - 1 - i) % 2 == 1) t *= 16;
+				if  ((len - 1 - i) % 2 == 1) t *= 16;
 				data[(len - 1 - i) / 2] += t;
 			}
 			break;
 		}
-		if (negative) data[byte - 1] |= 0x80; complement();
+		if (negative) data[byte - 1] |= 0x80; comple();
 		return *this;
 	}
 	/*----------------转字符串----------------*/
@@ -119,7 +124,7 @@ public:
 		return num + 1;
 	}
 	char* toStr(int8u base = 10) {
-		icomplement();
+		icomple();
 		char* str = NULL;
 		int64 num = usefulByte();
 		switch (base)
@@ -128,7 +133,7 @@ public:
 			str = (char*)calloc((8 * num + 1), sizeof(char));
 			for (int i = 0; i < num; i++)
 				for (int j = 0; j < 8; j++)
-					str[2 * i + j] = ((data[num - 1 - i] >> (7 - j)) & 1) + '0';
+					str[8 * i + j] = ((data[num - 1 - i] >> (7 - j)) & 1) + '0';
 			break;
 		case 10:		
 			str = (char*)calloc((num * log(256) / log(10) + 1), sizeof(char));
@@ -143,10 +148,10 @@ public:
 			}
 			break;
 		}
-		complement(); return str;
+		comple(); return str;
 	}
 	/*----------------补码----------------*/
-	BigNum& complement() {
+	BigNum& comple() {
 		if (sign && data[byte - 1] & 0x80) {
 			for (int i = 0; i < byte; i++) data[i] = ~data[i];
 			data[byte - 1] ^= 0x80;
@@ -156,7 +161,7 @@ public:
 			}
 		} return *this;
 	}
-	BigNum& icomplement() {
+	BigNum& icomple() {
 		if (sign && data[byte - 1] & 0x80) {
 			for (int i = 0; i < byte; i++) {
 				if (data[i] == 0) data[i] = 0xFF;
@@ -166,15 +171,46 @@ public:
 			data[byte - 1] ^= 0x80;
 		} return *this;
 	}
+	/*----------------与或非 [ & | ~ ]----------------*/
+	BigNum& operator&= (BigNum& a) {
+
+	}
+	BigNum& operator|= (BigNum& a) {
+
+	}
+	BigNum& operator~ () {
+		for (int i = 0; i < byte; i++) data[i] = ~data[i];
+	}
+	/*----------------左移右移 [ << >> ]----------------*/
+	BigNum& operator<<= (int n){
+		int8u c1 = 0, c2 = 0;
+		for (int64 i = 0; i < byte; i++) {
+			c2 = (data[i] >> 8 - n);
+			data[i] <<= n;
+			data[i] += c1;
+			c1 = c2;
+		} 
+		return *this;
+	}
+	BigNum& operator>>= (int n) {
+		int8u c1 = 0, c2 = 0;
+		for (int64 i = byte - 1; i >= 0; i--) {
+			c2 = (data[i] << 8 - n);
+			data[i] >>= n;
+			data[i] += c1;
+			c1 = c2;
+		}
+		return *this;
+	}
 	/*----------------加减乘除 [ + - * / ]----------------*/
 	BigNum& add(BigNum& a, BigNum& b) {
-		alloc(std::max(a.byte, b.byte));
-		bool c = 0; int t;	//c: 进位
-		for (int64 i = 0; i < byte; i++) {
-			t = a[i] + b[i] + (c ? 1 : 0);
+		int8u c = 0; int t;	//c: 进位
+		for (int64 i = 0; i < a.byte; i++) {
+			t = a[i] + b[i] + c;
 			data[i] = t % 0x100;
 			c = t > 0xFF ? 1 : 0;
-		}return *this;
+		}
+		return *this;
 	}
 	BigNum& operator+= (BigNum& a) { return add(*this, a); }
 	BigNum& operator+= (int64 & a) { return *this; }
@@ -182,14 +218,13 @@ public:
 	BigNum& operator-= (BigNum& a) { return sub(*this, a); }
 	BigNum& operator-= (int64 a) { return *this; }
 	BigNum& mul(BigNum& a, BigNum& b) {
-		BigNum t, ans("0");
-		t = b;
-		for (int64 i = 0; i < byte; i++) {
-			if (i != 0) t.leftShift();
-			if (data[i] == 1) ans += t;
-		}
-		memcpy(data, ans.data, sizeof(ans.data));
-		return *this;
+		BigNum t, ans(byte); t = b;
+		for (int64 i = 0; i < byte; i++) 
+			for (int j = 0; j < 8; j++) {
+				if (a.data[i] & (1 << j)) ans += t; 
+				t <<= 1;
+			}
+		return *this = ans;
 	}
 	BigNum& operator*= (BigNum& a) { return mul(*this, a); }
 	BigNum& operator*= (int64 a){ return *this; }
@@ -207,19 +242,6 @@ public:
 		BigNum t("0"); t = *this;
 		while (--n)  *this *= t;
 		return *this;
-	}
-	/*----------------左移右移 [ << >> ]----------------*/
-	void leftShift() {
-		for (int64 i = 0; i < byte; i++) {
-			if (i != byte - 1)data[i + 1] = data[i] / 0x80;
-			data[i] = (data[i] % 0x80) * 2;
-		}
-	}
-	void rightShift() {
-		for (int64 i = 0; i < byte; i++) {
-			if (i != 0)data[i - 1] += 0x80 * (data[i] % 2);
-			data[i] /= 2;
-		}
 	}
 };
 /*********************************************************************************
