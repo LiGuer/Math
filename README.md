@@ -13,8 +13,6 @@ LiGu's Basic Algorithm Library.
 * <list.h>						链表类  
 * <rb_tree.h>					红黑树  
 * <Tensor.h>					张量类  
-*  Other
-* <PartialDifferentialEquation.h>	偏微分方程类  
 
 ## <Mat.h> 矩阵类  
 ```
