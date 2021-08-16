@@ -1,5 +1,5 @@
 /*
-Copyright 2020,2021 LiGuer. All Rights Reserved.
+Copyright 2020-2021 LiGuer. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -155,24 +155,24 @@ public:
 		if (sign && data[byte - 1] & 0x80) {
 			for (int i = 0; i < byte; i++) data[i] = ~data[i];
 			data[byte - 1] ^= 0x80;
-			for (int i = 0; i < byte; i++) {
-				if (data[i] == 0xFF) data[i] = 0;
-				else { data[i] += 1; break; }
-			}
+			(*this)++;
 		} return *this;
 	}
 	BigNum& icomple() {
 		if (sign && data[byte - 1] & 0x80) {
-			for (int i = 0; i < byte; i++) {
-				if (data[i] == 0) data[i] = 0xFF;
-				else { data[i] -= 1; break; }
-			}
+			(*this)--;
 			for (int i = 0; i < byte; i++) data[i] = ~data[i];
 			data[byte - 1] ^= 0x80;
 		} return *this;
 	}
-	/*----------------与或非 [ & | ~ ]----------------*/
+	/*----------------与或非 异或 [ & | ~ ^ ]----------------*/
+	BigNum& operator& (BigNum& a) {
+
+	}
 	BigNum& operator&= (BigNum& a) {
+
+	}
+	BigNum& operator| (BigNum& a) {
 
 	}
 	BigNum& operator|= (BigNum& a) {
@@ -180,6 +180,12 @@ public:
 	}
 	BigNum& operator~ () {
 		for (int i = 0; i < byte; i++) data[i] = ~data[i];
+	}
+	BigNum& operator^ (BigNum& a) {
+
+	}
+	BigNum& operator^= (BigNum& a) {
+
 	}
 	/*----------------左移右移 [ << >> ]----------------*/
 	BigNum& operator<<= (int n){
@@ -202,7 +208,25 @@ public:
 		}
 		return *this;
 	}
-	/*----------------加减乘除 [ + - * / ]----------------*/
+	/*----------------负 [ - ]----------------*/
+	BigNum& negative () {
+		if(!sign) return *this;
+		if (data[byte - 1] & 0x80) { icomple(); data[byte - 1] ^= 0x80; }
+		else { data[byte - 1] |= 0x80;  comple(); }
+		return *this;
+	}
+	/*----------------加减乘除余 [ + - * / % ]----------------*/
+	// +
+	BigNum operator+ (BigNum& a) {
+		BigNum tmp(byte);
+		int8u c = 0; int t;	//c: 进位
+		for (int64 i = 0; i < byte; i++) {
+			t = data[i] + a[i] + c;
+			tmp[i] = t % 0x100;
+			c = t > 0xFF ? 1 : 0;
+		}
+		return tmp;
+	}
 	BigNum& add(BigNum& a, BigNum& b) {
 		int8u c = 0; int t;	//c: 进位
 		for (int64 i = 0; i < a.byte; i++) {
@@ -214,9 +238,50 @@ public:
 	}
 	BigNum& operator+= (BigNum& a) { return add(*this, a); }
 	BigNum& operator+= (int64 & a) { return *this; }
-	BigNum& sub(BigNum& a, BigNum& b) { return *this; }
+	BigNum& operator++ () { 
+		for (int i = 0; i < byte; i++) {
+			if (data[i] == 0xFF) data[i] = 0;
+			else { data[i] += 1; break; }
+		} return *this;
+	}
+	// -
+	BigNum  operator-  (BigNum& a) {
+		BigNum tmp(byte);
+		int8u c = 0; int t;		//借位
+		for (int64 i = 0; i < byte; i++) {
+			t = data[i] - a[i] - c;
+			tmp[i] = t > 0 ? t : t + 0x100;
+			c = t >= 0 ? 0 : 1;
+		}
+		return tmp;
+	}
+	BigNum& sub(BigNum& a, BigNum& b) { 
+		zero();
+		int8u c = 0; int t;		//借位
+		for (int64 i = 0; i < byte; i++) {
+			t = a[i] - b[i] - c; 
+			data[i] = t > 0 ? t : t + 0x100;
+			c = t >= 0 ? 0 : 1;
+		}return *this;
+	}
 	BigNum& operator-= (BigNum& a) { return sub(*this, a); }
 	BigNum& operator-= (int64 a) { return *this; }
+	BigNum& operator-- () {
+		for (int i = 0; i < byte; i++) {
+			if (data[i] == 0) data[i] = 0xFF;
+			else { data[i] -= 1; break; }
+		} return *this;
+	}
+	// *
+	BigNum  operator*  (BigNum& a) {
+		BigNum t, ans(byte); t = a;
+		for (int64 i = 0; i < byte; i++)
+			for (int j = 0; j < 8; j++) {
+				if (data[i] & (1 << j)) ans += t;
+				t <<= 1;
+			}
+		return ans;
+	}
 	BigNum& mul(BigNum& a, BigNum& b) {
 		BigNum t, ans(byte); t = b;
 		for (int64 i = 0; i < byte; i++) 
@@ -227,26 +292,33 @@ public:
 		return *this = ans;
 	}
 	BigNum& operator*= (BigNum& a) { return mul(*this, a); }
-	BigNum& operator*= (int64 a){ return *this; }
+	BigNum& operator*= (int64   a) { return *this; }
+	// /
 	BigNum& div(BigNum& a, BigNum& b) { return *this; }
-	BigNum& operator/= (BigNum& a){ return div(*this, a); }
-	BigNum& operator/= (int64 a) { return *this; }
-	/*----------------余 [mod]----------------*/
-	BigNum& mod(BigNum& b) { }
+	BigNum& operator/= (BigNum& a) { return div(*this, a); }
+	BigNum& operator/= (int64   a) { return *this; }
+	// %
+	BigNum& mod(BigNum& a) { }
+	BigNum& operator%= (BigNum& a) { return mod(a); }
+	BigNum& operator%= (int64   a) { return *this; }
 	/*----------------乘方 [pow]----------------*/
+	BigNum& pow(BigNum& a) {
+
+	}
 	BigNum& pow(int64 n) {
 		if (n == 0) {
-			memset(data, 0, sizeof(bool) * byte);
-			*data = 1; return *this;
+			zero(); data[0] = 1; return *this;
 		}
-		BigNum t("0"); t = *this;
-		while (--n)  *this *= t;
+		BigNum t; t = *this;
+		while (--n) *this *= t;
 		return *this;
 	}
 };
-/*********************************************************************************
-						大浮点数类
-*********************************************************************************/
+
+/*################################################################################################
+[大浮点数类 Big Float]
+
+################################################################################################*/
 class BigFloat {
 public:
 	typedef long long		int64;
