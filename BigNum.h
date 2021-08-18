@@ -123,6 +123,11 @@ public:
 		while (num > 0 && data[num] == 0)   num--;	//找到data的最高位
 		return num + 1;
 	}
+	int usefulBit() {
+		int num1 = usefulByte(), num2 = 7;
+		while (num2 > 0 && !((data[num1 - 1] >> num2) & 1))  num2--;
+		return (num1 - 1) * 8 + num2 + 1;
+	}
 	char* toStr(int8u base = 10) {
 		icomple();
 		char* str = NULL;
@@ -155,59 +160,89 @@ public:
 		if (sign && data[byte - 1] & 0x80) {
 			for (int i = 0; i < byte; i++) data[i] = ~data[i];
 			data[byte - 1] ^= 0x80;
-			(*this)++;
+			for (int i = 0; i < byte; i++) {
+				if (data[i] == 0xFF) data[i] = 0;
+				else { data[i] += 1; break; }
+			}
 		} return *this;
 	}
 	BigNum& icomple() {
 		if (sign && data[byte - 1] & 0x80) {
-			(*this)--;
+			for (int i = 0; i < byte; i++) {
+				if (data[i] == 0) data[i] = 0xFF;
+				else { data[i] -= 1; break; }
+			}
 			for (int i = 0; i < byte; i++) data[i] = ~data[i];
 			data[byte - 1] ^= 0x80;
 		} return *this;
 	}
 	/*----------------与或非 异或 [ & | ~ ^ ]----------------*/
-	BigNum& operator& (BigNum& a) {
+	BigNum operator& (BigNum& a) {
 
 	}
 	BigNum& operator&= (BigNum& a) {
-
+		for (int i = 0; i < byte; i++) data[i] &= a.data[i];
+		return *this;
 	}
-	BigNum& operator| (BigNum& a) {
+	BigNum operator| (BigNum& a) {
 
 	}
 	BigNum& operator|= (BigNum& a) {
-
+		for (int i = 0; i < byte; i++) data[i] |= a.data[i];
+		return *this;
 	}
 	BigNum& operator~ () {
 		for (int i = 0; i < byte; i++) data[i] = ~data[i];
+		return *this;
 	}
 	BigNum& operator^ (BigNum& a) {
 
 	}
 	BigNum& operator^= (BigNum& a) {
-
+		for (int i = 0; i < byte; i++) data[i] ^= a.data[i];
+		return *this;
 	}
 	/*----------------左移右移 [ << >> ]----------------*/
 	BigNum& operator<<= (int n){
-		int8u c1 = 0, c2 = 0;
+		int8u c1 = 0, c2 = 0, n1 = n / 8, n2 = n % 8;
 		for (int64 i = 0; i < byte; i++) {
-			c2 = (data[i] >> 8 - n);
-			data[i] <<= n;
+			c2 = (data[i] >> 8 - n2);
+			data[i] <<= n2;
 			data[i] += c1;
 			c1 = c2;
 		} 
+		for (int64 i = byte - 1; i >= 0; i--) 
+			data[i] = i >= n1 ? data[i - n1] : 0;
 		return *this;
 	}
 	BigNum& operator>>= (int n) {
-		int8u c1 = 0, c2 = 0;
+		int8u c1 = 0, c2 = 0, n1 = n / 8, n2 = n % 8;;
 		for (int64 i = byte - 1; i >= 0; i--) {
-			c2 = (data[i] << 8 - n);
-			data[i] >>= n;
+			c2 = (data[i] << 8 - n2);
+			data[i] >>= n2;
 			data[i] += c1;
 			c1 = c2;
 		}
+		for (int64 i = 0; i < byte; i++)
+			data[i] = i + n1 < byte ? data[i + n1] : 0;
 		return *this;
 	}
+	/*----------------比较 [ > < = ]----------------*/
+	char cmp(BigNum& a) {
+		int t1 = usefulByte(), t2 = a.usefulByte();
+		if (t1 > t2) return  1;
+		if (t1 < t2) return -1;
+		char t;
+		for (int i = t1 - 1; i >= 0; i--) {
+			t = memcmp(data + i, a.data + i, 1);
+			if (t != 0) return t;
+		} return 0;
+	}
+	bool operator>  (BigNum& a) { return cmp(a) >  0 ? true : false; }
+	bool operator>= (BigNum& a) { return cmp(a) >= 0 ? true : false; }
+	bool operator<  (BigNum& a) { return cmp(a) <  0 ? true : false; }
+	bool operator<= (BigNum& a) { return cmp(a) <= 0 ? true : false; }
+	bool operator== (BigNum& a) { return cmp(a) == 0 ? true : false; }
 	/*----------------负 [ - ]----------------*/
 	BigNum& negative () {
 		if(!sign) return *this;
@@ -215,7 +250,7 @@ public:
 		else { data[byte - 1] |= 0x80;  comple(); }
 		return *this;
 	}
-	/*----------------加减乘除余 [ + - * / % ]----------------*/
+	/*----------------加减乘除余幂 [ + - * / % pow ]----------------*/
 	// +
 	BigNum operator+ (BigNum& a) {
 		BigNum tmp(byte);
@@ -256,7 +291,6 @@ public:
 		return tmp;
 	}
 	BigNum& sub(BigNum& a, BigNum& b) { 
-		zero();
 		int8u c = 0; int t;		//借位
 		for (int64 i = 0; i < byte; i++) {
 			t = a[i] - b[i] - c; 
@@ -294,14 +328,38 @@ public:
 	BigNum& operator*= (BigNum& a) { return mul(*this, a); }
 	BigNum& operator*= (int64   a) { return *this; }
 	// /
+	BigNum operator/ (BigNum& a) {
+		int n1 = usefulBit(), n2 = a.usefulBit();
+		BigNum t1, t2, ans(byte); t1 = *this, t2 = a; 
+		t2 <<= n1 - n2; 
+		for (int i = n1 - 1; i >= n2 - 1; i--) {
+			if (t1 >= t2) {
+				int i_ = i - n2 + 1;
+				ans[i_ / 8] |= (1 << (i_ % 8));
+				t1 -= t2;
+			}
+			t2 >>= 1;
+		}
+		return ans;
+	}
 	BigNum& div(BigNum& a, BigNum& b) { return *this; }
 	BigNum& operator/= (BigNum& a) { return div(*this, a); }
 	BigNum& operator/= (int64   a) { return *this; }
 	// %
+	BigNum operator% (BigNum& a) { 
+		int n1 = usefulBit(), n2 = a.usefulBit();
+		BigNum t1, t2; t1 = *this, t2 = a;
+		t2 <<= n1 - n2;
+		for (int i = n1 - 1; i >= n2 - 1; i--) {
+			if (t1 >= t2) t1 -= t2;
+			t2 >>= 1;
+		}
+		return t1;
+	}
 	BigNum& mod(BigNum& a) { }
 	BigNum& operator%= (BigNum& a) { return mod(a); }
 	BigNum& operator%= (int64   a) { return *this; }
-	/*----------------乘方 [pow]----------------*/
+	//幂
 	BigNum& pow(BigNum& a) {
 
 	}
