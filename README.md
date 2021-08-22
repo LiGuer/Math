@@ -99,6 +99,76 @@ Mat& function	(T (*f)(T))
 (2) 位运算：与或非 异或 左移右移 补码  
 (3) 比较运算：> < = >= <=  
 (4) 数值计算：加减乘除余幂负  
+```
+/**************** 核心数据 ****************/
+bool	sign = 1;
+int8u*	data = NULL;			//堆叠顺序小低大高, 补码形式
+int64	byte = 0;
+/**************** 基础函数 ****************/  
+// 基础函数
+BigNum				()						//构造,析构
+BigNum				(int64 _byte, bool _sign = 1)
+BigNum				(const char* input)
+~BigNum				()
+BigNum& alloc		(int64 _byte)			//分配内存
+BigNum& Realloc		(int64 _byte)
+BigNum& zero		() 						//归零
+BigNum& zero		(int64 _byte)
+// 索引,赋值,输出
+int8u&	operator[]	(int64 index) 			//索引
+int8u&	operator()	(int64 index)
+BigNum& operator=	(BigNum& input)  		//赋值
+BigNum& operator=	(int64 input)
+BigNum& operator=	(const char* input)
+int usefulByte		()
+int usefulBit		()
+char* toStr			(int8u base = 10)		//输出字符串
+// 位运算: 补与或非异或左移右移 [ & | ~ ^ << >> ]
+BigNum&	comple		()  					//补码
+BigNum&	icomple		()
+BigNum	operator&	(BigNum& a)  			//与 &
+BigNum&	operator&=	(BigNum& a)
+BigNum	operator|	(BigNum& a) 			//或 |
+BigNum& operator|=	(BigNum& a)
+BigNum& operator~	() 						//非 ~
+BigNum& operator^	(BigNum& a) 			//异或 ^
+BigNum& operator^=	(BigNum& a)
+BigNum& operator<<=	(int n)  				//左移右移 << >> 
+BigNum& operator>>=	(int n)
+// 比较运算: 大小等 [ > < = ]
+char cmp(BigNum& a) 						
+bool operator> 		(BigNum& a)
+bool operator>=		(BigNum& a)
+bool operator< 		(BigNum& a)
+bool operator<=		(BigNum& a)
+bool operator==		(BigNum& a)
+// 数值运算: 负加减乘除余幂 [ + - * / % pow ]
+BigNum	operator-	() 						//负 -
+BigNum	operator+	(BigNum& a)  			//加 +
+BigNum& add			(BigNum& a, BigNum& b)
+BigNum& operator+=	(BigNum& a)
+BigNum& operator+=	(int64 & a)
+BigNum& operator++	()
+BigNum  operator- 	(BigNum& a)				//减 -
+BigNum& sub			(BigNum& a, BigNum& b)
+BigNum& operator-=	(BigNum& a)
+BigNum& operator-=	(int64 a)
+BigNum& operator--	()
+BigNum  operator* 	(BigNum& a) 			//乘 *
+BigNum& mul			(BigNum& a, BigNum& b)
+BigNum& operator*=	(BigNum& a)
+BigNum& operator*=	(int64   a)
+BigNum	operator/	(BigNum& a) 			//除 /
+BigNum& div			(BigNum& a, BigNum& b)
+BigNum& operator/=	(BigNum& a)
+BigNum& operator/=	(int64   a)
+BigNum	operator%	(BigNum& a) 			//余 %
+BigNum& mod			(BigNum& a)
+BigNum& operator%=	(BigNum& a)
+BigNum& operator%=	(int64   a)
+BigNum& pow			(BigNum& a) 			// 幂 pow
+BigNum& pow			(int64 n)
+```
 
 
 ## <Statistics.h> 统计学类

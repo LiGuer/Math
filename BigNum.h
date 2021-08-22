@@ -33,7 +33,7 @@ public:
 #define BIGNUM_AUTOREALLOC 0
 /******************************************************************************
 *                    核心数据
-*	特征: 堆叠顺序小低大高, 补码
+*	特征: 堆叠顺序小低大高, 补码形式
 ******************************************************************************/
 	bool	sign = 1;
 	int8u*	data = NULL;
@@ -41,6 +41,69 @@ public:
 /******************************************************************************
 *                    基础函数
 -------------------------------------------------------------------------------
+// 基础函数
+BigNum				()						//构造,析构
+BigNum				(int64 _byte, bool _sign = 1)
+BigNum				(const char* input)
+~BigNum				()
+BigNum& alloc		(int64 _byte)			//分配内存
+BigNum& Realloc		(int64 _byte)
+BigNum& zero		() 						//归零
+BigNum& zero		(int64 _byte)
+// 索引,赋值,输出
+int8u&	operator[]	(int64 index) 			//索引
+int8u&	operator()	(int64 index)
+BigNum& operator=	(BigNum& input)  		//赋值
+BigNum& operator=	(int64 input)
+BigNum& operator=	(const char* input)
+int usefulByte		()
+int usefulBit		()
+char* toStr			(int8u base = 10)		//输出字符串
+// 位运算: 补与或非异或左移右移 [ & | ~ ^ << >> ]
+BigNum&	comple		()  					//补码
+BigNum&	icomple		()
+BigNum	operator&	(BigNum& a)  			//与 &
+BigNum&	operator&=	(BigNum& a)
+BigNum	operator|	(BigNum& a) 			//或 |
+BigNum& operator|=	(BigNum& a)
+BigNum& operator~	() 						//非 ~
+BigNum& operator^	(BigNum& a) 			//异或 ^
+BigNum& operator^=	(BigNum& a)
+BigNum& operator<<=	(int n)  				//左移右移 << >> 
+BigNum& operator>>=	(int n)
+// 比较运算: 大小等 [ > < = ]
+char cmp(BigNum& a) 						
+bool operator> 		(BigNum& a)
+bool operator>=		(BigNum& a)
+bool operator< 		(BigNum& a)
+bool operator<=		(BigNum& a)
+bool operator==		(BigNum& a)
+// 数值运算: 负加减乘除余幂 [ + - * / % pow ]
+BigNum	operator-	() 						//负 -
+BigNum	operator+	(BigNum& a)  			//加 +
+BigNum& add			(BigNum& a, BigNum& b)
+BigNum& operator+=	(BigNum& a)
+BigNum& operator+=	(int64 & a)
+BigNum& operator++	()
+BigNum  operator- 	(BigNum& a)				//减 -
+BigNum& sub			(BigNum& a, BigNum& b)
+BigNum& operator-=	(BigNum& a)
+BigNum& operator-=	(int64 a)
+BigNum& operator--	()
+BigNum  operator* 	(BigNum& a) 			//乘 *
+BigNum& mul			(BigNum& a, BigNum& b)
+BigNum& operator*=	(BigNum& a)
+BigNum& operator*=	(int64   a)
+BigNum	operator/	(BigNum& a) 			//除 /
+BigNum& div			(BigNum& a, BigNum& b)
+BigNum& operator/=	(BigNum& a)
+BigNum& operator/=	(int64   a)
+BigNum	operator%	(BigNum& a) 			//余 %
+BigNum& mod			(BigNum& a)
+BigNum& operator%=	(BigNum& a)
+BigNum& operator%=	(int64   a)
+BigNum& pow			(BigNum& a) 			// 幂 pow
+BigNum& pow			(int64 n)
 ******************************************************************************/
 	/*----------------构造/析构----------------*/
 	BigNum()							{ zero(8); }
@@ -132,19 +195,25 @@ public:
 		icomple();
 		char* str = NULL;
 		int64 num = usefulByte();
+		bool negative = 0; 
+		if (sign && data[byte - 1] & 0x80) negative = 1;
+
 		switch (base)
 		{
 		case  2:
-			str = (char*)calloc((8 * num + 1), sizeof(char));
+			str = (char*)calloc((8 * num + 1 + negative ? 1 : 0), sizeof(char));
+			if (negative) { str[0] = '-'; str++; }
 			for (int i = 0; i < num; i++)
 				for (int j = 0; j < 8; j++)
 					str[8 * i + j] = ((data[num - 1 - i] >> (7 - j)) & 1) + '0';
 			break;
 		case 10:		
-			str = (char*)calloc((num * log(256) / log(10) + 1), sizeof(char));
+			str = (char*)calloc((num * log(256) / log(10) + 1 + negative ? 1 : 0), sizeof(char));
+			if (negative) { str[0] = '-'; str++; }
 			break;
 		case 16:
-			str = (char*)calloc((2 * num + 1), sizeof(char));
+			str = (char*)calloc((2 * num + 1 + negative ? 1 : 0), sizeof(char));
+			if (negative) { str[0] = '-'; str++; }
 			for (int i = 0; i < num; i++) {
 				str[2 * i]      = data[num - 1 - i] / 0x10;	
 				str[2 * i + 1]  = data[num - 1 - i] % 0x10;
@@ -153,7 +222,7 @@ public:
 			}
 			break;
 		}
-		comple(); return str;
+		comple(); if (negative) str--; return str;
 	}
 	/*----------------补码----------------*/
 	BigNum& comple() {
@@ -244,11 +313,13 @@ public:
 	bool operator<= (BigNum& a) { return cmp(a) <= 0 ? true : false; }
 	bool operator== (BigNum& a) { return cmp(a) == 0 ? true : false; }
 	/*----------------负 [ - ]----------------*/
-	BigNum& negative () {
-		if(!sign) return *this;
-		if (data[byte - 1] & 0x80) { icomple(); data[byte - 1] ^= 0x80; }
-		else { data[byte - 1] |= 0x80;  comple(); }
-		return *this;
+	BigNum operator- () {
+		BigNum ans; ans = *this;
+		if (sign) {
+			if (ans.data[byte - 1] & 0x80) { ans.icomple(); ans.data[byte - 1] ^= 0x80; }
+			else { ans.data[byte - 1] |= 0x80;  ans.comple(); }
+		}
+		return ans;
 	}
 	/*----------------加减乘除余幂 [ + - * / % pow ]----------------*/
 	// +
@@ -359,7 +430,7 @@ public:
 	BigNum& mod(BigNum& a) { }
 	BigNum& operator%= (BigNum& a) { return mod(a); }
 	BigNum& operator%= (int64   a) { return *this; }
-	//幂
+	// 幂
 	BigNum& pow(BigNum& a) {
 
 	}
