@@ -466,6 +466,9 @@ Mat& function	(T (*f)(T))
 		}
 		error(); return ans;
 	}
+	T mean() {
+		return sum() / size();
+	}
 	/*----------------求积 [ product Π ]----------------*/
 	T product() {
 		T ans = data[0];

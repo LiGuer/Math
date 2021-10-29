@@ -73,47 +73,78 @@ Mat<>& Var	(Mat<>& x, Mat<>& ans, int index) {
 	return ans *= 1.0 / (x.cols - 1);
 }
 /***************************************************************************
+[四分位数]: Quartile
+/***************************************************************************/
+void Quartile(Mat<>& x, double* meddle = NULL, double* Q1 = NULL, double* Q3 = NULL) {
+	Mat<> xt(x);
+	std::sort(xt.data, xt.data + xt.size());
+	if (meddle != NULL) *meddle = (xt(1.0 / 2 * xt.size()) + xt((int)(1.0 / 2 * xt.size() + 0.5))) / 2;
+	if (meddle != NULL) *Q1		= (xt(1.0 / 4 * xt.size()) + xt((int)(1.0 / 4 * xt.size() + 0.5))) / 2;
+	if (meddle != NULL) *Q3		= (xt(3.0 / 4 * xt.size()) + xt((int)(3.0 / 4 * xt.size() + 0.5))) / 2;
+}
+
+/***************************************************************************
+[min-max归一化]
+/***************************************************************************/
+void MinMaxNormalize(Mat<>& x, double min = DBL_MAX, double max = DBL_MAX) {
+	if (min == DBL_MAX) min = x.min();
+	if (max == DBL_MAX) max = x.max();
+	x.function([&min, &max](double x) {return (x - min) / (max - min); });
+}
+/***************************************************************************
+[随机变量生成]
+	[Poisson分布]
+	algorithm poisson random number (Knuth):
+    init:
+         Let L ← e^{−λ}, k ← 0 and p ← 1.
+    do:
+         k ← k + 1.
+         Generate uniform random number u in [0,1] and let p ← p × u.
+    while p > L.
+    return k − 1.
+***************************************************************************/
+/***************************************************************************
 *						常见分布: 分布函数、密度函数
 *	[公式]: 
-		泊松分布: P(x=k) = μ^k/k!·exp(-μ)
+		Poisson分布: P(x=k) = μ^k/k!·exp(-μ)
 				  F(x=k) = exp(-μ)·Σ_(i=0)^k μ^i / i!
 		正态分布: f(x) = 1 / sqrt(2πσ²)·exp(-(x-μ)² / (2σ²))
 		指数分布: f(x) = 1 / μ· exp(-x/μ)	(x>0)
 				  F(x) = 1 - exp(-x/μ)			(x>0)
-	   Gamma分布: f(x) = β^α/Γ(α)·x^(α-1)·exp(-βx)
+		Gamma分布: f(x) = β^α/Γ(α)·x^(α-1)·exp(-βx)
 				  F(x) = 1/Γ(α)·γ(α,βx)
 /***************************************************************************/
-inline double igamma_low(double x, double s, int N = 200) {
+inline double GammaInc(double x, double s, int N = 200) {
 	double ans = 0;
 	for (int i = 0; i < N; i++)ans += pow(s, i) / tgamma(x + i + 1);
 	return ans * tgamma(x) * pow(s, x) * exp(-s);
 }
-inline double PoissonDistrib(int x, double mean) {
+inline double PoissonCdf(int x, double mean) {
 	double ans = 0;
 	for (int i = 0; i < x; i++) ans += pow(mean, i) / NumberTheory::Factorial(i);
 	return ans * exp(-mean);
 }
-inline double NormalDensity(double x, double mean = 0, double var = 1) {
+inline double NormPdf	(double x, double mean = 0, double var = 1) {
 	return 1 / sqrt(2 * PI * var) * exp(-pow(x - mean, 2) / (2 * var));
 }
-inline double NormalDistrib(double x, double mean = 0, double var = 1) {
+inline double NormCdf	(double x, double mean = 0, double var = 1) {
 	return 1.0 / 2 * (1 + erf((x - mean) / sqrt(2 * var)));
 }
-inline double ExpDensity	(double x, double mean) {
+inline double ExpPdf	(double x, double mean) {
 	return x <= 0 ? 0.0 : 1.0 / mean * exp(-x / mean);
 }
-inline double ExpDistrib	(double x, double mean) {
+inline double ExpCdf	(double x, double mean) {
 	return x <= 0 ? 0.0 : 1 - exp(-x / mean);
 }
-inline double GammaDensity	(double x, double mean, double var) {
+inline double GammaPdf	(double x, double mean, double var) {
 	double a = mean * mean / var,
 		   b = mean / var;
 	return pow(b, a) / tgamma(a) * pow(x, a - 1) * exp(-b * x);
 }
-inline double GammaDistrib	(double x, double mean, double var) {
+inline double GammaCdf	(double x, double mean, double var) {
 	double a = mean * mean / var,
 		   b = mean / var;
-	return 1.0 / tgamma(a) * igamma_low(a, b * x);
+	return 1.0 / tgamma(a) * GammaInc(a, b * x);
 }
 /***************************************************************************
 *								偏度峰度
@@ -249,8 +280,7 @@ Mat<int>& Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow, doubl
 *[输出]: MediQuartThreshold: (1) 中位数 (2/3) 小/大四分位数 (4/5) 小/大边缘
 *[目的]: 数据 => 中位数、小/大四分位数  => 小/大边缘
 /***************************************************************************/
-void BoxPlot(Mat<>& x, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex) {
-	// 中位数、小/大四分位数、小/大边缘
+void BoxPlot(Mat<>& x, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex = NULL) {
 	MediQuartThreshold.zero(x.rows, 5);
 	Mat<> xTmp(x);
 	for (int i = 0; i < x.rows; i++) {
@@ -265,10 +295,12 @@ void BoxPlot(Mat<>& x, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex
 		MediQuartThreshold(i, 3) = MediQuartThreshold(i, 1) - 1.5 * delta;
 		MediQuartThreshold(i, 4) = MediQuartThreshold(i, 2) + 1.5 * delta;
 	}
-	for (int i = 0; i < x.rows; i++)
-		for (int j = 0; j < x.cols; j++)
-			if (x(i, j) < MediQuartThreshold(i, 3) || x(i, j) > MediQuartThreshold(i, 4))
-				OutlierIndex[i].push_back(j);
+	if (OutlierIndex != NULL) {
+		for (int i = 0; i < x.rows; i++)
+			for (int j = 0; j < x.cols; j++)
+				if (x(i, j) < MediQuartThreshold(i, 3) || x(i, j) > MediQuartThreshold(i, 4))
+					OutlierIndex[i].push_back(j);
+	}
 }
 }
 #endif
