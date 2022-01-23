@@ -18,7 +18,7 @@
                 [4] LU分解: 高斯消元法
             [5] A中包含U,L，分离出来即可
 ******************************************************************************/
-void LUP(Mat& a, Mat& U, Mat& L, Mat<int>& P) {
+void LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<int>& P) {
     if (a.rows != a.cols)error();
     int n = a.rows;
     Mat A(a);
@@ -27,7 +27,7 @@ void LUP(Mat& a, Mat& U, Mat& L, Mat<int>& P) {
     //[1]
     for (int k = 0; k < n; k++) {
         //[2] 选主元
-        T maxvalue = 0;
+        double maxvalue = 0;
         int kt;
         for (int i = k; i < n; i++) {
             if (fabs(A(i, k)) > maxvalue) { maxvalue = fabs(A(i, k)); kt = i; }
@@ -35,7 +35,7 @@ void LUP(Mat& a, Mat& U, Mat& L, Mat<int>& P) {
         if (maxvalue == 0) error();				// singular matrix，秩 rank<n
         //[3] 置换行
         for (int i = 0; i < n; i++) {
-            T t = A(k, i); A(k, i) = A(kt, i); A(kt, i) = t;
+            double t = A(k, i); A(k, i) = A(kt, i); A(kt, i) = t;
         }
         int t = P[k]; P[k] = P[kt]; P[kt] = t;
         //[4] LU分解: 高斯消元法

@@ -68,7 +68,7 @@ Mat<>& rotate(Mat<>& theta, Mat<>& transMat) {
 	for (int i = 0; i < theta.rows; i++) {
 		for (int j = i + 1; j < theta.cols; j++) {
 			transMat.mul(
-				PrimaryRotation(i, j, theta(i, j), rotateMat), 
+				rotate(i, j, theta(i, j), rotateMat), 
 				transMat
 			);
 		}
