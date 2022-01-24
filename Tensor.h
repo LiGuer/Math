@@ -19,21 +19,21 @@ template<class T = double>
 class Tensor {
 public:
 /******************************************************************************
-*                    ºËĞÄÊı¾İ
-*	[×¢]: Data¶Ñµş·½Ïò: µÍÎ¬ÓÅÏÈ
+*                    æ ¸å¿ƒæ•°æ®
+*	[æ³¨]: Dataå †å æ–¹å‘: ä½ç»´ä¼˜å…ˆ
 ******************************************************************************/
 	T* data = NULL;	
 	Mat<int> dim;										//{x, y, z, ...}
 /******************************************************************************
-*                    º¯Êı
+*                    å‡½æ•°
 ******************************************************************************/
-	/*---------------- ¹¹Ôì/Îö¹¹º¯Êı ----------------*/
+	/*---------------- æ„é€ /ææ„å‡½æ•° ----------------*/
 	Tensor() { ; }
 	Tensor(int dimNum, int* dimLength) { zero(dimNum, dimLength); }
 	Tensor(int x0, int y0, int z0)     { zero(x0, y0, z0); }
 	Tensor(Tensor& a) { *this = a; }
 	~Tensor() { delete data; }
-	/*---------------- »ù´¡º¯Êı ----------------*/
+	/*---------------- åŸºç¡€å‡½æ•° ----------------*/
 	void error() { exit(-1); }
 	inline int size() { return dim.product(); }
 	inline int size(int _dim) { 
@@ -42,7 +42,7 @@ public:
 		if (_dim == 3) return dim[0] * dim[1] * dim[2];
 		int ans = 1; for(int i = 0; i < _dim; i++) ans *= dim[i]; return ans; 
 	}
-	/*---------------- ·ÖÅä¿Õ¼ä ----------------*/
+	/*---------------- åˆ†é…ç©ºé—´ ----------------*/
 	Tensor& alloc(int dimNum, int* dimLength) {
 		if (dim.rows != dimNum || memcmp(dim.data, dimLength, dimNum * sizeof(int)) != 0) {
 			dim.alloc(dimNum) = (dimLength);
@@ -54,20 +54,20 @@ public:
 	Tensor& alloc(int x0, int y0)					{ int t[] = { x0, y0 };			alloc(2, t); return *this; }
 	Tensor& alloc(int x0, int y0, int z0)			{ int t[] = { x0, y0, z0 };		alloc(3, t); return *this; }
 	Tensor& alloc(int x0, int y0, int z0, int w0)	{ int t[] = { x0, y0, z0, w0 }; alloc(4, t); return *this; }
-	/*---------------- ÁãÔª/ÇåÁã ----------------*/
-	Tensor& zero() { memset(data, 0, sizeof(T) * size()); return *this; }	//ÇåÁã 
+	/*---------------- é›¶å…ƒ/æ¸…é›¶ ----------------*/
+	Tensor& zero() { memset(data, 0, sizeof(T) * size()); return *this; }	//æ¸…é›¶ 
 	Tensor& zero(int dimNum, int* dimLength)	{ alloc(dimNum, dimLength); zero(); return *this; }
 	Tensor& zero(int x0, int y0, int z0)		{ alloc(x0, y0, z0);		zero(); return *this; }
-	/*---------------- Ëæ»úÔª ----------------*/
+	/*---------------- éšæœºå…ƒ ----------------*/
 	Tensor& rands(T st, T ed) {	//[st,ed)
 		for (int i = 0; i < size(); i++)
 			data[i] = rand() / (double)RAND_MAX * (ed - st) + st;
 		return *this;
 	}
 	Tensor& rands(int dimNum, int* dimLength, T st, T ed) { alloc(dimNum, dimLength); rands(st, ed); return *this; }
-	/*---------------- "[]"È¡ÔªËØ ----------------
-	*	[×ø±ê]: { x, y, z, ...} = data[ x + y¡¤X0 + z¡¤X0¡¤Y0 + ... ]
-	*	[Data¶Ñµş·½Ïò]: Âúx,Ò»ÁĞ => Âúxy,Ò»¾ØÕó => Âúxyz,Ò»·½¿é => ....
+	/*---------------- "[]"å–å…ƒç´  ----------------
+	*	[åæ ‡]: { x, y, z, ...} = data[ x + yÂ·X0 + zÂ·X0Â·Y0 + ... ]
+	*	[Dataå †å æ–¹å‘]: æ»¡x,ä¸€åˆ— => æ»¡xy,ä¸€çŸ©é˜µ => æ»¡xyz,ä¸€æ–¹å— => ....
 	**-------------------------------------------*/
 	T& operator[](int i)				{ return data[i]; }
 	T& operator()(int x)				{ return data[x]; }
@@ -91,7 +91,7 @@ public:
 	inline int i2y(int i) { return dim.rows == 2 ? i / dim[0]          : i %(dim[1] * dim[0])/ dim[0]; }
 	inline int i2z(int i) { return dim.rows == 3 ? i /(dim[1] * dim[0]): i %(dim[2] * dim[1] * dim[0])/(dim[1] * dim[0]); }
 	inline int xyz2i(int x, int y, int z) { return x + y * dim[0] + z * dim[1] * dim[0]; }
-	/*----------------¸³Öµ [ = ]----------------*/ //²»ÄÜ¸³Öµ×Ô¼º
+	/*----------------èµ‹å€¼ [ = ]----------------*/ //ä¸èƒ½èµ‹å€¼è‡ªå·±
 	Tensor& operator=(Tensor& a) {
 		if (a.data == NULL) error();
 		alloc(a.dim);
@@ -104,7 +104,7 @@ public:
 		data = a.data; a.data = NULL; dim.eatMat(a.dim);
 		return *this;
 	}
-	/*----------------¼Ó·¨ [ add + ]----------------*/
+	/*----------------åŠ æ³• [ add + ]----------------*/
 	Tensor& add(Tensor& a, Tensor& b) {
 		if (!(a.dim == b.dim)) error();
 		alloc(a.dim);
@@ -116,7 +116,7 @@ public:
 		for (int i = 0; i < size(); i++) data[i] += a[i];
 		return *this;
 	}
-	/*----------------Êı³Ë [ mul ¡Á ]----------------*/
+	/*----------------æ•°ä¹˜ [ mul Ã— ]----------------*/
 	Tensor& mul(const double a, Tensor& b) {
 		alloc(b.dim);
 		for (int i = 0; i < b.size(); i++) data[i] = a * b[i];
@@ -126,7 +126,7 @@ public:
 		for (int i = 0; i < size(); i++) data[i] *= a;
 		return *this;
 	}
-	/*----------------¾í»ı----------------*/
+	/*----------------å·ç§¯----------------*/
 	Tensor& conv(Tensor& in, Tensor& kernel, int padding, int stride) {
 		alloc(
 			(in.dim[0] - kernel.dim[0] + 2 * padding) / stride + 1,
@@ -144,9 +144,9 @@ public:
 						data[i] += in(xt, yt, z) * kernel(kx, ky, i2z(i));
 				}
 	}
-	/*----------------ºÏ²¢ [ merge ]----------------
-	*	±È dimIndex ½×ÊıµÍ¼¶µÄ£¬×÷ÎªÔªËØ¿é£¬ÕûÌå½øĞĞÄÚ´æ¸´ÖÆ
-		±È dimIndex ½×Êı¸ß¼¶µÄ£¬×÷Îª¸´ÖÆ´ÎÊı
+	/*----------------åˆå¹¶ [ merge ]----------------
+	*	æ¯” dimIndex é˜¶æ•°ä½çº§çš„ï¼Œä½œä¸ºå…ƒç´ å—ï¼Œæ•´ä½“è¿›è¡Œå†…å­˜å¤åˆ¶
+		æ¯” dimIndex é˜¶æ•°é«˜çº§çš„ï¼Œä½œä¸ºå¤åˆ¶æ¬¡æ•°
 	-----------------------------------------------*/
 	Tensor& merge(Tensor* a[], const int N, int dimIndex) {
 		// new memory
@@ -170,7 +170,7 @@ public:
 		}
 		eat(ansTemp); return *this;
 	}
-	/*----------------º¯Êı²Ù×÷ []----------------*/
+	/*----------------å‡½æ•°æ“ä½œ []----------------*/
 	template<typename F>
 	Tensor& function(Tensor& x, F&& f) {
 		alloc(x.dim);

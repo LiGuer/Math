@@ -1,7 +1,7 @@
 #include "Decompose.h"
 
 /******************************************************************************
-* LUP分解
+* LUP 上下三角分解
     * [定义]: P A = L U		其中 L: 单位下三角矩阵  U: 上三角矩阵  P: 置换矩阵
             *	因为置换矩阵每行只有一个1，可以变为一维数组，每行计入改行1的位置
     * [算法]: 高斯消元法
@@ -18,7 +18,7 @@
                 [4] LU分解: 高斯消元法
             [5] A中包含U,L，分离出来即可
 ******************************************************************************/
-void LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<int>& P) {
+void Matrix::LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<int>& P) {
     if (a.rows != a.cols) exit(-1);
     int n = a.rows;
     Mat<> A(a);
@@ -52,4 +52,31 @@ void LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<int>& P) {
         for (int j = 0; j < n; j++) 
             if (i > j) L(i, j) = A(i, j);
             else	   U(i, j) = A(i, j);
+}
+/******************************************************************************
+* QR  正交三角分解
+    \def{正交三角分解} 将非奇异矩阵A化成正交矩阵Q与非奇异上三角矩阵R的乘积.$A = Q R$
+    * 初等反射变换
+******************************************************************************/
+void Matrix::QR(Mat<>& A, Mat<>& Q, Mat<>& R){
+	R = A; 
+	Q.E(A.rows);
+
+	Mat<> v, e, Ti, T(A.rows, A.cols);
+	for (int i = 0; i < A.rows; i++) {
+		R.block(i, R.rows - 1, i, i, v);
+		e.zero(v.rows);
+		e(0) = 1;
+
+		v -= (e *= v.norm());
+		v.normalize();
+
+		Matrix::reflect(v, Ti);
+		T.E().setBlock(Ti, i, i);
+
+		R.mul(T, R);
+		Q.mul(T, Q);
+	}
+
+	Q.transpose(Q);
 }

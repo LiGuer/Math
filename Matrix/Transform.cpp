@@ -83,6 +83,17 @@ Mat<>& Matrix::rotate(Mat<>& rotateAxis, double theta, Mat<>& transMat) {
 }
 
 /******************************************************************************
+* 反射变换
+    $ y = H x = (I - 2 e_2 e_2^T) x $
+******************************************************************************/
+Mat<>& Matrix::reflect(Mat<>& e, Mat<>& transMat){
+    Mat<> tmp;
+    transMat.mul(e, e.transpose(tmp));
+    transMat.sub(tmp.E(transMat.rows), transMat *= 2);
+    return transMat;
+}
+
+/******************************************************************************
 * 缩放变换
     $T_{ij} = [
         dx_1 \\
