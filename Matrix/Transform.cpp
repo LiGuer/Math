@@ -1,23 +1,4 @@
 #include "Transform.h"
-
-/******************************************************************************
-* 平移
-    $
-        [1 ]   [ 1  0  0  0 ] [1]
-        [x'] = [dx  1  0  0 ] [x]
-        |y'|   |dy  0  1  0 | |y|
-        |z'|   |dz  0  0  1 | |z|
-    $
-******************************************************************************/
-Mat<>& translate(Mat<>& delta, Mat<>& transMat) {
-	Mat<> translateMat; translateMat.E(transMat.rows);
-
-	for (int i = 0; i < delta.rows; i++) 
-        translateMat(i + 1, 0) = delta[i];
-
-	return transMat.mul(translateMat, transMat);
-}
-
 /******************************************************************************
 * 旋转变换
     * 初等旋转矩阵.
@@ -53,7 +34,7 @@ Mat<>& translate(Mat<>& delta, Mat<>& transMat) {
                     [d  c -b  a]
 ******************************************************************************/
 // 初等旋转矩阵
-Mat<>& rotate(int i, int j, double theta, Mat<>& transMat) {
+Mat<>& Matrix::rotate(int i, int j, double theta, Mat<>& transMat) {
     transMat.E();
     transMat(i, i) = transMat(j, j) = cos(theta);
     transMat(i, j) = sin(theta);
@@ -61,7 +42,7 @@ Mat<>& rotate(int i, int j, double theta, Mat<>& transMat) {
     return transMat;
 }
 
-Mat<>& rotate(Mat<>& theta, Mat<>& transMat) {
+Mat<>& Matrix::rotate(Mat<>& theta, Mat<>& transMat) {
     transMat.E();
 	Mat<> rotateMat = transMat;
 
@@ -77,7 +58,7 @@ Mat<>& rotate(Mat<>& theta, Mat<>& transMat) {
 }
 
 //3D·四元数
-Mat<>& rotate(Mat<>& rotateAxis, double theta, Mat<>& transMat) {
+Mat<>& Matrix::rotate(Mat<>& rotateAxis, double theta, Mat<>& transMat) {
 	if (transMat.rows != 3 + 1) exit(-1);
 	
 	rotateAxis.normalize();
@@ -89,7 +70,7 @@ Mat<>& rotate(Mat<>& rotateAxis, double theta, Mat<>& transMat) {
 		sin(theta / 2) * rotateAxis[2]
 	};
 	// rotate mat
-	transMat.zero()
+	transMat.zero();
 	for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) transMat(i, j) = q[((j % 2 == 0 ? 1 : -1) * i + j + 4) % 4];
 	for (int i = 1; i < 4; i++) transMat(i, i % 3 + 1) *= -1;
 	Mat<> tmp = transMat;
@@ -110,6 +91,6 @@ Mat<>& rotate(Mat<>& rotateAxis, double theta, Mat<>& transMat) {
         & & & dx_n
     ]$
 ******************************************************************************/
-inline Mat<>& scale(Mat<>& ratio, Mat<>& transMat) {
+Mat<>& Matrix::scale(Mat<>& ratio, Mat<>& transMat) {
     return transMat.diag(ratio);
 }

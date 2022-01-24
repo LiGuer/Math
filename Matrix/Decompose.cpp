@@ -19,9 +19,9 @@
             [5] A中包含U,L，分离出来即可
 ******************************************************************************/
 void LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<int>& P) {
-    if (a.rows != a.cols)error();
+    if (a.rows != a.cols) exit(-1);
     int n = a.rows;
-    Mat A(a);
+    Mat<> A(a);
     P.zero(n);
     for (int i = 0; i < n; i++) P[i] = i;
     //[1]
@@ -32,7 +32,7 @@ void LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<int>& P) {
         for (int i = k; i < n; i++) {
             if (fabs(A(i, k)) > maxvalue) { maxvalue = fabs(A(i, k)); kt = i; }
         }
-        if (maxvalue == 0) error();				// singular matrix，秩 rank<n
+        if (maxvalue == 0) exit(-1);				// singular matrix，秩 rank<n
         //[3] 置换行
         for (int i = 0; i < n; i++) {
             double t = A(k, i); A(k, i) = A(kt, i); A(kt, i) = t;

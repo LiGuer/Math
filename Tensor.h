@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #ifndef TENSOR_H
 #define TENSOR_H
-#include "Mat.h"
+#include "Matrix/Mat.h"
 template<class T = double>
 class Tensor {
 public:

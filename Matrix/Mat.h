@@ -3,6 +3,6 @@
 
 #include "Matrix.h"
 #include "Transform.h"
-#include "Decompose.h.h"
+#include "Decompose.h"
 
 #endif

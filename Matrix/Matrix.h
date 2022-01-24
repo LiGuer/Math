@@ -153,7 +153,7 @@ void swap(Mat& a);							//交换数据
 				(*this)(i, i) = a(i);
 		}
 		else error();
-		return eatMat(ansTmp);
+		return *this;
 	}
 
 /******************************************************************************
@@ -240,7 +240,7 @@ Mat& colStack
 		for (int i = 0; i < rows; i++) (*this)(i, _col) = a[i];
 		return *this;
 	}
-	Mat& setCol(int _row, Mat& a) {
+	Mat& setRow(int _row, Mat& a) {
 		for (int i = 0; i < cols; i++) (*this)(_row, i) = a[i];
 		return *this;
 	}
