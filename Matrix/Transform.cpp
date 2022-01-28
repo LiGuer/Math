@@ -105,3 +105,21 @@ Mat<>& Matrix::reflect(Mat<>& e, Mat<>& transMat){
 Mat<>& Matrix::scale(Mat<>& ratio, Mat<>& transMat) {
     return transMat.diag(ratio);
 }
+
+/******************************************************************************
+* 正交化
+******************************************************************************/
+/*
+void orthogonalize(Mat<>& A) {
+	Mat<> q;
+	q[0].normalize();
+	q[1] -= t1.mul(q[1].dot(q[0]), q[0]);   //施密特正交化
+	q[1].normalize();
+	q[2] -= t1.mul(q[2].dot(q[0]), q[0]);
+	q[2] -= t1.mul(q[2].dot(q[1]), q[1]);
+	q[2].normalize();
+	q[3] -= t1.mul(q[3].dot(q[0]), q[0]);
+	q[3] -= t1.mul(q[3].dot(q[1]), q[1]);
+	q[3] -= t1.mul(q[3].dot(q[2]), q[2]);
+	q[3].normalize();
+}*/

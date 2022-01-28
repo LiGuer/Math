@@ -37,7 +37,7 @@ Mat(const int _rows, const int _cols);
 Mat(const int _rows);
 Mat(const Mat& a);
 ~Mat();
-void error();								//报错
+void exit(-1);;								//报错
 int  size();								//元素数量
 Mat& fill(T a);								//填充
 void eatMat(Mat& a);						//吃掉另一个矩阵(指针操作)
@@ -45,20 +45,20 @@ void swap(Mat& a);							//交换数据
 ******************************************************************************/
 	/*---------------- 构造/析构 ----------------*/
 	Mat() { ; }
-	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
 	Mat(const int _rows) { zero(_rows, 1); }
-	Mat(const Mat& a) { *this = a; }
-	Mat(const int _rows, const int _cols, T* _data) { zero(_rows, _cols); set(_data); }
+	Mat(const int _rows, const int _cols) { zero(_rows, _cols); }
+	Mat(const int _rows, const int _cols, T* _data) { set(_rows, _cols, _data); }
 	~Mat() { delete data; }
-	/*---------------- 报错  ----------------*/
-	static void error() { exit(-1); }
+
 	/*---------------- 元素数量 ----------------*/
 	inline int size() const { return rows * cols; }
+
 	/*---------------- 填充  ----------------*/
 	inline Mat& fill(const T& a) { 
 		for (int i = 0; i < size(); i++) data[i] = a; 
 		return *this;
 	}
+
 	/*---------------- 吃掉另一个矩阵(指针操作)  ----------------*/
 	inline Mat& eatMat(Mat& a) {
 		if (data != NULL) delete data;
@@ -66,6 +66,7 @@ void swap(Mat& a);							//交换数据
 		rows = a.rows; cols = a.cols; a.rows = a.cols = 0;
 		return *this;
 	}
+
 	/*---------------- 交换数据 ----------------*/
 	Mat& swap(Mat& a) {
 		T* tmp = a.data; a.data = data; data = tmp;
@@ -73,6 +74,7 @@ void swap(Mat& a);							//交换数据
 			t  = a.cols; a.cols = cols; cols = t;
 		return *this;
 	}
+
 /******************************************************************************
 *                    基础矩阵
 -------------------------------------------------------------------------------
@@ -152,7 +154,7 @@ void swap(Mat& a);							//交换数据
 			for (int i = 0; i < n; i++) 
 				(*this)(i, i) = a(i);
 		}
-		else error();
+		else exit(-1);;
 		return *this;
 	}
 
@@ -200,23 +202,10 @@ Mat& colStack
 		for (auto& item : list) data[i++] = item;
 		return *this;
 	}
-	Mat& set(T x, T y) {
-		if (size() != 2) error();
-		data[0] = x;
-		data[1] = y;
-		return *this;
-	}
-	Mat& set(T x, T y, T z) {
-		if (size() != 3) error();
-		data[0] = x;
-		data[1] = y;
-		data[2] = z;
-		return *this;
-	}
-	Mat& set(const char* fileName) {
-		FILE* fin = fopen(fileName, "r");
-		for (int i = 0; i < size(); i++) fscanf(fin, "%lf", &data[i]);
-		return *this;
+	Mat& set(const int _rows, const int _cols, T* _data) { 
+		zero(_rows, _cols);
+		memcpy(data, _data, sizeof(T) * size());
+		return *this; 
 	}
 	Mat& set_(const int _rows, const int _cols, T* _data) { 
 		rows = _rows; 
@@ -224,7 +213,11 @@ Mat& colStack
 		data = _data; 
 		return *this; 
 	}
-
+	Mat& set(const char* fileName) {
+		FILE* fin = fopen(fileName, "r");
+		for (int i = 0; i < size(); i++) fscanf(fin, "%lf", &data[i]);
+		return *this;
+	}
 	/*----------------读/写一列/行----------------*/
 	Mat& getCol(int _col, Mat& a) {
 		a.alloc(rows);
@@ -276,7 +269,7 @@ Mat& colStack
 
 	/*----------------拼接----------------*/
 	Mat& rowStack(Mat& a, Mat& b) {
-		if (a.cols != b.cols)error();
+		if (a.cols != b.cols) exit(-1);;
 		Mat ansTmp(a.rows + b.rows, a.cols);
 		for (int i = 0; i < ansTmp.rows; i++)
 			for (int j = 0; j < ansTmp.cols; j++)
@@ -287,7 +280,7 @@ Mat& colStack
 		return *this;
 	}
 	Mat& colStack(Mat& a, Mat& b) {
-		if (a.rows != b.rows)error();
+		if (a.rows != b.rows) exit(-1);;
 		Mat ansTmp(a.rows, a.cols + b.cols);
 		for (int i = 0; i < ansTmp.rows; i++)
 			for (int j = 0; j < ansTmp.cols; j++)
@@ -300,7 +293,7 @@ Mat& colStack
 	
 	/*----------------复制拓展----------------*/
 	Mat& colRepeat(int repeatNum, Mat& ans) {
-		if (cols != 1)error();
+		if (cols != 1) exit(-1);;
 		Mat ansTmp(rows, repeatNum);
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < repeatNum; j++)
@@ -422,32 +415,32 @@ Mat& function	(T (*f)(T))
 	}
 	/*----------------加法 [ add + ]----------------*/
 	Mat& operator+=(Mat& a) {
-		if (a.rows != rows || a.cols != cols) error();
+		if (a.rows != rows || a.cols != cols) exit(-1);;
 //#pragma omp parallel for
 		for (int i = 0; i < a.size(); i++) data[i] += a[i];
 		return *this;
 	}
 	Mat& add(Mat& a, Mat& b) {
-		if (a.rows != b.rows || a.cols != b.cols) error();
+		if (a.rows != b.rows || a.cols != b.cols) exit(-1);;
 		alloc(a.rows, a.cols);
 		for (int i = 0; i < a.size(); i++) data[i] = a[i] + b[i];
 		return *this;
 	}
 	/*----------------减法 [ sub - ]----------------*/
 	Mat& operator-=(Mat& a) {
-		if (a.rows != rows || a.cols != cols) error();
+		if (a.rows != rows || a.cols != cols) exit(-1);;
 		for (int i = 0; i < a.size(); i++) data[i] -= a[i];
 		return *this;
 	}
 	Mat& sub(Mat& a, Mat& b) {
-		if (a.rows != b.rows || a.cols != b.cols) error();
+		if (a.rows != b.rows || a.cols != b.cols) exit(-1);;
 		alloc(a.rows, a.cols);
 		for (int i = 0; i < a.size(); i++) data[i] = a[i] - b[i];
 		return *this;
 	}
 	/*----------------乘法 [ mul × ]----------------*/
 	Mat& mul(Mat& a, Mat& b) {
-		if (a.cols != b.rows) error();
+		if (a.cols != b.rows) exit(-1);;
 		Mat ansTmp(a.rows, b.cols);
 		for (int i = 0; i < a.rows; i++)
 			for (int j = 0; j < b.cols; j++) 
@@ -456,7 +449,7 @@ Mat& function	(T (*f)(T))
 		return eatMat(ansTmp);
 	}
 	Mat& operator*=(Mat& a) {
-		if (cols != a.rows) error();
+		if (cols != a.rows) exit(-1);;
 		Mat ansTmp(rows, a.cols);
 //#pragma omp parallel for schedule(dynamic, 1)
 		for (int i = 0; i < rows; i++)
@@ -493,13 +486,13 @@ Mat& function	(T (*f)(T))
 	*	a·b = Σ ai·bi = aT * b
 	**------------------------------------------------*/
 	static T dot(Mat& a, Mat& b) {
-		if (a.rows != b.rows || a.cols != b.cols) error();
+		if (a.rows != b.rows || a.cols != b.cols) exit(-1);;
 		T ans = a[0] * b[0];
 		for (int i = 1; i < a.size(); i++) ans += a[i] * b[i];
 		return ans;
 	}
 	T dot(Mat& a) {
-		if (a.rows != rows && a.cols != cols) error();
+		if (a.rows != rows && a.cols != cols) exit(-1);;
 		T ans = data[0] * a[0];
 		for (int i = 1; i < size(); i++) ans += data[i] * a[i];
 		return ans;
@@ -517,7 +510,7 @@ Mat& function	(T (*f)(T))
 					| 𝑥𝑏	𝑦𝑏	 zb |
 	**------------------------------------------------*/
 	Mat& cross(Mat& a, Mat& b) {
-		if (a.rows != b.rows)error();
+		if (a.rows != b.rows) exit(-1);;
 		Mat ansTmp(a.rows, a.cols);
 		ansTmp[0] = a[1] * b[2] - a[2] * b[1];
 		ansTmp[1] = a[2] * b[0] - a[0] * b[2];
@@ -525,7 +518,7 @@ Mat& function	(T (*f)(T))
 		return eatMat(ansTmp);
 	}
 	Mat& cross_(Mat& a, Mat& b) {
-		if (a.rows != b.rows)error();
+		if (a.rows != b.rows) exit(-1);;
 		alloc(a.rows, a.cols);
 		data[0] = a[1] * b[2] - a[2] * b[1];
 		data[1] = a[2] * b[0] - a[0] * b[2];
@@ -534,26 +527,26 @@ Mat& function	(T (*f)(T))
 	}
 	/*----------------元素乘 [ elementMul × ]----------------*/
 	Mat& elementMul(Mat& a, Mat& b) {
-		if (a.rows != b.rows || a.cols != b.cols) error();
+		if (a.rows != b.rows || a.cols != b.cols) exit(-1);;
 		alloc(a.rows, a.cols);
 		for (int i = 0; i < size(); i++) data[i] = a[i] * b[i];
 		return*this;
 	}
 	Mat& elementMul(Mat& a) {
-		if (rows != a.rows || cols != a.cols) error();
+		if (rows != a.rows || cols != a.cols) exit(-1);;
 //#pragma omp parallel for schedule(dynamic, 1)
 		for (int i = 0; i < size(); i++) data[i] *= a[i];
 		return *this;
 	}
 	/*----------------元素除 [ elementDiv / ]----------------*/
 	Mat& elementDiv(Mat& a, Mat& b) {
-		if (a.rows != b.rows || a.cols != b.cols) error();
+		if (a.rows != b.rows || a.cols != b.cols) exit(-1);;
 		alloc(a.rows, a.cols);
 		for (int i = 0; i < size(); i++)data[i] = a[i] / b[i];
 		return *this;
 	}
 	Mat& elementDiv(Mat& a) {
-		if (rows != a.rows || cols != a.cols) error();
+		if (rows != a.rows || cols != a.cols) exit(-1);;
 		for (int i = 0; i < size(); i++)data[i] /= a[i];
 		return *this;
 	}
@@ -591,7 +584,7 @@ Mat& function	(T (*f)(T))
 					ansTmp[i] += (*this)(i, j);
 			return ans.eatMat(ansTmp);
 		}
-		error(); return ans;
+		exit(-1);; return ans;
 	}
 	T mean() {
 		return sum() / size();
@@ -629,7 +622,7 @@ Mat& function	(T (*f)(T))
 	*	[方法]: 利用不断解线性方程组，对每一列求解.
 	**------------------------------------------*/
 	Mat& inv(Mat& ans) {
-		if (rows != cols)error();
+		if (rows != cols) exit(-1);;
 		Mat tmp(rows, cols);
 		int n = rows;
 		// LUP分解
@@ -666,7 +659,7 @@ Mat& function	(T (*f)(T))
 				 - A02·A11·A20 - A00·A12·A21 - A01·A10·A22
 	**----------------------------------------------*/
 	T abs() {
-		if (rows != cols)error();
+		if (rows != cols) exit(-1);;
 		//加速
 		if (rows == 1)return data[0];
 		if (rows == 2)return (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(0, 1);
