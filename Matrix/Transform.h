@@ -13,6 +13,8 @@ Mat<>& scale	(Mat<>& ratio, 						Mat<>& T);	// 缩放
 Mat<>& reflect	(Mat<>& e, 							Mat<>& T);	// 镜像
 Mat<>& project 	(Mat<>& X, 							Mat<>& T);	// 正交投影
 																// 正交化
+
+Mat<>& Lorentz 	(double V, int i,					Mat<>& T);	// Lorentz变换
 }
 
 #endif

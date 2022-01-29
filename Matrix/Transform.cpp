@@ -146,3 +146,25 @@ void orthogonalize (Mat<>& A) {
 	q[3] -= t1.mul(q[3].dot(q[2]), q[2]);
 	q[3].normalize();
 }*/
+
+/****************************************************************
+* Lorentz变换
+    * Minkowski时空 (t, x, y, z)^T 下的一类参考系间变换
+        $
+        (\mb t' \\ x' \\ y' \\ z' \me) = (\mb
+            \frac{1}{\sqrt{1-(\frac{V}{c})^2}} & \frac{-\frac{V}{c^2}}{\sqrt{1-( \frac{V}{c} )^2}}
+            \frac{-V}{\sqrt{1-( \frac{V}{c} )^2}} & \frac{1}{\sqrt{1-( \frac{V}{c} )^2}}
+            & & 1
+            & & & 1
+        \me) (\mb t \\ x \\ y \\ z \me)
+        $
+****************************************************************/
+Mat<>& Matrix::Lorentz (double V, int i, Mat<>& T){
+    const double c = 299792458;
+    double t = sqrt(1 - pow(V / c, 2));
+
+    T.E(4);
+    T(0,0) = T(i,i) = 1 / t;
+    T(0,i) = (-V / pow(c, 2)) / t;
+    T(i,0) = (-V) / t;
+}
