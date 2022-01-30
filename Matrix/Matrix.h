@@ -627,7 +627,7 @@ Mat& function	(T (*f)(T))
 		int n = rows;
 		// LUP分解
 		Mat L, U; Mat<int> P;
-		LUPdecomposition(U, L, P);
+		// ### LUPdecomposition(U, L, P);
 		//对每一列
 		Mat b(n), x(n);
 		for (int k = 0; k < n; k++) {

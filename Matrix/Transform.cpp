@@ -124,7 +124,7 @@ Mat<>& Matrix::scale (Mat<>& ratio, Mat<>& T) {
 Mat<>& Matrix::project (Mat<>& X, Mat<>& T){
     Mat<> tmp;
     T.mul(X.transpose(tmp), X);
-    T.mul(X, T.inv(T);
+    T.mul(X, T.inv(T));
     T.mul(T, X.transpose(tmp));
     return T;
 }

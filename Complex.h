@@ -7,21 +7,35 @@
 #include <math.h>
 
 class Complex {
-    double real = 0, imag = 0;
+public:
 
-    // 赋值
-    Mat& operator=(Complex& a) { 
-        real = a.real;
-        imag = a.imag;
-        return *this; 
-    }
+	double real = 0, imag = 0;
 
-    Mat& set(double _real, double _imag){
-        real = _real;
-        imag = _imag;
-        return *this; 
-    }
-}
+	// 赋值 / 取值
+	Complex& operator=(Complex& a) {
+		real = a.real;
+		imag = a.imag;
+		return *this;
+	}
+
+	Complex& operator=(Complex a) {
+		real = a.real;
+		imag = a.imag;
+		return *this;
+	}
+
+	Complex& set(double _real, double _imag) {
+		real = _real;
+		imag = _imag;
+		return *this;
+	}
+
+	void get(double& _real, double& _imag) {
+		_real = real;
+		_imag = imag;
+	}
+
+};
 
 namespace ComplexLib {
 
@@ -46,38 +60,104 @@ Complex& I(Complex& a){
  */
 
 //加
-Complex& add(Complex& a, Complex& b, Complex& ans) {
+Complex operator+(Complex& a, Complex& b) {
+	Complex ans;
+
     ans.real = a.real + b.real;
     ans.imag = a.imag + b.imag;
     return ans;
 }
 
+Complex operator+(Complex& a, double& b) {
+	Complex ans;
+
+	ans.real = a.real + b;
+	ans.imag = a.imag;
+	return ans;
+}
+
+Complex operator+(double& a, Complex& b) {
+	Complex ans;
+
+	ans.real = b.real + a;
+	ans.imag = b.imag;
+	return ans;
+}
+
 //减
-Complex& sub(Complex& a, Complex& b, Complex& ans) {
+Complex operator-(Complex& a, Complex& b) {
+	Complex ans;
+
     ans.real = a.real - b.real;
     ans.imag = a.imag - b.imag;
     return ans;
 }
 
+Complex operator-(Complex& a, double& b) {
+	Complex ans;
+
+	ans.real = a.real + b;
+	ans.imag = a.imag;
+	return ans;
+}
+
+Complex operator-(double& a, Complex& b) {
+	Complex ans;
+
+	ans.real = a - b.real;
+	ans.imag =   - b.imag;
+	return ans;
+}
+
 //乘
-Complex& mul(Complex& a, Complex& b, Complex& ans) {
-    double _real, _imag;
-    _real = a.real * b.real - a.imag * b.imag;
-    _imag = a.real * b.imag + a.imag * b.real;
-    ans.real = _real;
-    ans.imag = _imag;
+Complex operator*(Complex& a, Complex& b) {
+	Complex ans;
+
+	ans.real = a.real * b.real - a.imag * b.imag;
+	ans.imag = a.real * b.imag + a.imag * b.real;
     return ans;
 }
 
+Complex operator*(Complex& a, double& b) {
+	Complex ans;
+
+	ans.real = a.real * b;
+	ans.imag = a.imag * b;
+	return ans;
+}
+
+Complex operator*(double& a, Complex& b) {
+	Complex ans;
+
+	ans.real = a * b.real;
+	ans.imag = a * b.imag;
+	return ans;
+}
 //除
-Complex& div(Complex& a, Complex& b, Complex& ans) {
-    double _real, _imag, t;
-    t = b.real * b.real + b.imag * b.imag
-    _real = (a.real * b.real + a.imag * b.imag) / t;
-    _imag = (a.imag * b.real - a.real * b.imag) / t;
-    ans.real = _real;
-    ans.imag = _imag;
+Complex operator/(Complex& a, Complex& b) {
+	Complex ans;
+
+    double t =  b.real * b.real + b.imag * b.imag;
+	ans.real = (a.real * b.real + a.imag * b.imag) / t;
+	ans.imag = (a.imag * b.real - a.real * b.imag) / t;
     return ans;
+}
+
+Complex operator/(Complex& a, double& b) {
+	Complex ans;
+
+	ans.real = a.real / b;
+	ans.imag = a.imag / b;
+	return ans;
+}
+
+Complex operator/(double& a, Complex& b) {
+	Complex ans;
+
+	double t = b.real * b.real + b.imag * b.imag;
+	ans.real =  a * b.real / t;
+	ans.imag = -a * b.imag / t;
+	return ans;
 }
 
 //共轭
@@ -87,8 +167,16 @@ Complex& conjugate (Complex& a, Complex& ans){
     return ans;
 }
 
+//模
+double abs (Complex& a){
+    return sqrt(a.real * a.real + a.imag * a.imag);
 }
 
+//幅角
+double arg (Complex& a){
+    return atan(a.imag / a.real);
+}
 
+}
 
 #endif
