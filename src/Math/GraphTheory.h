@@ -25,57 +25,46 @@ struct Edge {
 	void set(int _u, int _v, double _w) { u = _u; v = _v; w = _w; }
 };
 /*********************************************************************************
+* 
 						构建  邻接图 / 邻接链表
+
 *********************************************************************************/
 struct GraphListNode { int v; double w; GraphListNode* next = NULL; };	//邻接链表节点
 Mat<>& bulidGraphMat(int u[], int v[], double w[], int N, Mat<>& GraphMat) {
 	GraphMat.alloc(N, N).fill(DBL_MAX);
-	for (int i = 0; i < N; i++) GraphMat(u[i], v[i]) = w[i];
+
+	for (int i = 0; i < N; i++) 
+		GraphMat(u[i], v[i]) = w[i];
+
 	return GraphMat;
 }
+
 Mat<GraphListNode*>& bulidGraphList(int u[], int v[], double w[], int N, Mat<GraphListNode*>& GraphList) {
 	GraphList.zero(N);
+
 	for (int i = 0; i < N; i++) {
 		GraphListNode* ptr = new GraphListNode;
 		ptr->v = v[i]; 
 		ptr->w = w[i];
-		ptr->next = GraphList[u[i]]; GraphList[u[i]] = ptr; 		//加入临接链表
-	} return GraphList;
+		ptr->next = GraphList[u[i]]; 
+		GraphList[u[i]] = ptr; 		//加入临接链表
+	} 
+	return GraphList;
 }
+
 /*********************************************************************************
+* 
 						最小生成树 
-*	[算法]: Prim
-		[输入]: 图的邻接链表[Graph], 节点数量[n]
-		[输出]: 最小生成树,每一条有向边的 起点[TreeU],终点[TreeV],总边数[TreeCur]
-		[原理]: 按点贪心, 每次加入已搜索点集u的最短边(u,v)，其中v不属于已搜索点集的点v
-		[时间复杂度]: O(E·logV)
-		[流程]:
-			[1] 初始化[已搜点集 VertexNew]
-			[2] 将第一个图的节点, 加入VertexNew
-			[3] 开始迭代, 直至所有节点均已搜索完成, 即VertexNew已满
-				[4] 在已搜点集, 寻找最短边(u,v), 其中u∈VertexNew, v ∉ VertexNew
-				[5] 将边(u,v)加入最小生成树， 将v加入VertexNew
-----------------------------------------------------------------------------------
-*	[算法]: Kruskal
-		[输入]: 图的边数据 起点[u] 终点[v] 权值[w] 边数[n]
-		[输出]: 最小生成树,每一条有向边的 起点[TreeU],终点[TreeV],总边数[TreeCur]
-		[时间复杂度] O(E·logV)
-		[流程]:
-			[1] 初始化未搜索边集EdgeNew = E0图边集
-			[2] 开始迭代,直至未搜索边集为空集
-				[3] 在边集合,选择最短边(u,v)
-				[4] 若(u,v)不在同一颗树, u,v所在两棵树合并,(u,v)加入该树
-				[5] 点集中删(u,v)
-			[6] 最后剩下的那棵树,就是最小生成树
-		Kruskal	是按边贪心，适合稀疏图。
-		Prim	是按点贪心，适合稠密图。
+
 *********************************************************************************/
 void Prim(Mat<GraphListNode*>& GraphList, std::vector<int> TreeU[], std::vector<int> TreeV[])
 {
 	bool* flag      = (bool*)calloc(GraphList.size(), sizeof(bool));
 	int * VertexSet = (int *)calloc(GraphList.size(), sizeof(int ));
 	int VertexNum = 0;
-	VertexSet[VertexNum++] = 0; flag[0] = 1;
+	VertexSet[VertexNum++] = 0;
+	flag[0] = 1;
+
 	//[3]
 	while (true) {
 		//[4]
@@ -99,32 +88,41 @@ void Prim(Mat<GraphListNode*>& GraphList, std::vector<int> TreeU[], std::vector<
 	free(flag);
 	free(VertexSet);
 }
+
 void Prim(Mat<>& graph, std::vector<int>& TreeU, std::vector<int>& TreeV)
 {
 	int N = graph.rows;
 	bool* flag     = (bool*)calloc(N, sizeof(bool));
 	int * visitSet = (int *)calloc(N, sizeof(int ));
 	int visitNum = 0;
-	visitSet[visitNum++] = 0; flag[0] = 1;
+	visitSet[visitNum++] = 0; 
+	flag[0] = 1;
+
 	//[3]
 	while (true) {
 		//[4]
 		Edge minEdge = { -1, -1, DBL_MAX };
+
 		for (int i = 0; i < visitNum; i++) {
 			int u = visitSet[i];
 			for (int v = 0; v < N; v++) 
 				if (!flag[v] && graph(u, v) < minEdge.w)
 					minEdge.set(u, v, graph(u, v));
 		}
-		if (minEdge.u == -1) break;//[3]
+
+		if (minEdge.u == -1) 
+			break;//[3]
+
 		//[5]
 		TreeU.push_back(minEdge.u);
 		TreeV.push_back(minEdge.v);
 		visitSet[visitNum++] = minEdge.v;
 		flag[minEdge.v] = 1;
 	}
-	free(flag); free(visitSet);
+	free(flag); 
+	free(visitSet);
 }
+
 void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV)
 {
 	std::sort(edge, edge + N, [](Edge a, Edge b) {				//边集排序, 让其顺序自然从小到大, 不需要再一个个寻找
@@ -132,6 +130,7 @@ void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV
 		if (a.u != b.u) return a.u < b.u;
 		return a.v < b.v;
 	});
+
 	Mat<int> root;
 	for (int i = 0; i < N; i++) {
 		//[3]
@@ -139,17 +138,21 @@ void Kruskal(Edge* edge, int N, std::vector<int>& TreeU, std::vector<int>& TreeV
 			vRoot = edge[i].v;
 		while (root[uRoot] != 0) uRoot = root[uRoot];			//并查集思想, 找该点根节点
 		while (root[vRoot] != 0) vRoot = root[vRoot];
+
 		if (uRoot == 0 || vRoot == 0 || uRoot != vRoot) {
 			//[4]
 			TreeU.push_back(edge[i].u);
 			TreeV.push_back(edge[i].v);
-			if (uRoot == 0 && vRoot == 0) root[edge[i].u] = root[edge[i].v] = edge[i].u;	//更新根节点,并查集思想
+
+			if (uRoot == 0 && vRoot == 0) 
+				root[edge[i].u] = root[edge[i].v] = edge[i].u;	//更新根节点,并查集思想
 			else if (uRoot == 0) root[edge[i].u] = vRoot;
 			else if (vRoot == 0) root[edge[i].v] = uRoot;
 			else root[vRoot] = uRoot;
 		}
 	}
 }
+
 /*********************************************************************************
 						最短路径
 *	[算法]: Dijkstra
@@ -187,23 +190,35 @@ double* Dijkstra(Mat<GraphListNode*>& GraphList, int st, Mat<GraphListNode*>& Pa
 	double* Dis = (double*)malloc(N * sizeof(double));
 	bool  * flag= (bool  *)calloc(N,  sizeof(bool)  );
 	Path.alloc(N);
-	for (int i = 0; i < N; i++) Dis[i] = DBL_MAX;
+
+	for (int i = 0; i < N; i++) 
+		Dis[i] = DBL_MAX;
+
 	GraphListNode* ptr = GraphList[st];
+
 	while (ptr != NULL) {
 		Dis[ptr->v] = ptr->w;
 		ptr = ptr->next;
 	}
+
 	//[2]
 	while (true) {
 		//[2.1]
 		double minW = DBL_MAX;
 		int    minP;
+
 		for (int i = 0; i < N; i++) 
-			if(!flag[i]) minW = minW > Dis[i] ? minP = i, Dis[i] : minW;
-		if (minW == DBL_MAX) break;
+			if(!flag[i]) 
+				minW = minW > Dis[i] ? minP = i, Dis[i] : minW;
+
+		if (minW == DBL_MAX) 
+			break;
+
 		flag[minP] = 1;
+
 		//[2.2]
 		GraphListNode* ptr = GraphList[minP];
+
 		while (ptr != NULL) {
 			Dis[ptr->v] = Dis[ptr->v] <= (Dis[minP] + ptr->w) ? Dis[ptr->v] : (Dis[minP] + ptr->w);
 			ptr = ptr->next;
@@ -217,7 +232,10 @@ void Floyd(Mat<>& GraphMat, Mat<>& Distance, Mat<int>& Path)
 	int N = GraphMat.rows;
 	Distance = GraphMat;
 	Path.zero(GraphMat.rows, GraphMat.cols);
-	for (int i = 0; i < Path.size(); i++) Path[i] = i % N;
+
+	for (int i = 0; i < Path.size(); i++)
+		Path[i] = i % N;
+
 	//[2]
 	for (int k = 0; k < N; k++)
 		for (int i = 0; i < N; i++)
@@ -268,22 +286,28 @@ void Dinic_DFS(int s, int t, int N) {/*
 }
 double Dinic(Mat<>& GraphMat, Mat<>& Path,int s, int t, int N) {
 	double ans = 0;
-	Mat<int> level; level.alloc(N).fill(-1);
+	Mat<int> level;
+	level.alloc(N).fill(-1);
 	Dinic_BFS(s, N);
+
 	while (level[t] != -1) {
 		double minwight = DBL_MAX;
 		Path.zero();
 		Dinic_DFS(s, t, N);
+
 		for (int i = Path.size() - 1; i > 0; i--) {
-			int u = Path[i], v = Path[i - 1];
+			int u = Path[i],
+				v = Path[i - 1];
 			GraphMat(u, v) -= minwight;
 			GraphMat(v, u) += minwight;
 		}
+
 		ans += minwight;
 		Dinic_DFS(s, t, N);
 	}
 	return ans;
 }
+
 /*********************************************************************************
 *						商旅问题	Traveling Salesman Problem
 *	[问题]: 遍历所有给定点的最短闭合路径.
@@ -299,8 +323,11 @@ void TravelingSalesmanProblem_AntGroup(Mat<>& Dis, Mat<int>& ansY,
 	int N = Dis.cols;
 	double disSumMin = DBL_MAX;
 	Mat<> S(N, N); S = 1; ansY.zero(N);
+
 	for (int iter = 0; iter < iterNum; iter++) {
-		static Mat<> dS(N, N), dSk(N, N); dS.zero();
+		static Mat<> dS(N, N), dSk(N, N);
+		dS.zero();
+
 		for (int ant = 0; ant < antNum; ant++) {
 			static Mat<bool> isVisit(N);  isVisit.zero(); dSk.zero();
 			static Mat<int>  yT(N);
@@ -310,23 +337,39 @@ void TravelingSalesmanProblem_AntGroup(Mat<>& Dis, Mat<int>& ansY,
 				isVisit[x] = 1;
 				int y;
 				static Mat<> P(N);
+
 				for (int j = 0; j < P.size(); j++)
 					P[j] = isVisit[j] ? 0 : pow(S(x, j), alpha) / pow(Dis(x, j), beta);
+
 				P /= P.sum();
 				double rands = RAND_DBL;
+
 				for (int j = 0; j < P.size(); j++)
-					if (isVisit[j] == 0 && (rands -= P[j]) <= 0) { y = j; break; };
-				dSk(x, y) = Sq; x = y; isVisit[y] = 1; yT[i] = y;
+					if (isVisit[j] == 0 && (rands -= P[j]) <= 0) { 
+						y = j; 
+						break;
+					};
+
+				dSk(x, y) = Sq; 
+				x = y; 
+
+				isVisit[y] = 1; 
+				yT[i] = y;
 			}
 			//Distance
 			double disSum = Dis(yT[0], yT[yT.size() - 1]);
+
 			for (int i = 0; i < yT.size() - 1; i++)
 				disSum += Dis(yT[i], yT[i + 1]);
-			if (disSum < disSumMin) { ansY = yT; disSumMin = disSum; }
+
+			if (disSum < disSumMin) { 
+				ansY = yT; 
+				disSumMin = disSum; 
+			}
+
 			dS += (dSk /= disSum);
 		}
 		(S *= (1 - lossS_p)) += dS;
-		//if (iter % 1 == 0)printf("> %d %f\n", iter, disSumMin);
 	}
 }
 }

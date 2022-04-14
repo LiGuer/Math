@@ -1,0 +1,32 @@
+* 图论
+	* 图的数据结构
+		* 邻接链表
+		* 邻接矩阵
+	* 图的算法
+		* 最短路径
+			* Dijkstra 算法
+				\Algorithm
+					- 时间复杂度 $O(V^2)$
+			* Floyd 算法
+				\Algorithm
+					- 原理
+						状态转移方程:
+						$Distance(i,j) = \min\{ Distance(i,k) + Distance(k,j) , Distance(i,j) \}$
+					- 时间复杂度 $O(V^3)$
+					  空间复杂度 $O(V^2)$
+		* 最小生成树
+			* Prim 算法
+				\Algorithm
+					- 原理	
+						按点贪心, 每次加入已搜索点集u的最短边(u,v), 其中v不属于已搜索点集的点v
+					- 时间复杂度 $O(E·logV)$
+			* Kruskal 算法
+				\Algorithm
+					- 原理
+						按边贪心
+					- 时间复杂度 $O(E·logV)$
+		* 网络最大流
+			* Dinic 算法
+				\Algorithm
+					- 原理
+						贪心 + "反悔"机制

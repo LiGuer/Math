@@ -12,7 +12,7 @@ limitations under the License.
 ==============================================================================*/
 #ifndef STATISTICS_H
 #define STATISTICS_H
-#include "Mat.h"
+#include "Matrix/Mat.h"
 #include "NumberTheory.h"
 #include <math.h>
 #include <vector>
@@ -54,19 +54,27 @@ namespace Statistics {
 		Var  = Σ(x_i - x_mean)² / (N - 1)
 /***************************************************************************/
 //均值
-double Mean	(Mat<>& x) { return x.sum() / x.size(); }
+double Mean	(Mat<>& x) { 
+	return x.sum() / x.size();
+}
+
 Mat<>& Mean	(Mat<>& x, Mat<>& ans, int index) { 
 	return x.sum(ans, index) *= 1.0 / (index == 0 ? x.cols : x.rows);
 }
+
 //方差
 double Var	(Mat<>& x) {
 	double mean = Mean(x), var = 0;
-	for (int i = 0; i < x.size(); i++) var += pow(x[i] - mean, 2);
+
+	for (int i = 0; i < x.size(); i++) 
+		var += pow(x[i] - mean, 2);
 	return var / (x.size() - 1);
 }
+
 Mat<>& Var	(Mat<>& x, Mat<>& ans, int index) {
 	Mat<> mean; Mean(x, mean, index);
 	ans.alloc(x.rows);
+
 	for (int i = 0; i < x.rows; i++) 
 		for (int j = 0; j < x.cols; j++)
 			ans[i] += pow(x(i, j) - mean[i], 2);
@@ -78,9 +86,13 @@ Mat<>& Var	(Mat<>& x, Mat<>& ans, int index) {
 void Quartile(Mat<>& x, double* meddle = NULL, double* Q1 = NULL, double* Q3 = NULL) {
 	Mat<> xt(x);
 	std::sort(xt.data, xt.data + xt.size());
-	if (meddle != NULL) *meddle = (xt(1.0 / 2 * xt.size()) + xt((int)(1.0 / 2 * xt.size() + 0.5))) / 2;
-	if (meddle != NULL) *Q1		= (xt(1.0 / 4 * xt.size()) + xt((int)(1.0 / 4 * xt.size() + 0.5))) / 2;
-	if (meddle != NULL) *Q3		= (xt(3.0 / 4 * xt.size()) + xt((int)(3.0 / 4 * xt.size() + 0.5))) / 2;
+
+	if (meddle != NULL) 
+		*meddle = (xt(1.0 / 2 * xt.size()) + xt((int)(1.0 / 2 * xt.size() + 0.5))) / 2;
+	if (Q1 != NULL) 
+		*Q1		= (xt(1.0 / 4 * xt.size()) + xt((int)(1.0 / 4 * xt.size() + 0.5))) / 2;
+	if (Q3 != NULL)
+		*Q3		= (xt(3.0 / 4 * xt.size()) + xt((int)(3.0 / 4 * xt.size() + 0.5))) / 2;
 }
 
 /***************************************************************************
@@ -91,6 +103,7 @@ void MinMaxNormalize(Mat<>& x, double min = DBL_MAX, double max = DBL_MAX) {
 	if (max == DBL_MAX) max = x.max();
 	x.function([&min, &max](double x) {return (x - min) / (max - min); });
 }
+
 /***************************************************************************
 [随机变量生成]
 	[Poisson分布]
@@ -119,33 +132,42 @@ inline double GammaInc(double x, double s, int N = 200) {
 	for (int i = 0; i < N; i++)ans += pow(s, i) / tgamma(x + i + 1);
 	return ans * tgamma(x) * pow(s, x) * exp(-s);
 }
+
 inline double PoissonCdf(int x, double mean) {
 	double ans = 0;
-	for (int i = 0; i < x; i++) ans += pow(mean, i) / NumberTheory::Factorial(i);
+	for (int i = 0; i < x; i++) 
+		ans += pow(mean, i) / NumberTheory::Factorial(i);
 	return ans * exp(-mean);
 }
+
 inline double NormPdf	(double x, double mean = 0, double var = 1) {
 	return 1 / sqrt(2 * PI * var) * exp(-pow(x - mean, 2) / (2 * var));
 }
+
 inline double NormCdf	(double x, double mean = 0, double var = 1) {
 	return 1.0 / 2 * (1 + erf((x - mean) / sqrt(2 * var)));
 }
+
 inline double ExpPdf	(double x, double mean) {
 	return x <= 0 ? 0.0 : 1.0 / mean * exp(-x / mean);
 }
+
 inline double ExpCdf	(double x, double mean) {
 	return x <= 0 ? 0.0 : 1 - exp(-x / mean);
 }
+
 inline double GammaPdf	(double x, double mean, double var) {
 	double a = mean * mean / var,
 		   b = mean / var;
 	return pow(b, a) / tgamma(a) * pow(x, a - 1) * exp(-b * x);
 }
+
 inline double GammaCdf	(double x, double mean, double var) {
 	double a = mean * mean / var,
 		   b = mean / var;
 	return 1.0 / tgamma(a) * GammaInc(a, b * x);
 }
+
 /***************************************************************************
 *								偏度峰度
 *	[定义]:
@@ -157,20 +179,26 @@ inline double GammaCdf	(double x, double mean, double var) {
 /***************************************************************************/
 double Skewness(Mat<>& x) {
 	double mean = Mean(x), B[5] = { 0 };
+
 	for (int k = 2; k <= 4; k++) {
-		for (int i = 0; i < x.size(); i++) B[k] += pow(x[i] - mean, k);
+		for (int i = 0; i < x.size(); i++) 
+			B[k] += pow(x[i] - mean, k);
 		B[k] /= x.size();
 	}
 	return B[3] / pow(B[2], 1.5);
 }
+
 double Kurtosis(Mat<>& x) {
 	double mean = Mean(x), B[5] = { 0 };
+
 	for (int k = 2; k <= 4; k++) {
-		for (int i = 0; i < x.size(); i++) B[k] += pow(x[i] - mean, k);
+		for (int i = 0; i < x.size(); i++) 
+			B[k] += pow(x[i] - mean, k);
 		B[k] /= x.size();
 	}
 	return B[4] / pow(B[2], 2);
 }
+
 /*#############################################################################
 
 								假设检验
@@ -193,14 +221,18 @@ double Kurtosis(Mat<>& x) {
 /***************************************************************************/
 double X2Test(Mat<>& x, Mat<>& expect) {
 	double X2 = 0;
-	for (int i = 0; i < x.size(); i++) X2 += pow(expect[i] - x[i], 2) / x[i];
+
+	for (int i = 0; i < x.size(); i++)
+		X2 += pow(expect[i] - x[i], 2) / x[i];
 	return X2;
 }
+
 template<typename F>
 double X2Test(Mat<>& x, double St, double Ed, int N, F&& DistribFunc) {
 	//[1]
 	double delta = (Ed - St) / N, n = x.size();
 	Mat<int> freq(N + 2);
+
 	for (int i = 0; i < x.size(); i++) {
 		int index = ceil((x[i] - St) / delta);
 		if (x[i] < St) index = 0;
@@ -220,6 +252,7 @@ double X2Test(Mat<>& x, double St, double Ed, int N, F&& DistribFunc) {
 		X2 += pow(freq[i], 2) / (n * p);
 	} return X2 -= n;
 }
+
 /***************************************************************************
 *								正态分布 - 偏度峰度检验
 *	[定义]:
@@ -236,7 +269,8 @@ bool SkewnessKurtosisTest(Mat<>& x, double SignificanceLevel) {
 	int N = x.size();
 	double mean = Mean(x), B[5] = { 0 };
 	for (int k = 2; k <= 4; k++) {
-		for (int i = 0; i < N; i++) B[k] += pow(x[i] - mean, k);
+		for (int i = 0; i < N; i++) 
+			B[k] += pow(x[i] - mean, k);
 		B[k] /= N;
 	}
 	//[2][3]
@@ -252,6 +286,7 @@ bool SkewnessKurtosisTest(Mat<>& x, double SignificanceLevel) {
 	if (u1 >= SignificanceLevel || u2 >= SignificanceLevel) return false;
 	return true;
 }
+
 /*#############################################################################
 
 								其他
@@ -267,6 +302,7 @@ Mat<int>& Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow, doubl
 		   min = underFlow == NULL ? x.min() : underFlow,
 		   delta = (max - min) / N;
 	frequency.zero(1, N + (overFlow == NULL ? 1 : 0) + (underFlow == NULL ? 1 : 0));
+
 	for (int i = 0; i < x.cols; i++) {
 		int index = (x[i] - min) / delta + (overFlow == NULL ? 1 : 0);
 		index = x[i] <= min ? 0 : index;
@@ -275,6 +311,7 @@ Mat<int>& Histogram(Mat<>& x, int N, Mat<int>& frequency, double overFlow, doubl
 	}
 	return frequency;
 }
+
 /***************************************************************************
 *								箱形图
 *[输出]: MediQuartThreshold: (1) 中位数 (2/3) 小/大四分位数 (4/5) 小/大边缘
@@ -302,5 +339,6 @@ void BoxPlot(Mat<>& x, Mat<>& MediQuartThreshold, std::vector<int>* OutlierIndex
 					OutlierIndex[i].push_back(j);
 	}
 }
+
 }
 #endif

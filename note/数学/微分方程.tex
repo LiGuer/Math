@@ -1,0 +1,45 @@
+* 微分方程
+	* 常微分方程	
+		\Algorithm{Runge Kutta 法}
+	* 偏微分方程
+		\def
+			$F(D^k u(x), ... , D^2 u(x), u(x), x) = 0$
+			$F: R^{n^k} × R^{n^{k-1}} × R^n × R × \Omega \to R; x \in \Omega; u: \Omega \to R$
+		* 线性偏微分方程
+			\def
+				$\sum_{k=0}^K a_k(x) D^k u(x) = f(x)$
+			* 二阶非线性偏微分方程
+				\def
+					$\sum_{ij} a_{ij}(x) \frac{∂^2 u}{∂ x_i ∂ x_j} + \sum_i b_i(x) \frac{∂ u}{∂ x_i} + c(x) u(x) = f(x)$
+					系数矩阵$A(x) = (a_{ij}(x))_{m×m}$
+				* 椭圆型偏微分方程
+					\def
+						指$A(x)$负定.
+					\Example
+						* Poisson's方程
+							\def
+								$ -\nabla^2 \phi = f $
+							* Laplace's方程
+								$ \nabla^2 \phi ≡ 0 $
+				* 双曲型偏微分方程
+					\def
+						指$A(x)$的特征值由1个0和其他负数组成.
+					\Example
+						* 扩散方程
+							\def
+								$\frac{∂u}{∂t} - a \nabla^2 u = f(x,t)$
+				* 抛物型偏微分方程
+					\def
+						指$A(x)$的特征值由1个正数和其他负数组成.
+					\Example
+						* 波动方程
+							\def
+								$\frac{∂^2 u}{∂t^2} - a \nabla^2 u = f(x,t)$
+		* 半线性偏微分方程
+		* 拟线性偏微分方程
+		* 完全非线性偏微分方程
+
+
+
+
+

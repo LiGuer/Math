@@ -1,0 +1,316 @@
+* 矩阵论
+	* 线性空间
+		\def
+			一个带有加法和数乘的非空集合, 且满足下列条件,
+			- 加法封闭 $x+y \in V$
+			- 数乘封闭 $k x \in V$
+			- 存在零元 $x+0=x$
+			- 存在负元 $x+(-x) = 0$
+			- $1x = x$
+			- 交换律 $x+y = y+x$
+			- 分配律 $(k+l)x = kx+lx$
+			- 加法结合律 $x+(y+z) = (x+y) +z$
+			- 数乘结合律 $k(Lx) = (kl)x$
+		\Property
+			* 线性无关/线性相关
+				$\nexists / \exists\ a ≠ 0 => x = \sum_{i=1}^n a_i x_i = 0$ 
+			* 维数
+				\def 
+					线性空间中, 线性无关向量组所含向量最大的个数.
+			* 基
+				\def
+					$\forall x \in V, and\ x = \sum_{i=1}^n a_i x_i$
+					基是一个线性无关的向量组$X = (x_1, ... , x_n)$, 且线性空间中所有向量都是该向量组的线性组合.$x_i$ 基向量, $a_i$ 坐标.
+				\Property 
+					- 基变换
+						$Y = X C$
+						新旧基之间的变换矩阵.
+						\Property
+							基变换矩阵是非奇异矩阵.
+					- 坐标变换
+						$a_x = C a_y$
+						\Proof
+							$v = X a_x = Y a_y = X C a_y => a_x = C a_y$
+					* 张成
+						$Span(x_1,...,x_n) = \{x | x = \sum_{i=1}^n a_i x_i\}$ 
+						线性空间由基向量给出的一种表示.
+		* 线性子空间
+			\def
+				线性空间中的一个非空集合, 且对线性运算的封闭.
+				- 加法封闭 $x,y\in V_1 ,\qu x+y \in V_1$
+				- 数乘封闭 $x \in V_1, k x \in V_1$
+		\Example
+			* 内积空间
+				\def
+					定义了内积的空间.
+					* 内积
+						\def
+							满足下列条件的运算,
+							- 交换律:$<x, y>=\overline{<y, x>}$
+							- 分配律:$<x, y+z> = <x , y> + <x, z>$
+							- 齐次性:$<k x, y> = k <x, y>$
+							- 非负性:$<x,x> ≥ 0$, 当且仅当 $x = 0, <x,x> = 0$
+						\Property
+							* 正交
+								\def
+									$<x,y> = 0$
+									正交指两个向量的内积为零. 
+							* \Theorem Cauchy-Бyнияковскнй不等式
+								$|<x, y>| ≤ |x| |y|$
+	* 线性变换
+		\def
+			$T(k x + l y) = k(T x) + l(T y)$
+			线性空间$V$到自身的一类映射$T$, 对于所有$x \in V$都有唯一的$y \in V$与之对应, 且满足线性条件.
+			* 线性变换矩阵
+				\def
+					$T X = X A  \qu; X = [x_1, ... , x_n]$ 
+					线性变换由基的矩阵给出的一种表示.
+				\Property
+					- 运算 
+						- $(T_1 + T_2) X = X (A + B)$
+						- $(k\ T_1) X = X (k\ A)$
+						- $(T_1 T_2) X = X AB$
+						- $T_1^{-1} X = X A^{-1}$
+		\Property
+			* 值域 
+				\def
+					$Range(T)=\{T x | x \in V\}$
+					线性空间中, 所有向量在线性变换后的结果的集合, 即 线性变换后的线性空间. 
+				\Property
+					* 秩
+						\def
+							$rank(A) = \dim Range(A) = \dim Range(A^T)$
+							变换后的空间的维数, 即 值域的维数.
+			* 零空间
+				\def
+					$Null(T) = \{x | T x = 0\}$
+					线性空间中, 所有在线性变换为零向量的原向量的集合. 
+				\Property
+					$\dim V = \dim Range(A) + \dim Null(A)$
+					变换前线性空间维数 = 值域维数 + 零空间维数. 
+			* 不变子空间
+				\def
+					$\forall x \in V_1, V_1 \subseteq V, T x \in V_1$
+			* 特征值、特征向量
+				\def
+					$T x = λ x$
+					$x$ 特征向量, 是线性变换前后方向不改变的向量;
+					$λ$ 特征值, 是特征向量在线性变换后长度变化的倍率.
+				\Property
+					* 特征多项式
+						$\varphi(λ) = |λ I - A| = λ^n + a_1 λ^{n-1} + ... + a_{n-1} λ + a_n$
+					* \Theorem Hamilton-Cayley定理
+						$\varphi(A) = A^n + a_{1} A^{n-1}+ ... +a_{n-1} A + a_n I = 0$
+						矩阵是其特征多项式的根.
+			* 广义逆
+				\def
+					满足以下方程的解,
+					$ \{\mb
+						A X A = A
+						X A X = X
+						(A X)^H = A X
+						(X A)^H = A X
+					\me\right.$
+					列满秩 $A^+ = (A^H A)^{-1} A^H$
+					行满秩 $A^+ = A^H (A A^H)^{-1}$
+				\Property
+					* $rank(A) = rank(A^H A) = rank(A A^H)$
+					* 满秩分解算广义逆 $A^+ = G^H (F^H A G^H)^{-1} F^H$
+			* 相似
+				\def
+					$\exists \text{非奇异矩阵}P => B = P^{-1} A P$, 则$A$与$B$相似, 记作$A ~ B$.
+				\Property 
+					- $A ~ A$ 
+					- $A ~ B <=> B ~ A$ 
+					- $A ~ B, B ~ C <=> A ~ C$
+					- 相似矩阵特征值、特征向量相同.
+					- 相似矩阵迹相同.
+			- 不同基下线性变换矩阵的转换
+				$A_Y = C^{-1} A_X C \qu; Y = C X$
+				\Proof
+					$
+						T Y = Y A_Y		 \tag{定义} 
+						T X C = X C A_Y	 \tag{ Y = X C }
+						X A_X C = X C A_Y   \tag{ T X = X A_X }
+						A_X C = C A_Y
+						A_Y = C^{-1} A_X C
+					$
+		\Example
+			* 恒等变换
+				\def $T x = x \qu ;(\forall x \in V)$
+			* 零变换
+				\def $T x = 0 \qu ;(\forall x \in V)$
+			* 正交变换
+				\def
+					$<x, x> = <T x, T x>$
+					内积空间中, 保持任意向量的长度不变的线性变换.
+					正交矩阵:
+						$A A^T = I$
+						$A A^H = I$
+				* 初等旋转变换
+					\def
+						初等旋转变换矩阵:
+						$T_{ij} = (\mb
+							\. I \\ & cosθ|_{(i,i)}&  & \sinθ|_{(i,j)} \\ & & \. I \\ & -\sinθ|_{(j,i)} & & \cosθ|_{(j,j)} \\ & & & & \. I
+						\me)$
+				* 初等反射变换
+					\def
+						$y = H x = (I - 2 e_2 e_2^T) x$
+						\Proof
+							$
+								x - y = e_2 · (e_2^T x)
+								=> y = (I-2 e_2 e_2^T) x
+							$
+			* 对称变换
+				\def
+					$<T x, y> = <x, T y>$
+					对称矩阵:
+						$A^T = A$
+						$A^H = A$
+			* 投影变换
+				\def
+					令线性空间分为不交的子空间L,M, 投影变换是将线性空间沿M到L的投影的变换.
+					投影矩阵: 
+						$P_{L,M} = (X & 0)\ (X & Y)^{-1}$
+				* 正交投影变换
+					\def
+						设线性空间的子空间L, 将线性空间沿$L_\bot$到L的投影的变换, 称投影变换.
+						正交投影矩阵:
+							投影后子空间的基 $X = (x_1, ... , x_r) ,$ 则正交投影矩阵 $P_L = X(X^H X)^{-1}X^H$.
+			* 斜切变换
+				\def
+					斜切变换矩阵: 
+						单位矩阵的第(i,j)个元素改为斜切比率 $a_{ij}$
+			* 缩放变换
+				\def
+					缩放变换矩阵:
+					$T = (\mb dx_1 \\ & dx_2 \\ & & \ddots \\ & & & dx_n \me)$
+	* 范数
+		* 向量范数
+			\def
+				一类函数, 且满足
+				- 非负性, $||A|| ≥ 0$, 当且仅当$A = 0, ||A|| = 0$
+				- 齐次性, $||k A|| = |k| ||A||$
+				- 三角不等式, $||A + B|| e ||A|| + ||B||$
+			\Example 
+				* $p$-范数 $||x||_{p}=(\sum_{i=1}^{n}|x_i|^p)^{1 / p}$
+				* $∞$-范数 $||x||_∞ = \max|x_i|$
+				* 椭圆范数 $||x||_A=(x^T A x)^{1/2}$
+		* 矩阵范数
+			\def
+				一类函数, 且满足
+				- 非负性, $||A|| ≥ 0$, 当且仅当$A = 0, ||A|| = 0$
+				- 齐次性, $||k A|| = |k| ||A||$
+				- 三角不等式, $||A + B|| e ||A|| + ||B||$
+				- 相容性, $||A B|| e ||A||\ ||B||$
+			\Example 
+				* $||A||_{m_1} = \sum_{i,j} |a_{ij}|$
+				* $||A||_{m_2} = (\sum_{i,j} a_{ij}^2)^{1/2}$
+				* $||A||_{m_∞} = n·\max_{i,j}|a_{ij}|$
+				* 列和范数 $||A||_1	  = \max_j \sum_i |a_{ij}|$
+				* 行和范数 $||A||_∞ = \max_i \sum_j |a_{ij}|$
+				* 谱范数   $||A||_2 = \sqrt{\max\ λ_i} \qu ,(λ_i)$为$A^H A$特征值.
+		\Note
+			矩阵范数, 向量范数相容: $||A x||_V \le ||A||_M ||x||_V$
+	* 矩阵分解
+		\Example
+			* 上下三角分解
+				\Algorithm
+					- 目的
+						将矩阵A化成上三角矩阵R与下三角矩阵L的乘积.$A = L R$
+			* 上下三角对角分解
+				\Algorithm
+					- 目的
+						将矩阵A化成上三角矩阵R, 对角矩阵D, 下三角矩阵L的乘积.$A = L D R$
+			* 对称三角分解
+				\Algorithm
+					- 目的
+						将对称正定矩阵化成对称的两个上下三角矩阵. $A = G G^T$
+					- 步骤
+						- 先上下三角分解 $A = L D U = L D L^T \tag{因为对称正定矩阵}$
+						- 
+							$
+								A = L (\sqrt(D))^2 L^T
+									= (L \sqrt(D)) (\sqrt(D) L^T)
+									= (L \sqrt(D)) (L \sqrt(D))^T
+									= G G^T
+							$
+			* 正交三角分解
+				\Algorithm
+					- 目的
+						将非奇异矩阵A化成正交矩阵Q与非奇异上三角矩阵R的乘积. $A = Q R$
+					- Schmidt正交化方法
+						- 步骤
+							- $A = (a_1, ..., a_n)$
+							- Schmidt正交化 $b_i = a_i - \sum_{k=1}^{i-1} \/{<a_i,b_j>}{<b_j,b_j>}b_j$
+							- 
+								$
+									Q = ( \/{b_1}{|b_1|}, ... , \/{b_n}{|b_n|} )
+									R = (\mb |b_1|\\ & \ddots\\ && |b_{n}| ) ( 1 & k_{21} & ... & k_{n1} \\ & 1 & ... & k_{n2} \\& & \ddots & \vdots \\& & & 1 \me) \qu; k_ij = \/{<a_i,b_j>}{<b_j,b_j>}
+									A = Q R
+								$
+					- 初等旋转变换方法
+						- 步骤
+							- 对第1列, 初等旋转变换使其变为 $T_i a_1 = (b_{11}, 0,...,0)$
+							- $T_i = \prod_{i=0}^{n-1} T_{i(n-1-j)}$
+							- 重复上面步骤, 直至将 $A_i$ 化为上三角矩阵
+							- 
+								$
+									R = A_{n-1}
+									Q = (\prod_{i=0}^{n-1} T_{n-1-i} )^T
+									A = Q R
+								$
+					- 初等反射变换
+						- 步骤
+							- 对第1列, 初等旋转变换使其变为 $H_i a_1 = (b_{11}, 0,...,0)$
+								$
+									u_i = \/{b_i - |b_i|}{| b_i - |b_i| |}
+									H_i = I - 2 u u^T
+									A_{i+1} = H_i A_i
+								$
+							- 重复上面步骤, 直至将 $A_i$ 化为上三角矩阵
+							- 
+								$
+									R = A_{n-1}
+									Q = (\prod_{i=0}^{n-1} H_{n-1-i} )^T
+									A = Q R
+								$
+			* 满秩分解
+				\Algorithm
+					- 目的
+						将矩阵A化成F G的乘积. $A = F G$
+						\Proof
+							$A=P^{-1} B= (\mb F & S \me) (\mb G\\ 0 \me) = F G$
+					- 步骤
+						初等行变换$A \to (\mb G\\ 0 \me)$, 取A左侧rank(A)列作为F, 则$A = F G$
+			* 奇异值分解
+				\Algorithm
+					\Theorem
+						$\exists \text{Unitary矩阵} U, V => U^H A V = [\Sigma & 0 \\ 0 & 0]$
+					- 目的
+						将矩阵A化成两个Unitary矩阵$U, V$, 和一个非零奇异值组成的矩阵$Σ$的乘积. $A = U (Σ & 0 \\ 0 & 0) V^T$
+					- 步骤
+						- $A^T A$ 计算特征值 $λ$, 特征向量$x$
+						- $V = ( \/{x_1}{|x_1|}, ... ,\/{x_n}{|x_n|} ), \qu Σ = diag(\sqrt(λ_1), ... ,\sqrt(λ_n))$
+						- $U_1 = A V Σ^{-1}$, 计算正交矩阵$U$
+						- $ A = U (\mb Σ & 0 \\ 0 & 0 \me) V^T $
+				\Property
+					$
+						Range(A) = Span(u_1, ..., u_r)
+						Null (A) = Span(v_{r+1}, ... , v_n)
+						Range(A^T) = Span(v_1, ..., v_r)
+						Null (A^T) = Span(u_{r+1}, ... , u_m)
+						A = \sum_{i=1}^{r} \sigma_i u_i v_i^H
+					$
+					\Proof
+						$
+							A = [U_{1:r} & U_{r+1:m}] [\Sigma & 0 \\ 0 & 0] [V_{1:r}^H V_{r+1:n}^H]  \tag{定义式变形}
+								= U_{1:r} \Sigma V_{1:r}^H
+							Range(A) = \{y | A x = y\}
+								= \{y | U_{1:r} (\Sigma V_{1:r}^H x) = y\}  \tag{代入}
+								\subseteq Range(U_{1:r})
+							Range(U_{1:r}) = \{y | U_{1:r} x = y\}
+								= \{y | A (V_{1:r} \Sigma^{-1} x) = y\}  \tag{$U_{1:r} = A V_{1:r} \Sigma^{-1}$}
+								\subseteq Range(A)
+							=> Range(A) = Range(U_{1:r}) = Span(u_1, ..., u_r)
+						$

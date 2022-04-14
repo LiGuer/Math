@@ -1,17 +1,3 @@
-/*
-Copyright 2020-2021 LiGuer. All Rights Reserved.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-	http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-[Reference]:
-[1] Thanks for Artiprocher at https://www.zhihu.com/question/379824357/answer/1088257294
-==============================================================================*/
 #ifndef NUMBERTHEORY_H
 #define NUMBERTHEORY_H
 #include <stdlib.h>
@@ -63,14 +49,18 @@ inline INT64S Factorial(INT64S n){
 INT64S C(INT64S n, INT64S m) {
 	return (INT64S)round(Factorial(n) / Factorial(m) / Factorial(n - m));
 }
+
 INT64S A(INT64S n, INT64S m) {
 	return (INT64S)round(Factorial(n) / Factorial(n - m));
 }
+
 INT64S C_Lucas(INT64S n, INT64S m, INT64S p) {
 	INT64S ans = 1;
-	while (n | m) ans *= C(n % p, m % p), n /= p, m /= p;
+	while (n | m) 
+		ans *= C(n % p, m % p), n /= p, m /= p;
 	return ans;
 }
+
 /*********************************************************************************
 						Fibonacci数列
 [定义]: F[n] = F[n-1] + F[n-2]		(n≥2, F[0]=0, F[1]=1)
@@ -80,9 +70,11 @@ INT64S* FibonacciSequence(int N) {
 	INT64S* seq = (INT64S*)calloc(N, sizeof(INT64S));
 	seq[0] = 0; 
 	seq[1] = 1;
-	for (int i = 2; i < N; i++) seq[i] = seq[i - 1] + seq[i - 2];
+	for (int i = 2; i < N; i++) 
+		seq[i] = seq[i - 1] + seq[i - 2];
 	return seq;
 }
+
 /*********************************************************************************
 						最大公约数 / 最小公倍数
 [算法]: 辗转相除法 GCD(a,b) == GCD(b, a mod b)
@@ -91,6 +83,7 @@ INT64S* FibonacciSequence(int N) {
 *********************************************************************************/
 INT64S GCD(INT64S a, INT64S b) { return a % b == 0 ? b : GCD(b, a % b); }
 INT64S LCM(INT64S a, INT64S b) { return a / GCD(a, b) * b; }
+
 /*********************************************************************************
 [拓展Euclid算法]
 	[算法]: 辗转相除法的拓展
@@ -117,18 +110,24 @@ INT64S GCDex(INT64S a, INT64S b, INT64S& x, INT64S& y){
 *********************************************************************************/
 bool isPrime(INT64S a) {
 	if (a == 1)return false;
-	for (INT64S i = 2; i <= sqrt(a); i++) if (a % i == 0) return false;
+	for (INT64S i = 2; i <= sqrt(a); i++) 
+		if (a % i == 0) 
+			return false;
 	return true;
 }
 bool* getPrime(INT64S n) {
 	bool* prime = (bool*)malloc((n + 1) * sizeof(bool));
-	for (int i = 2; i <= n; i++) prime[i] = true;
+	for (int i = 2; i <= n; i++) 
+		prime[i] = true;
 	prime[1] = prime[0] = false;
+	
 	for (int i = 2; i <= n; i++) {
 		if (prime[i])
-			for (int j = i + i; j <= n; j += i) prime[j] = false;
+			for (int j = i + i; j <= n; j += i) 
+			prime[j] = false;
 	}
 }
+
 /*********************************************************************************
 [幂次模]
 	[问题]: 求 b = a^k (mod m)
@@ -145,7 +144,8 @@ bool* getPrime(INT64S n) {
 INT64S PowMod(INT64S a, INT64S k, INT64S m) {
 	INT64S ans = 1;
 	for (int i = 0; i < sizeof(k) * 8; i++) {
-		if (k & ((INT64S)1 << i))ans = (ans * a) % m;
+		if (k & ((INT64S)1 << i))
+			ans = (ans * a) % m;
 		a = (a * a) % m;
 	}return ans;
 }
