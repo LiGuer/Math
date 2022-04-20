@@ -185,6 +185,7 @@
 				\def
 					缩放变换矩阵:
 					$T = (\mb dx_1 \\ & dx_2 \\ & & \ddots \\ & & & dx_n \me)$
+					
 	* 范数
 		* 向量范数
 			\def
@@ -212,105 +213,5 @@
 				* 谱范数   $||A||_2 = \sqrt{\max\ λ_i} \qu ,(λ_i)$为$A^H A$特征值.
 		\Note
 			矩阵范数, 向量范数相容: $||A x||_V \le ||A||_M ||x||_V$
+
 	* 矩阵分解
-		\Example
-			* 上下三角分解
-				\Algorithm
-					- 目的
-						将矩阵A化成上三角矩阵R与下三角矩阵L的乘积.$A = L R$
-			* 上下三角对角分解
-				\Algorithm
-					- 目的
-						将矩阵A化成上三角矩阵R, 对角矩阵D, 下三角矩阵L的乘积.$A = L D R$
-			* 对称三角分解
-				\Algorithm
-					- 目的
-						将对称正定矩阵化成对称的两个上下三角矩阵. $A = G G^T$
-					- 步骤
-						- 先上下三角分解 $A = L D U = L D L^T \tag{因为对称正定矩阵}$
-						- 
-							$
-								A = L (\sqrt(D))^2 L^T
-									= (L \sqrt(D)) (\sqrt(D) L^T)
-									= (L \sqrt(D)) (L \sqrt(D))^T
-									= G G^T
-							$
-			* 正交三角分解
-				\Algorithm
-					- 目的
-						将非奇异矩阵A化成正交矩阵Q与非奇异上三角矩阵R的乘积. $A = Q R$
-					- Schmidt正交化方法
-						- 步骤
-							- $A = (a_1, ..., a_n)$
-							- Schmidt正交化 $b_i = a_i - \sum_{k=1}^{i-1} \/{<a_i,b_j>}{<b_j,b_j>}b_j$
-							- 
-								$
-									Q = ( \/{b_1}{|b_1|}, ... , \/{b_n}{|b_n|} )
-									R = (\mb |b_1|\\ & \ddots\\ && |b_{n}| ) ( 1 & k_{21} & ... & k_{n1} \\ & 1 & ... & k_{n2} \\& & \ddots & \vdots \\& & & 1 \me) \qu; k_ij = \/{<a_i,b_j>}{<b_j,b_j>}
-									A = Q R
-								$
-					- 初等旋转变换方法
-						- 步骤
-							- 对第1列, 初等旋转变换使其变为 $T_i a_1 = (b_{11}, 0,...,0)$
-							- $T_i = \prod_{i=0}^{n-1} T_{i(n-1-j)}$
-							- 重复上面步骤, 直至将 $A_i$ 化为上三角矩阵
-							- 
-								$
-									R = A_{n-1}
-									Q = (\prod_{i=0}^{n-1} T_{n-1-i} )^T
-									A = Q R
-								$
-					- 初等反射变换
-						- 步骤
-							- 对第1列, 初等旋转变换使其变为 $H_i a_1 = (b_{11}, 0,...,0)$
-								$
-									u_i = \/{b_i - |b_i|}{| b_i - |b_i| |}
-									H_i = I - 2 u u^T
-									A_{i+1} = H_i A_i
-								$
-							- 重复上面步骤, 直至将 $A_i$ 化为上三角矩阵
-							- 
-								$
-									R = A_{n-1}
-									Q = (\prod_{i=0}^{n-1} H_{n-1-i} )^T
-									A = Q R
-								$
-			* 满秩分解
-				\Algorithm
-					- 目的
-						将矩阵A化成F G的乘积. $A = F G$
-						\Proof
-							$A=P^{-1} B= (\mb F & S \me) (\mb G\\ 0 \me) = F G$
-					- 步骤
-						初等行变换$A \to (\mb G\\ 0 \me)$, 取A左侧rank(A)列作为F, 则$A = F G$
-			* 奇异值分解
-				\Algorithm
-					\Theorem
-						$\exists \text{Unitary矩阵} U, V => U^H A V = [\Sigma & 0 \\ 0 & 0]$
-					- 目的
-						将矩阵A化成两个Unitary矩阵$U, V$, 和一个非零奇异值组成的矩阵$Σ$的乘积. $A = U (Σ & 0 \\ 0 & 0) V^T$
-					- 步骤
-						- $A^T A$ 计算特征值 $λ$, 特征向量$x$
-						- $V = ( \/{x_1}{|x_1|}, ... ,\/{x_n}{|x_n|} ), \qu Σ = diag(\sqrt(λ_1), ... ,\sqrt(λ_n))$
-						- $U_1 = A V Σ^{-1}$, 计算正交矩阵$U$
-						- $ A = U (\mb Σ & 0 \\ 0 & 0 \me) V^T $
-				\Property
-					$
-						Range(A) = Span(u_1, ..., u_r)
-						Null (A) = Span(v_{r+1}, ... , v_n)
-						Range(A^T) = Span(v_1, ..., v_r)
-						Null (A^T) = Span(u_{r+1}, ... , u_m)
-						A = \sum_{i=1}^{r} \sigma_i u_i v_i^H
-					$
-					\Proof
-						$
-							A = [U_{1:r} & U_{r+1:m}] [\Sigma & 0 \\ 0 & 0] [V_{1:r}^H V_{r+1:n}^H]  \tag{定义式变形}
-								= U_{1:r} \Sigma V_{1:r}^H
-							Range(A) = \{y | A x = y\}
-								= \{y | U_{1:r} (\Sigma V_{1:r}^H x) = y\}  \tag{代入}
-								\subseteq Range(U_{1:r})
-							Range(U_{1:r}) = \{y | U_{1:r} x = y\}
-								= \{y | A (V_{1:r} \Sigma^{-1} x) = y\}  \tag{$U_{1:r} = A V_{1:r} \Sigma^{-1}$}
-								\subseteq Range(A)
-							=> Range(A) = Range(U_{1:r}) = Span(u_1, ..., u_r)
-						$

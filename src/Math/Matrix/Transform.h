@@ -43,10 +43,10 @@ inline Mat<>& Matrix::rotate(Mat<>& theta, Mat<>& T) {
 
 //3D·四元数
 inline Mat<>& Matrix::rotate(Mat<>& rotateAxis, double theta, Mat<>& T) {
-    if (T.rows != 3 + 1) exit(-1);
-
+    E(T.alloc(4, 4));
+    
     normalize(rotateAxis);
-    Mat<> q(4);				//四元数
+    static Mat<> q(4), tmp;				//四元数
     q = {
         cos(theta / 2),
         sin(theta / 2) * rotateAxis[0],
@@ -54,9 +54,7 @@ inline Mat<>& Matrix::rotate(Mat<>& rotateAxis, double theta, Mat<>& T) {
         sin(theta / 2) * rotateAxis[2]
     };
 
-    // rotate mat
-    T.zero();
-
+    // rotate mats
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
             T(i, j) = q[((j % 2 == 0 ? 1 : -1) * i + j + 4) % 4];
@@ -64,14 +62,13 @@ inline Mat<>& Matrix::rotate(Mat<>& rotateAxis, double theta, Mat<>& T) {
     for (int i = 1; i < 4; i++)
         T(i, i % 3 + 1) *= -1;
 
-    Mat<> tmp = T;
+    tmp = T;
     for (int i = 1; i < 4; i++) {
         T(0, i) *= -1;
         tmp(i, 0) *= -1;
     }
 
     mul(T, T, tmp);
-
     return T;
 }
 

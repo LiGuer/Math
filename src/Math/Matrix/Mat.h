@@ -31,6 +31,10 @@ public:
 		set(_rows, _cols, _data); 
 	}
 
+	Mat(const Mat& a) {			//复制式构造函数
+		*this = a;
+	}
+
 	~Mat() { 
 		delete data; 
 	}
