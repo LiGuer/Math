@@ -7,7 +7,7 @@
 namespace Matrix {
 	/******************************************************************************
 	*
-	*                    ÇóºÍ
+	*                    æ±‚å’Œ
 	*
 	******************************************************************************/
 
@@ -50,7 +50,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	// ĞĞ/ÁĞ
+	// è¡Œ/åˆ—
 	inline Mat<>& max(Mat<>& ans, Mat<>& a, int index) {
 		if (index == 0) {
 			ans.alloc(a.rows);
@@ -101,7 +101,7 @@ namespace Matrix {
 		}
 	}
 
-	/*---------------- ÇóºÍ ----------------*/
+	/*---------------- æ±‚å’Œ ----------------*/
 	inline double sum(Mat<>& a) {
 		double ans = 0;
 		for (int i = 1; i < a.size(); i++)
@@ -110,7 +110,7 @@ namespace Matrix {
 	}
 
 	inline Mat<>& sum(Mat<>& ans, Mat<>& a, int dim) {
-		if (dim == 0) {				//¶ÔÃ¿Ò»ÁĞÇóºÍ
+		if (dim == 0) {				//å¯¹æ¯ä¸€åˆ—æ±‚å’Œ
 			Mat<> ansTmp(1, a.cols);
 			for (int j = 0; j < a.cols; j++)
 				for (int i = 0; i < a.rows; i++)
@@ -120,7 +120,7 @@ namespace Matrix {
 			return ans;
 		}
 
-		if (dim == 1) {				//¶ÔÃ¿Ò»ĞĞÇóºÍ
+		if (dim == 1) {				//å¯¹æ¯ä¸€è¡Œæ±‚å’Œ
 			Mat<> ansTmp(a.rows);
 			for (int i = 0; i < a.rows; i++)
 				for (int j = 0; j < a.cols; j++)
@@ -133,7 +133,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*---------------- Çó»ı ----------------*/
+	/*---------------- æ±‚ç§¯ ----------------*/
 	inline double product(Mat<>& a) {
 		double ans = 0;
 		for (int i = 1; i < a.size(); i++)

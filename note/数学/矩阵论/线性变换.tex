@@ -1,0 +1,150 @@
+* 线性变换
+	\Define
+		$T(k x + l y) = k(T x) + l(T y)$
+		线性空间$V$到自身的一类映射$T$, 对于所有$x \in V$都有唯一的$y \in V$与之对应, 且满足线性条件.
+
+		线性变换可由基构成的矩阵表示. 即, 线性变换矩阵
+		$T X = X A  \qu; X = [x_1, ... , x_n]$ 
+
+	\Property
+		- 运算 
+			- $(T_1 + T_2) X = X (A + B)$
+			- $(k\ T_1) X = X (k\ A)$
+			- $(T_1 T_2) X = X AB$
+			- $T_1^{-1} X = X A^{-1}$
+
+		- 值域 
+			$Range(T)=\{T x | x \in V\}$
+			线性空间中, 所有向量在线性变换后的结果的集合, 即 线性变换后的线性空间. 
+
+			- 秩
+				$rank(A) = \dim Range(A) = \dim Range(A^T)$
+				变换后的空间的维数, 即 值域的维数.
+
+		- 零空间
+			$Null(T) = \{x | T x = 0\}$
+			线性空间中, 所有在线性变换为零向量的原向量的集合. 
+
+		- $\dim V = \dim Range(A) + \dim Null(A)$
+			变换前线性空间维数 = 值域维数 + 零空间维数. 
+
+		- 不变子空间
+			$\forall x \in V_1, V_1 \subseteq V, T x \in V_1$
+
+		* 特征值、特征向量
+			\Define
+				$T x = λ x$
+				- $x$ 特征向量, 是线性变换前后方向不改变的向量;
+				- $λ$ 特征值, 是特征向量在线性变换后长度变化的倍率.
+
+			\Property
+				- 特征多项式
+					$\varphi(λ) = |λ I - A| = λ^n + a_1 λ^{n-1} + ... + a_{n-1} λ + a_n$
+
+				- \Theorem Hamilton-Cayley定理
+					$\varphi(A) = A^n + a_1 A^{n-1}+ ... +a_{n-1} A + a_n I = 0$
+					矩阵是其特征多项式的根.
+
+		* 广义逆
+			\Define
+				满足以下方程的解,
+				$ 
+					\{\mb
+						A X A = A
+						X A X = X
+						(A X)^H = A X
+						(X A)^H = A X
+					\me\right.
+				$
+				列满秩时, $A^+ = (A^H A)^{-1} A^H$
+				行满秩时, $A^+ = A^H (A A^H)^{-1}$
+
+			\Property
+				- $rank(A) = rank(A^H A) = rank(A A^H)$
+				- 满秩分解算广义逆 $A^+ = G^H (F^H A G^H)^{-1} F^H$
+
+		* 相似
+			\Define
+				$\exists \text{非奇异矩阵}P => B = P^{-1} A P$
+				则$A$与$B$相似, 记作$A ~ B$.
+
+			\Property 
+				- $A ~ A$ 
+				- $A ~ B <=> B ~ A$ 
+				- $A ~ B, B ~ C <=> A ~ C$
+				- 相似矩阵特征值、特征向量相同.
+				- 相似矩阵迹相同.
+
+		- 不同基下线性变换矩阵的转换
+			$A_Y = C^{-1} A_X C \qu; Y = C X$
+
+			\Proof
+				$
+					T Y &= Y A_Y		 \tag{定义} 
+					T X C &= X C A_Y	 \tag{$ Y = X C $}
+					X A_X C &= X C A_Y   \tag{$ T X = X A_X $}
+					A_X C &= C A_Y
+					A_Y &= C^{-1} A_X C
+				$
+				
+	\Include
+		* 恒等变换
+			\Define
+				$T x = x \qu ;(\forall x \in V)$
+
+		* 零变换
+			\Define
+				$T x = 0 \qu ;(\forall x \in V)$
+
+		* 正交变换
+			\Define
+				$<x, x> = <T x, T x>$
+				内积空间中, 保持任意向量的长度不变的线性变换.
+				正交矩阵:
+					$A A^T = I$
+					$A A^H = I$
+
+			* 初等旋转变换
+				\Define
+					初等旋转变换矩阵:
+					$T_{ij} = (\mb
+						\. I \\ & cosθ|_{(i,i)}&  & \sinθ|_{(i,j)} \\ & & \. I \\ & -\sinθ|_{(j,i)} & & \cosθ|_{(j,j)} \\ & & & & \. I
+					\me)$
+
+			* 初等反射变换
+				\Define
+					$y = H x = (I - 2 e_2 e_2^T) x$
+					\Proof
+						$
+							x - y &= e_2 · (e_2^T x)
+							=> y &= (I-2 e_2 e_2^T) x
+						$
+
+		* 对称变换
+			\Define
+				$<T x, y> = <x, T y>$
+				对称矩阵:
+					$A^T = A$
+					$A^H = A$
+
+		* 投影变换
+			\Define
+				令线性空间分为不交的子空间L,M, 投影变换是将线性空间沿M到L的投影的变换.
+				投影矩阵: 
+					$P_{L,M} = (\mb X & 0 \me) (\mb X & Y \me)^{-1}$
+
+			* 正交投影变换
+				\Define
+					设线性空间的子空间L, 将线性空间沿$L_\bot$到L的投影的变换, 称投影变换.
+					正交投影矩阵:
+						投影后子空间的基 $X = (x_1, ... , x_r) ,$ 则正交投影矩阵 $P_L = X(X^H X)^{-1}X^H$.
+
+		* 斜切变换
+			\Define
+				斜切变换矩阵: 
+					单位矩阵的第(i,j)个元素改为斜切比率 $a_{ij}$
+
+		* 缩放变换
+			\Define
+				缩放变换矩阵:
+				$T = (\mb Δx_1 \\ & Δx_2 \\ & & \ddots \\ & & & Δx_n \me)$

@@ -7,7 +7,7 @@
 
 namespace Matrix {
 
-/*----------------È¡Äæ [ inv x^{-1} ]----------------*/
+/*----------------å–é€† [ inv x^{-1} ]----------------*/
 	inline Mat<>& inv(Mat<>& ans, Mat<>& a) {
 		if (a.rows != a.cols)
 			exit(-1);
@@ -15,17 +15,17 @@ namespace Matrix {
 		Mat<> tmp(a.rows, a.cols);
 		int n = a.rows;
 
-		// LUP·Ö½â
+		// LUPåˆ†è§£
 		Mat<> L, U, P;
 		LUP(a, U, L, P);
 
-		//¶ÔÃ¿Ò»ÁĞ
+		//å¯¹æ¯ä¸€åˆ—
 		Mat<> b(n), x(n);
 		for (int k = 0; k < n; k++) {
 			b.zero();
 			b[k] = 1;
 
-			// ½âÏßĞÔ·½³Ì×é //solve y
+			// è§£çº¿æ€§æ–¹ç¨‹ç»„ //solve y
 			for (int i = 0; i < n; i++) {
 				x[i] = b[P[i]];		//yi
 				for (int j = 0; j < i; j++)
@@ -39,7 +39,7 @@ namespace Matrix {
 				x[i] /= U(i, i);
 			}
 
-			//ºÏ²¢ÖÁ½á¹û
+			//åˆå¹¶è‡³ç»“æœ
 			for (int i = 0; i < a.rows; i++)
 				tmp(i, k) = x[i];
 		}

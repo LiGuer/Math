@@ -7,12 +7,12 @@
 namespace Matrix {
 /******************************************************************************
 * 
-*                    ĞĞÁĞÊ½
+*                    è¡Œåˆ—å¼
 * 
 ******************************************************************************/
 	double det(Mat<>& a);
 
-	/*----------------Óà×ÓÊ½ [ comi ]----------------*/
+	/*----------------ä½™å­å¼ [ comi ]----------------*/
 	inline double comi(Mat<>& a, int i0, int j0) {
 		Mat<> tmp(a.rows - 1, a.cols - 1);
 		for (int i = 0; i < a.rows; i++) {
@@ -26,11 +26,11 @@ namespace Matrix {
 		return det(a);
 	}
 
-	/*----------------ĞĞÁĞÊ½ [ det |x| ]----------------*/
+	/*----------------è¡Œåˆ—å¼ [ det |x| ]----------------*/
 	inline double det(Mat<>& a) {
 		if (a.rows != a.cols)
 			exit(-1);
-		//¼ÓËÙ
+		//åŠ é€Ÿ
 		if (a.rows == 1)
 			return a[0];
 
@@ -54,13 +54,13 @@ namespace Matrix {
 			}
 			return ans;
 		}
-		//ÆÕÊÊ
+		//æ™®é€‚
 		for (int i = 0; i < a.rows; i++)
 			ans += a(i, 0) * (i % 2 == 0 ? 1 : -1) * comi(a, i, 0);
 		return ans;
 	}
 
-	/*--------------°éËæ¾ØÕó [ adjugate A* ]----------------*/
+	/*--------------ä¼´éšçŸ©é˜µ [ adjugate A* ]----------------*/
 	inline Mat<>& adjugate(Mat<>& ans, Mat<>& a) {
 		Mat<> ansTmp(a.rows, a.cols);
 		for (int i = 0; i < a.rows; i++)

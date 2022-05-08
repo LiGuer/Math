@@ -9,14 +9,14 @@ namespace Matrix {
 
 	/******************************************************************************
 	*
-	*                    解方程组
+	*                    瑙ｆ柟绋嬬粍
 	*
 	******************************************************************************/
-	inline Mat<>& solveEquations(Mat<>& a, Mat<>& b, Mat<>& x) {
+	inline Mat<>& LinearEquations(Mat<>& a, Mat<>& b, Mat<>& x) {
 		int n = a.rows;
 		x.zero(n);
 
-		//[1] LUP分解
+		//[1] LUP鍒嗚В
 		Mat<> U, L, P;
 		LUP(a, U, L, P);
 

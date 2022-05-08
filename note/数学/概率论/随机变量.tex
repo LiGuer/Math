@@ -1,5 +1,5 @@
 * 随机变量
-	\def	
+	\Define	
 		$X:Ω \to R$
 		随机变量是一种函数.
 		\Note
@@ -8,24 +8,24 @@
 
 	\Property
 		* 累计分布函数
-			\def
+			\Define
 				$
 					F_X(x) = \P(X ≤ x)
 					F_{\.X}(x) = \P(X_1 ≤ x_1, ..., X_n ≤ x_n) = \P(\.X ≤ \.x)
 				$
 		* 概率密度函数
-			\def
+			\Define
 				$
 					f_X(x) = \/{\d F_X(x)}{\d x}
 					f_{\.X}(\.x) = \/{∂^n F_{\.X}(x)}{∂ x_1 ... ∂ x_n}
 				$
 			* 边缘概率密度函数
-				\def
+				\Define
 					$
 						f_{X_i}(x_i) = \int_{-∞}^∞ ... \int_{-∞}^∞ f_{\.X}(\.x) \d x_1 ... \d x_j ... \d x_n |_{j ≠ i}
 					$
 		* 矩
-			\def
+			\Define
 				- K阶矩
 					$
 						E(X^k) = \int_{-∞}^∞ x^k f_X(x) \d x  \tag{连续式}
@@ -37,12 +37,12 @@
 							= \sum_i (x_i-μ)^k \P_X(x_i)  \tag{离散式}
 					$
 			* 联合矩
-				\def
+				\Define
 					$
 						E(X^i Y^j) tag{ij阶联合矩}
 						E((X-\bar X)^i (Y-\bar Y)^j) tag{ij阶联合中心矩}
 					$
-				\Example
+				\Include
 					* 协相关
 						$
 							E(XY)  &\tag{协相关}
@@ -60,7 +60,7 @@
 							- 自协方差矩阵$Σ_{\.X\.X}$是半正定矩阵.
 							- $\.Y = \.A \.X => \.Σ_{\.Y\.Y} = \.A \.Σ_{\.X\.X} \.A^T$
 			* 期望
-				\def
+				\Define
 					$	
 						E(X) = \sum x_i \P_X(x_i)  \tag{离散式}
 							= \int_{-∞}^∞ x f_X(x) \d x  \tag{连续式}
@@ -73,10 +73,10 @@
 						Y = g(X)  \tag{$g$是可测函数}
 					$
 
-	\Example
+	\Include
 		* 离散概率分布
 			* 0-1分布
-				\def
+				\Define
 					$\P(X = k) = p^k (1 - p)^k \qu; k \in \{0,1\}$
 				\Property
 					$
@@ -84,7 +84,7 @@
 						D(x) = p (1 - p)
 					$
 			* 二项分布
-				\def
+				\Define
 					$\P(X = k) = C^k_n p^k (1-p)^{n-k}$
 				\Property
 					$
@@ -92,7 +92,7 @@
 						D(x) = n p(1 - p)
 					$
 			* 几何分布
-				\def
+				\Define
 					$\P(X = k) = p (1-p)^{n-1}$
 					描述连续独立重复实验中, 首次成功所进行的实验次数.
 				\Property
@@ -101,7 +101,7 @@
 						D(x) = \/{1 - p}{p^2}
 					$
 			* 超几何分布
-				\def
+				\Define
 					$\P(X = k) = \/{C_M^k C_{N_M}^{n-k}}{C_N^n}$
 				\Property
 					$
@@ -109,7 +109,7 @@
 						D(x) = \/{n M}{N} (1 - M/N)\/{N - M}{N - 1}
 					$
 			* Poisson分布
-				\def
+				\Define
 					$\P(X = k) = \/{λ^k}{k!} e^{-λ}$
 				\Property
 					$
@@ -121,7 +121,7 @@
 					
 		* 连续概率分布
 			* 均匀分布
-				\def
+				\Define
 					$
 						f(x) = \{\mb \/{1}{b-a} &\qu a < x < b \\ 0 &\qu other \me\right.
 						F(x) = \{\mb 0 &\qu x < a \\ \/{1}{b-a} &\qu a ≤ x < b \\ 1 &\qu b ≤ x \me\right.
@@ -132,7 +132,7 @@
 						D(x) = \/{(b - a)^2}{12}
 					$
 			* Normal分布
-				\def
+				\Define
 					$
 						f_X(x) = \/{1}{\sqrt{2 π} \sigma} e^{-\/{(x - μ)^2}{2 \sigma^2}} \qu; x \in (-∞, +∞)
 						f_{\.X}(\.x) = \/{1}{(2 π)^{n/2} |\.Σ|^{1/2}} e^{-\/{(\.x - \.μ)\.Σ^{-1}(\.x - \.μ)^T}{2}} \tag{多元Normal分布}
@@ -172,12 +172,12 @@
 							= \sqrt{2 π λ_k}  \tag{$Γ(1/2) = \sqrt{π}$}
 						$
 			* Rayleigh 分布
-				\def
+				\Define
 					$
 						f_X(x) = \/{x}{σ^2} e^{\/{-x^2}{2 σ^2}}
 					$
 			* $Γ$分布
-				\def
+				\Define
 					$
 						f(x) = \{\mb \/{1}{β^α Γ(α)} x^{a^{-1}} e^{-x / β} &\qu x \in (0, +∞) \\ 0 &\qu x \in (-∞, 0] \me\right.
 					$
@@ -191,7 +191,7 @@
 						当$α=1$时, $Γ$分布退化为指数分布;
 						当$α=n/2, β=1/2$时, $Γ$分布退化为$\chi^2$分布.
 				* 指数分布
-					\def
+					\Define
 						$
 							f(x) = \{\mb λ e^{-λ x} &\qu x \in (0, +∞) \\ 0 &\qu x \in (-∞, 0] \me\right.
 							F(x) = \{\mb λ 1 - e^{-λ x} &\qu x \in (0, +∞) \\ 0 &\qu x \in (-∞, 0] \me\right.
@@ -202,7 +202,7 @@
 							D(x) = θ^2
 						$
 				* $\chi^2$分布
-					\def
+					\Define
 						$\/{1}{2^{n / 2} Γ(n / 2)} x^{n / 2 - 1} e^{-x / 2}$
 					\Property
 						$

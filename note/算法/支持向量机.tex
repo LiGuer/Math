@@ -1,0 +1,65 @@
+* 支持向量机
+	\Problem
+		$
+			\max_{\.w, b} \qu& \min_i d_i = \/{1}{||\.w||} \min_i |\.w^T \.x_i + b|
+			s.t. \qu& y_i (\.w^T \.x_i + b) ≤ 1
+		$
+		找到一个超平面, 最大化样本点与超平面的最小距离, 且使得不同类别$y_i \in \{-1,1\}$的点分居超平面的两侧. 
+	
+	\Algorithm
+		$
+			\max_{\.λ} \qu& \sum λ_i - 1/2 \sum_i \sum_j λ_i λ_j y_i y_j \.x_i^T \.x_j  \tag{对偶问题}
+			s.t. \qu& \sum_i λ_i^* y_i = 0
+				& λ_i &≥ 0
+		$
+		利用Sequential Minimal Optimization算法求解$λ_i^*$, 代入解出$\.w^*, b^*$.
+		
+		\Proof
+			优化问题简化, 可令$\min_i |\.w^T \.x_i + b| = 1$, 且$ \arg\max_{\.w, b} \/{1}{||\.w||} => \arg\min_{\.w, b} \/{||\.w||^2}{2}$
+			$
+				\max_{\.w, b} \qu& \/{||\.w||^2}{2}
+				s.t. \qu&	y_i (\.w^T \.x_i + b) ≤ 1
+			$
+			Lagrange函数,
+			$
+				L(\.w, b,\.λ) = \/{||\.w||^2}{2} + \sum_i λ_i (1 - y_i (\.w^T \.x_i + b)) \tag{Lagrange函数}
+				\/{∂ L(\.w, b,\.λ)}{∂ \.w} |_{\.w = \.w^*} = \.w^* - \sum_i λ_i x_i y_i = 0
+				\/{∂ L(\.w, b,\.λ)}{∂ b} |_{b = b^*} = - \sum_i λ_i y_i = 0
+			$
+			$
+				=>\qu& \.w^* = \sum_i λ_i y_i x_i
+				& \sum_i λ_i^* y_i = 0
+			$
+			Lagrange对偶函数, 对偶问题,
+			$
+				G(\.λ) = \inf_{\.w, b} L(\.w, b, \.λ)  \tag{Lagrange对偶函数}
+					= L(\.w^*, b^*, \.λ)
+					= 1/2 (\sum_i λ_i y_i x_i)^T (\sum_j λ_j y_j x_j) + (-\sum_i λ_i y_i (\sum_j λ_j y_j x_j)^T x_i + \sum_i λ_i)  \tag{$\.w^*, b^*$代入}
+					= \sum λ_i - 1/2 \sum_i \sum_j λ_i λ_j y_i y_j \.x_i^T \.x_j
+			$
+			$
+				\max_{\.λ} \qu& \sum λ_i - 1/2 \sum_i \sum_j λ_i λ_j y_i y_j \.x_i^T \.x_j  \tag{对偶问题}
+				s.t. \qu& \sum_i λ_i^* y_i = 0
+					& λ_i &≥ 0
+			$
+			对偶问题是凸二次规划问题, 可利用Sequential Minimal Optimization算法求解$λ_i^*$, 代入解出$\.w^*, b^*$.
+			KKT条件,
+			$
+				y_i (\.w^{*T} \.x_i + b^*) ≤ 1
+				λ_i^* ≥ 0
+				λ_i^* (1 - y_i (\.w^{*T} \.x_i + b^*)) = 0
+				\.w^* = \sum_i λ_i^* x_i y_i
+				\sum_i λ_i^* y_i = 0
+			$
+
+* 核方法
+	* 核函数
+		\def
+			$κ(\.x_i, \.x_j) = \phi(\.x_i)^T \phi(\.x_j)$
+		\Example
+			- 线性核: $κ(\.x_i, \.x_j) = \.x_i^T \.x_j$
+			- 高斯核: $κ(\.x_i, \.x_j) = e^{-1/2(\.x_i - \.x_j)^T Σ^{-1} (\.x_i - \.x_j)}$
+			- 多项式核: $κ(\.x_i, \.x_j) = (\.x_i^T \.x_j)^d$
+			- Laplace核: $κ(\.x_i, \.x_j) = e^{-\/{\|\.x_i-\.x_j\|}{\sigma}}$
+			- Sigmoid核: $κ(\.x_i, \.x_j) = \tanh (\beta \.x_i^T \.x_j + θ)$
+

@@ -5,11 +5,11 @@
 namespace Matrix {
 /******************************************************************************
 * 
-*                    ×Ó¾ØÕó
+*                    å­çŸ©é˜µ
 * 
 ******************************************************************************/
 
-	/*----------------¶Á/Ğ´ ×Ó¾ØÕó----------------*/
+	/*----------------è¯»/å†™ å­çŸ©é˜µ----------------*/
 	inline Mat<>& block(Mat<>& ans, Mat<>& a, int rowSt, int rowEd, int colSt, int colEd) {
 		Mat<> ansTmp(rowEd - rowSt + 1, colEd - colSt + 1);
 		for (int i = rowSt; i <= rowEd; i++)
@@ -33,7 +33,7 @@ namespace Matrix {
 		return a;
 	}
 
-	/*----------------Æ´½Ó----------------*/
+	/*----------------æ‹¼æ¥----------------*/
 	inline Mat<>& rowStack(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.cols != b.cols)
 			exit(-1);
@@ -70,7 +70,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------¸´ÖÆÍØÕ¹----------------*/
+	/*----------------å¤åˆ¶æ‹“å±•----------------*/
 	inline Mat<>& colRepeat(Mat<>& ans, Mat<>& a, int repeatNum) {
 		if (a.cols != 1) 
 			exit(-1);

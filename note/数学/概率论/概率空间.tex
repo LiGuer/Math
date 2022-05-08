@@ -1,0 +1,57 @@
+* 概率空间
+	\Define
+		$<Ω, \mathcal F, \P>$
+		概率空间是一个三元组. 
+		- $Ω$ 样本空间
+		- $\P$ 概率
+		- $\mathcal F$ 被选择的样本集合的集合, 且满足
+			- $\emptyset, Ω \in \mathcal F$ 包含空集、样本空间全集 
+			- 取补封闭
+				$A \in \mathcal F => A^C \in \mathcal F$
+				若一个事件A在其中, 则补集也需在其中.  
+			- 可列并封闭 
+				$A_1, A_2, ... \in \mathcal F => \bigcup_{i=1}^∞ A_i \in \mathcal F$
+
+		* 概率
+			\Define
+				$\P: \mathcal F \to [0, 1]$
+				概率是一种集合函数, 是一种对集合的测度, 且满足:
+				- 非负性 $\P(A) \in [0, 1] \qu ; \forall A \in F$
+				- 规范性 $\P(Ω) = 1$
+				- 可列可加性 $\P (\bigcup_i A_i) = \sum_i \P(A_i)$
+
+			\Property
+				- \Theorem{大数定律}
+					- 弱大数定理
+						$\lim_{n \to ∞} \P(|1/N \sum_{k=1}^n X_k-μ|<ε) = 1$
+					- Bernoulli大数定理
+						$\lim_{n \to ∞} \P(|\/{f_A}{n}-p|<ε) = 1$
+
+				- \Theorem{中心极限定律}
+					$\lim_{n \to ∞} F_n(x) &= \lim_{n \to ∞} \P(\/{\sum_{k=1}^n X_k - n μ}{\sqrt{n} σ} ≤ x)
+						&= \int_{-∞}^x \/{1}{\sqrt{2 π}} e^{-t^2 / 2} \d t=\Phi(x)$
+
+			* 联合概率
+				\Define 
+					$\P(A B)$
+					A B一起发生的概率.
+
+			* 条件概率
+				\Define
+					$\P(B | A)$
+					A发生条件下, B发生的概率.
+
+				\Property
+					- 独立性 $ <=> \P(A B) = \P(A) \P(B)$. 即, $A, B$的发生互不影响.
+					- 联合概率 - 条件概率关系
+						$
+							\P(B | A) &= \/{\P(A B)}{\P(A)}
+							\P(A B) &= \P(B | A) \P(A) = \P(A | B) \P(B)
+						$
+					* \Theorem{全概率公式}
+						$\P(A) = \sum_i \P(A|B_i) \P(B_i) \qu; \sum_i A_i = Ω$
+					* \Theorem{Bayes公式}
+						$
+							\P(A | B) &= \/{\P(B | A) \P(A)}{\P(B)}
+							\P(A_i | B) &= \/{\P(B | A_i) \P(A_i)}{\sum_j \P(B|A_j) \P(A_j)}; \sum_j A_j = Ω
+						$

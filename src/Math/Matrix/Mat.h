@@ -104,7 +104,7 @@ public:
 		return *this;
 	}
 
-	Mat& operator=(T  x) {
+	Mat& operator=(T x) {
 		return fill(x);
 	}
 
@@ -118,6 +118,17 @@ public:
 		rows = _rows;
 		cols = _cols;
 		data = _data;
+		return *this;
+	}
+
+	/*---------------- 改变矩阵形状 ----------------*/
+	Mat& reshape(int _rows, int _cols) {
+		if(_rows * _cols != size())
+			exit(-1);
+		
+		rows = _rows;
+		cols = _cols;
+
 		return *this;
 	}
 

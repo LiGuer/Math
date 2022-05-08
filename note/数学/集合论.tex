@@ -1,6 +1,6 @@
 * 仿射、凸、锥
 	* 仿射集
-		\def
+		\Define
 			$
 				\forall \.x_i \in C, θ_i \in R, \sum θ_i = 1
 				then\ \sum θ_i x_i \in C 
@@ -8,14 +8,14 @@
 			集合内任意两点所画直线仍在该集合内的集合. 
 
 	* 仿射包
-		\def
+		\Define
 			$ 
 				aff\ C = \{\sum θ_i x_i\ |\ x_i\in C,theta_i \in R, \sum θ_i = 1  \}
 			$
 			集合内所有点的仿射组合的集合构成一个仿射包. 
 
 	* 凸集
-		\def
+		\Define
 			$
 				\forall \.x_i \in C, θ_i \in [0,1], \sum θ_i = 1 
 				then\ \sum θ_i x_i \in C 
@@ -23,19 +23,19 @@
 			集合内任意两点间的线段仍在该集合内的集合. 
 
 	* 凸包
-		\def
+		\Define
 			$
 				conv\ C = \{\sum θ_i x_i\ |\ x_i\in C, θ_i \in [0,1], \sum θ_i = 1 \}
 			$
 			集合内所有点的凸组合的集合构成一个凸包. 该凸包也是包含给定集合内所有点的最小凸集.
 
 	* 锥
-		\def
+		\Define
 			$\forall \.x \in C, θ > 0, then\ θ \.x \in C$
 			以零点为起点的射线的集合.
 
 		* 凸锥
-			\def
+			\Define
 				$
 					\forall \.x_1, \.x_2 \in C, θ_1,θ_2 ≥ 0
 					then\ θ_1 \.x_1 + θ_2 \.x_2 \in C
@@ -43,7 +43,7 @@
 
 * 几何集合
 	* 超平面、半空间
-		\def
+		\Define
 			$
 				\{x | a^T x = b\}  \tag{超平面}
 				\{x | a^T x ≤ b\}  \tag{半空间}
@@ -53,7 +53,7 @@
 			- 是凸集
 
 	* Euclid球
-		\def
+		\Define
 			$
 				B(x_c,r) = \{ x | ||x - x_c||_2 ≤ r, r>0\}
 					= \{ x | (x - x_c)^T (x - x_c) ≤ r^2, r>0\}  \tag{等价}
@@ -64,7 +64,7 @@
 			- 是凸集
 
 	* 椭球
-		\def
+		\Define
 			$
 				\{ x | (x - x_c)^T P^{-1} (x - x_c) ≤ 1, P = P^T ⪰ 0\}
 				\{ x_c + A u | ||u||_2 ≤ 1\}  \tag{等价}
@@ -74,12 +74,12 @@
 			- 是凸集
 
 	* 多面体
-		\def
+		\Define
 			$\{x | a_j^T x ≤ b_j, j = 1,...,m,\ c_j^T x = d_j, j = 1,...,p\}$
 			有限个超平面和半空间的交集.
 
 		* 单纯形
-			\def
+			\Define
 				$C = conv \{v_0, ..., v_{k}\} = \{\sum_{i=0}^k θ_i v_i | θ ⪰ 0, \.1^{T} θ=1\}$
 				n维空间内有n+1个顶点的多面体
 

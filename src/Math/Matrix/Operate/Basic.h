@@ -5,11 +5,11 @@
 namespace Matrix {
 /******************************************************************************
 * 
-*                    »ù±¾ÔËËã
+*                    åŸºæœ¬è¿ç®—
 * 
 ******************************************************************************/
 
-	/*----------------¸º [ negative - ]----------------*/
+	/*----------------è´Ÿ [ negative - ]----------------*/
 	inline Mat<>& negative(Mat<>& ans, Mat<>& a) {
 		ans.alloc(a.rows, a.cols);
 		for (int i = 0; i < a.size(); i++)
@@ -26,7 +26,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------×ªÖÃ ----------------*/
+	/*----------------è½¬ç½® ----------------*/
 	inline Mat<>& transpose(Mat<>& ans, Mat<>& a) {
 		Mat<> ansTmp(a.cols, a.rows);
 
@@ -38,7 +38,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------¼Ó·¨ [ add + ]----------------*/
+	/*----------------åŠ æ³• [ add + ]----------------*/
 	inline Mat<>& add(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
@@ -50,7 +50,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------¼õ·¨ [ sub - ]----------------*/
+	/*----------------å‡æ³• [ sub - ]----------------*/
 	inline Mat<>& sub(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
@@ -61,7 +61,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------³Ë·¨ [ mul ¡Á ]----------------*/
+	/*----------------ä¹˜æ³• [ mul Ã— ]----------------*/
 	inline Mat<>& mul(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.cols != b.rows)
 			exit(-1);
@@ -76,7 +76,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------Êı³Ë [ mul ¡Á ]----------------*/
+	/*----------------æ•°ä¹˜ [ mul Ã— ]----------------*/
 	inline Mat<>& mul(Mat<>& ans, const double a, Mat<>& b) {
 		ans.alloc(b.rows, b.cols);
 
@@ -85,7 +85,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------ÔªËØ³Ë [ elementMul ¡Á ]----------------*/
+	/*----------------å…ƒç´ ä¹˜ [ elementMul Ã— ]----------------*/
 	inline Mat<>& elementMul(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
@@ -96,7 +96,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------ÔªËØ³ı [ elementDiv / ]----------------*/
+	/*----------------å…ƒç´ é™¤ [ elementDiv / ]----------------*/
 	inline Mat<>& elementDiv(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
