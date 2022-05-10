@@ -26,21 +26,31 @@ inline void LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<>& P) {
     int n = a.rows;
     Mat<> A(a);
     P.zero(n);
-    for (int i = 0; i < n; i++) P[i] = i;
+    U.zero(n, n);
+    L.zero(n, n);
+
+    for (int i = 0; i < n; i++) 
+        P[i] = i;
+
     //[1]
     for (int k = 0; k < n; k++) {
         //[2] 选主元
         double maxvalue = 0;
         int kt;
         for (int i = k; i < n; i++) {
-            if (fabs(A(i, k)) > maxvalue) { maxvalue = fabs(A(i, k)); kt = i; }
+            if (fabs(A(i, k)) > maxvalue) { 
+                maxvalue = fabs(A(i, k));
+                kt = i;
+            }
         }
         if (maxvalue == 0) exit(-1);				// singular matrix，秩 rank<n
+
         //[3] 置换行
         for (int i = 0; i < n; i++) {
             double t = A(k, i); A(k, i) = A(kt, i); A(kt, i) = t;
         }
         int t = P[k]; P[k] = P[kt]; P[kt] = t;
+
         //[4] LU分解: 高斯消元法
         for (int i = k + 1; i < n; i++) {
             A(i, k) /= A(k, k);					//aik存储消去该行第k位所需的乘数,即L
@@ -49,8 +59,6 @@ inline void LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<>& P) {
         }
     }
     //[5] A中包含U,L，分离出来即可
-    U.zero(n, n);
-    L.zero(n);
     E(L);
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++)

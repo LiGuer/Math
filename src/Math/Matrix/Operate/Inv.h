@@ -18,7 +18,7 @@ namespace Matrix {
 		// LUP分解
 		Mat<> L, U, P;
 		LUP(a, U, L, P);
-
+		
 		//对每一列
 		Mat<> b(n), x(n);
 		for (int k = 0; k < n; k++) {
@@ -43,7 +43,20 @@ namespace Matrix {
 			for (int i = 0; i < a.rows; i++)
 				tmp(i, k) = x[i];
 		}
-		return ans.eatMat(tmp);
+
+		ans.eatMat(tmp);
+		return ans;
+	}
+
+/*----------------伪逆 [ x^+ ]----------------*/
+	inline Mat<>& pinv(Mat<>& ans, Mat<>& a) {
+		Mat<> aT;
+		transpose(aT, a);
+		mul(ans, aT, a);
+		inv(ans, ans);
+		mul(ans, ans, aT);
+
+		return ans;
 	}
 }
 
