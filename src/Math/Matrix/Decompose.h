@@ -9,7 +9,7 @@
  * 矩阵分解
  */
 namespace Matrix{
-void LUP(Mat<>& A, Mat<>& U, Mat<>& L, Mat<>& P);	// LUP 上下三角分解
+void LUP(Mat<>& A, Mat<>& L, Mat<>& U, Mat<>& P);	// LUP 上下三角分解
 														// LU  上下三角对角分解
 														// GGT 对称三角分解
 void QR (Mat<>& A, Mat<>& Q, Mat<>& R);					// QR  正交三角分解
@@ -19,7 +19,7 @@ void SVD(Mat<>& A, Mat<>& U, Mat<>& S, Mat<>& V);		// SVD 奇异值分解
 /******************************************************************************
 * LUP 上下三角分解
 ******************************************************************************/
-inline void LUP(Mat<>& a, Mat<>& U, Mat<>& L, Mat<>& P) {
+inline void LUP(Mat<>& a, Mat<>& L, Mat<>& U, Mat<>& P) {
     if (a.rows != a.cols)
         exit(-1);
 

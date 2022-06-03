@@ -17,8 +17,8 @@ namespace Matrix {
 		x.zero(n);
 
 		//[1] LUP分解
-		Mat<> U, L, P;
-		LUP(a, U, L, P);
+		Mat<> L, U, P;
+		LUP(a, L, U, P);
 
 		//[2] LUP - Solve  [3] solve y
 		for (int i = 0; i < n; i++) {

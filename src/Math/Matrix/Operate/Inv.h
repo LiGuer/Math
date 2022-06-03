@@ -17,7 +17,7 @@ namespace Matrix {
 
 		// LUP分解
 		Mat<> L, U, P;
-		LUP(a, U, L, P);
+		LUP(a, L, U, P);
 		
 		//对每一列
 		Mat<> b(n), x(n);

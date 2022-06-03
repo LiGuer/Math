@@ -1,0 +1,33 @@
+* 映射 (函数)
+	\Define
+		$f: X \to Y$
+		$\forall x \in X, \exists_{= 1} y \in Y, f(x) = y$
+		映射, 是指从集合$X$到集合$Y$的元素之间的一类对应关系, 且满足$X$中的任意元素都有唯一的$Y$中元素与之对应.
+
+		- $X$ 定义域
+
+		\Note
+			- 不允许一对多.
+
+	\Include
+		* 单射
+			\Define
+				$\forall x, x', f(x) = f(x') => x = x'$
+				每一个被映射的y都有唯一的x与之对应.
+
+		* 满射
+			\Define
+				$\forall y \in Y, \exists x \in X, f(x) = y$
+				每一个y都至少有一个x与之对应.
+
+		* 双射 (一一对应)
+			\Define
+				$\forall y \in Y, \exists_{= 1} x \in X, f(x) = y$
+				既是单射又是满射的映射.
+				每一个x都有唯一的y与之对应, 每一个y都有唯一的x与之对应.
+
+			\Property
+				* 反函数
+					\Define
+						若$f$是双射, 则其反函数为
+						$f^{-1}(b) = a <=> f(a) = b$

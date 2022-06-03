@@ -1,0 +1,82 @@
+
+* 计数
+
+	\Property
+		- 加法定理
+			for $S = \cap_{i=1}^n S_i, S_i \cap S_j = \emptyset (i ≠ j)$
+			$ => number(S) = \sum_{i=1}^n number(S_i)$
+
+		- 乘法定理
+			for sets $S_A, S_B$, and
+			$
+				S &= \{(a, b) | a \in S_A, b \in S_B\}
+					&= S_A × S_B  \tag{Cartesian积}
+			$
+			$ => number(S) = number(S_A) × number(S_B)$
+
+			\Proof
+				$
+					S &= \{(a, b) | a \in S_A, b \in S_B\}
+						&= \cap_{a_i \in S_A} \{(a_i, b) | b \in S_B\} 
+				=> number(S) &= \sum_{i=1}^{number(S_A)} number(S_B)  \tag{加法定理}
+						&= number(S_A) × number(S_B)
+				$
+
+		- 容斥定理
+			for $A_1,...,A_n \subseteq S$
+			$
+				number(\cup_{i=1}^n A_i) &= \sum_{k=1}^n ((-1)^{k-1} \sum_{\substack{i_1,...,i_k \in 1:n \\ i_1≠...≠i_k}} number(\cap_{i\in\{i_1,...,i_k\}} A_i))
+			$
+
+* 排列、组合
+	\Define
+		- 组合: n个元素的集合中, 任取r个元素形成无序子集合. 
+		- 排列: n个元素的集合中, 任取r个元素形成有序序列. 
+
+	\Property
+		- 排列、组合的子集个数
+			$
+				C(n, r) &= \/{n!}{(n - m)!·m!}  \tag{组合的子集个数}
+				A(n, r) &= \/{n!}{(n - m)!}  \tag{排列的子集个数}
+			$
+		
+		- 
+			$C(n,r) = C(n-1,r-1) + C(n-1,r)$
+			$C(n,r) = C(n,n-r)$
+			$
+				\sum_{i=0}^n C(n,i) &= 2^n
+				\sum_{i=0}^n C(n,i)^2 &= C(2n, n)
+				\sum_{i=0}^n C(k+i,k)^2 &= C(n+k+1, k+1)
+			$
+
+	- 全排列的生成
+		\Problem 
+
+		\Property
+			$
+				f(\{a_i | i\in 1:n\}) &= \{(a_1, a_2, ..., a_n), (a_2, a_1, ..., a_n), (a_n, a_{n-1}, ..., a_1)\}
+					&= \cup_{i=1}^n (\{(a_i)\} × f(\{a_j\ |\ j ≠ i, j\in 1:n\}))  \tag{$×$: 序列合并}
+				f(\{a_1\}) &= \{(a_1)\}  \tag{初始易知值}
+			$
+
+		- 全排列的生成, 顺序为字典序
+
+		- 全排列的下个元素, 字典序
+
+- 特殊计数序列
+	- Catalan数
+		$
+			f_n &= \.{1}{n+1} C(2n, n) = C(2n, n) - C(2n, n-1)   \tag{通项式}
+				&= \/{(2n)!}{(n+1)!·n!}
+			f_n &= \sum_{i=0}^{n-1} f_{i} · f_{n-1-i}  \qu; n ≥ 2  \tag{递推式}
+				&= \/{4n-2}{n+1} f_{n-1}
+		$
+
+- 鸽巢定理
+	- 
+		for, $A_1, ..., A_n \subseteq A, number(A) = n + 1$
+		$ => \exists A_i, number(A_i) ≥ 2$
+
+	- 
+		$q_1,...,q_n \in \mathbb Z_+$
+		若$(\sum_{i=1}^n q_i) - n + 1$分配到$n$个盒子里, 
