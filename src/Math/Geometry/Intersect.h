@@ -12,6 +12,9 @@ namespace Intersect {
 extern double eps;
 
 /*---------------- 求交点 ----------------*/
+// Line
+bool Segments(Mat<>& p1, Mat<>& p2, Mat<>& p3, Mat<>& p4);		// 判断线段与线段相交
+
 // Plane
 double RayPlane		(Mat<>& raySt, Mat<>& ray, Mat<>& a, double b);							//求交-射线与平面
 double RayPlane		(Mat<>& raySt, Mat<>& ray, double& A, double& B, double& C, double& D);	//求交-射线与平面(3D)

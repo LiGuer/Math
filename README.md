@@ -1,18 +1,21 @@
-# LiGu_AlgorithmLib
-LiGu's Basic Algorithm Library.  
-*  框架 (算法 + 数据结构)
-* <Mat.h>						矩阵类
-* <BasicMachineLearning.h>		基础机器学习类
-* <BigNum.h>					大数类
+# LiGu's Mathematic Library
+LiGu's Mathematic and Basic Algorithm Library.  
+
+* 数学  Math  
+	* 矩阵  Matrix
+	* 微积分  Calculus
+	* 复数  Complex
+	* 图论  GraphTheory
+	* 数论  NumberTheory
+	* 统计  Statistics
+	* 几何  Geometry
+	* 大数  BigNum
+  
 *  算法 Algorithm
-* <Statistics.h>				统计学类
-* <BasicAlgorithm.h>			基础算法类  
-* <GraphTheory.h>				图论类 
-* <NumberTheory.h>				数论类
-*  数据结构 DataStructure
-* <list.h>						链表类  
-* <rb_tree.h>					红黑树  
-* <Tensor.h>					张量类  
+	* 链表  list
+	* 红黑树  rb_tree  
+	* Hash表  HashTable
+	* 基础算法类  BasicAlgorithm  
 
 ## <Mat.h> 矩阵类  
 ```

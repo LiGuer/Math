@@ -9,6 +9,45 @@ using namespace Matrix;
 
 double Intersect::eps = 1e-5;
 
+/*
+ * 线段、线段交点
+ */
+bool OnSegments(Mat<>& p1, Mat<>& p2, Mat<>& p3) {
+	if (std::min(p1(1), p2(1)) <= p3(1) 
+	&&  std::max(p1(1), p2(1)) >= p3(1)
+	&&  std::min(p1(2), p2(2)) <= p3(2) 
+	&&  std::max(p1(2), p2(2)) >= p3(2)
+	)
+		return true;
+	return false;
+}
+
+bool Intersect::Segments(Mat<>& p1, Mat<>& p2, Mat<>& p3, Mat<>& p4) {
+	double 
+		d1 = (p1(1) - p3(1)) * (p4(2) - p3(2)) - (p4(1) - p3(1)) * (p1(2) - p3(2)),
+		d2 = (p2(1) - p3(1)) * (p4(2) - p3(2)) - (p4(1) - p3(1)) * (p2(2) - p3(2)),
+		d3 = (p3(1) - p1(1)) * (p2(2) - p1(2)) - (p2(1) - p1(1)) * (p3(2) - p1(2)),
+		d4 = (p4(1) - p1(1)) * (p2(2) - p1(2)) - (p2(1) - p1(1)) * (p4(2) - p1(2));
+
+	if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0))
+	&&  ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0)))
+		return true;
+
+	else if (d1 == 0 && OnSegments(p3, p4, p1))
+		return true;
+
+	else if (d2 == 0 && OnSegments(p3, p4, p2))
+		return true;
+
+	else if (d3 == 0 && OnSegments(p1, p2, p3))
+		return true;
+
+	else if (d4 == 0 && OnSegments(p1, p2, p4))
+		return true;
+
+	return false;
+}
+
 /* 
  * 射线、平面交点
  */
