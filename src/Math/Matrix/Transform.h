@@ -30,7 +30,7 @@ inline Mat<>& Matrix::rotate(int i, int j, double theta, Mat<>& T) {
 }
 
 inline Mat<>& Matrix::rotate(Mat<>& theta, Mat<>& T) {
-    E(T);
+    E(T.alloc(theta.rows, theta.cols));
     Mat<> rotateMat = T;
 
     for (int i = 0; i < theta.rows; i++) {
