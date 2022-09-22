@@ -194,16 +194,16 @@ double Intersect::RaySphere(Mat<>& raySt, Mat<>& ray, Mat<>& center, double& R, 
 }
 
 /*
- * 射线、椭球面交点
+ * 射线、二次曲面交点
  */
-double Intersect::RayEllipsoid (Mat<>& raySt, Mat<>& ray, Mat<>& center, Mat<>& PInv) {
+double Intersect::RayQuadric(Mat<>& raySt, Mat<>& ray, Mat<>& center, Mat<>& G) {
 	static Mat<> rayStCenter, tmp;
 	sub(rayStCenter, raySt, center);
 
 	double
-		A = dot(ray, mul(tmp, PInv, ray)),
-		B = 2 * dot(ray, mul(tmp, PInv, rayStCenter)),
-		C = dot(rayStCenter, mul(tmp, PInv, rayStCenter)) - 1,
+		A = dot(ray, mul(tmp, G, ray)),
+		B = 2 * dot(ray, mul(tmp, G, rayStCenter)),
+		C = dot(rayStCenter, mul(tmp, G, rayStCenter)) - 1,
 		Delta = B * B - 4 * A * C;
 
 	if (Delta < 0)
@@ -241,3 +241,62 @@ double Intersect::RayCuboid(Mat<>& raySt, Mat<>& ray, Mat<>& pmin, Mat<>& pmax) 
 	}
 	return t0 >= 0 ? t0 : t1;
 }
+
+/*
+ * 射线、圆环交点
+ */
+double Intersect::RayTorus(Mat<>& raySt, Mat<>& ray, Mat<>& center, double R, double r) {
+	double dx = ray[0], dy = ray[1], dz = ray[2],
+		x0 = raySt[0], y0 = raySt[1], z0 = raySt[2],
+		a = 4 * R * R,
+		b = 2 * (x0 * dx + y0 * dy + z0 * dz),
+		c = (R * R - r * r) + (x0 * x0 + y0 * y0 + z0 * z0),
+		A = 1,
+		B = 2 * b,
+		C = b * b + 2 * c - a * (dx * dx + dy * dy),
+		D = 2 * b * c - a * 2 * (x0 * dx + y0 * dy),
+		E = c * c - a * (x0 * x0 + y0 * y0);
+
+	complex<double> coeff[5], roots[4];
+	coeff[4] = A;
+	coeff[3] = B;
+	coeff[2] = C;
+	coeff[1] = D;
+	coeff[0] = E;
+
+	Function::solveQuarticEquation(coeff, roots);
+
+	double minn = DBL_MAX;
+	for (int i = 0; i < 4; i++) {
+		if (abs(roots[i].imag()) < 10e-4 && roots[i].real() > 10e-4) {
+			minn = min(minn, roots->real());
+		}
+	}
+	return minn;
+}
+/*
+double Intersect::RayPolynomialSurface(Mat<>& raySt, Mat<>& ray, Tensor<>& A) {
+	int n = A.dimNum, m = A.dim[0] - 1;
+
+	double dx = ray[0], dy = ray[1], dz = ray[2],
+		x0 = raySt[0], y0 = raySt[1], z0 = raySt[2];
+
+	complex<double>* coeff, roots;
+	coeff = (complex<double>*) calloc((n + 1) * sizeof(complex<double>));
+	roots = (complex<double>*) calloc( n      * sizeof(complex<double>));
+
+	while (1) {
+
+	}
+
+	if(n == 4)
+		solveQuartic(coeff, roots);
+
+	double minn = DBL_MAX;
+	for (int i = 0; i < 4; i++) {
+		if (abs(roots[i].imag()) < 10e-4 && roots[i].real() > 10e-4) {
+			minn = min(minn, roots->real());
+		}
+	}
+	return minn;
+}*/

@@ -1,7 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include "Mat.h"     //矩阵
+#include "Mat.h"		//矩阵
 #include "Init.h"		//基本矩阵
 #include "Operate/Operate.h"	//线性变换
 #include "Function.h"	//函数操作

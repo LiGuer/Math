@@ -107,5 +107,18 @@ namespace Matrix {
 		return ans;
 	}
 
+	/*
+	 * Binarization 
+	 */
+	inline Mat<>& binarization(Mat<>& ans, Mat<>& a, double threshold = 0.5) {
+		ans.alloc(a.rows, a.cols);
+
+		for (int i = 0; i < a.size(); i++)
+			ans(i) = a(i) >= threshold ? 1 : 0;
+
+		return ans;
+	}
+
+
 }
 #endif
