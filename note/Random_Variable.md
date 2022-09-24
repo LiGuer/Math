@@ -1,18 +1,18 @@
 * Random Variable & Random Vector
   - Define  
-    - Random Variable
-      $$X: Ω \to \mathbb R  \tag{Random Variable}$$
-      a random variable $X$ is a function from the sample space $Ω$ to the real numbers $\mathbb R$.
+    Random Variable:
+    $$X: Ω \to \mathbb R  \tag{Random Variable}$$
+    a random variable $X$ is a function from the sample space $Ω$ to the real numbers $\mathbb R$.
 
-      Symbol:
-        - $Ω$: sample space
-        - $\mathbb R$: the field of real numbers
+    Symbol:
+      - $Ω$: sample space
+      - $\mathbb R$: the field of real numbers
 
-      - Note  
-        event set $\{ζ | X(ζ) ≤ x\}$, shorthand as $\{X ≤ x\}$.
+    - Note  
+      event set $\{ζ | X(ζ) ≤ x\}$, shorthand as $\{X ≤ x\}$.
 
-    - Random Vector ; Multivariate random variable
-      $$\boldsymbol X = (X_1, ... , X_n)^T  \tag{Random Vector}$$ 
+    Random Vector ; Multivariate random variable:
+    $$\boldsymbol X = (X_1, ... , X_n)^T  \tag{Random Vector}$$ 
 
   - Property
     * Probability mass function  

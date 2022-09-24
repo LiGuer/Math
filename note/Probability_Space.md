@@ -5,7 +5,7 @@
 
     - $Ω$: sample space
     - $\mathbb P$: Probability
-    - $\mathcal F$: The set of selected sample sets, and satisfying
+    - $\mathcal F$: σ-algebra, a set of subsets of $Ω$, called a set of events, and satisfying
       - $\emptyset, Ω \in \mathcal F$ Including empty set and full set of sample space
       - closed under complements
         $$A \in \mathcal F \Rightarrow A^C \in \mathcal F$$
