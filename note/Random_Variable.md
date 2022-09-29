@@ -15,7 +15,7 @@
     $$\boldsymbol X = (X_1, ... , X_n)^T  \tag{Random Vector}$$ 
 
   - Property
-    * Probability mass function  
+    * Probability Mass function  
       - Define   
         for a discrete Random Variable $X$
         $$\mathbb P(X = x)$$
@@ -97,7 +97,7 @@
           
         * Kurtosis  
           $$\mathbb E\left(\frac{(X - \mu_x)^4}{\sigma_x^4}\right)  \tag{4-order Central Moment}$$  
-    
+
         * Mixed Moment  
           - Define  
             $$
@@ -108,22 +108,23 @@
             $$
 
           - Include
-            * Correlation  
-              $$
-              \begin{align*}
-                \mathbb E(XY)  &\tag{Cocorrelation}  \\
-                R_{\boldsymbol X\boldsymbol X} &= \mathbb E(\boldsymbol X \boldsymbol X^T)  \\
-                  &= \left(\begin{matrix} E(X_i X_j) & ... \\ \vdots & \ddots \end{matrix}\right)  \tag{Autocorrelation matrix}
-              \end{align*}
-              $$
-
-            * Covariance
+            * Correlation & Covariance  
               - Define 
                 $$
                 \begin{align*}
-                  Cov(X,Y) &= \mathbb E((X-\bar X) (Y-\bar Y))   \tag{Covariance}  \\
-                  \boldsymbol Σ_{\boldsymbol X\boldsymbol X} &= \mathbb E((\boldsymbol X - \bar{\boldsymbol X}) (X - \bar{\boldsymbol X})^T)  \tag{Autocovariance matrix}\\
-                    &= \left(\begin{matrix} E((X_i - \bar X_i) (X_j - \bar X_j)) & ... \\ \vdots & \ddots \end{matrix}\right)  
+                  Corr(X,Y) &= \mathbb E(X Y)  &\tag{Correlation}  \\
+
+                  Cov(X,Y) 
+                  &= \mathbb E((X-\bar X) (Y-\bar Y))   \tag{Covariance}  \\
+                  &= \mathbb E(X Y) - \mathbb E(X) \mathbb E(Y)  \\
+                  &= Corr(X,Y) - \mathbb E(X) \mathbb E(Y)  \\
+
+                  R_{\boldsymbol X\boldsymbol X} &= \mathbb E(\boldsymbol X \boldsymbol X^T)  \\
+                  &= \left(\begin{matrix} E(X_i X_j) & ... \\ \vdots & \ddots \end{matrix}\right)  \tag{AutoCorrelation matrix}  \\
+
+
+                  \boldsymbol Σ_{\boldsymbol X\boldsymbol X} &= \mathbb E((\boldsymbol X - \bar{\boldsymbol X}) (X - \bar{\boldsymbol X})^T)  \tag{AutoCovariance matrix}\\
+                  &= \left(\begin{matrix} E((X_i - \bar X_i) (X_j - \bar X_j)) & ... \\ \vdots & \ddots \end{matrix}\right)  
                 \end{align*}
                 $$
 
@@ -134,8 +135,7 @@
               - Property
                 - $Cov(X,Y) = Cov(Y,X)$
                 - $Cov(X,X) = Var(X,X)$
-                - relation between Covariance & Correlation
-                  $$Cov(X,Y) = \mathbb E((X-\bar X) (Y-\bar Y)) = \mathbb E(XY) - \mathbb E(X) \mathbb E(Y)$$
+                - relation between AutoCorrelation & AutoCovariance matrix
                   $$\boldsymbol Σ_{\boldsymbol X\boldsymbol X} = \boldsymbol R_{\boldsymbol X\boldsymbol X} - \bar{\boldsymbol X} \bar{\boldsymbol X}^T$$
                 - Autocovariance matrix $Σ_{\boldsymbol X\boldsymbol X}$ is a positive semi-definite matrix.
                 - $\boldsymbol Y = \boldsymbol A \boldsymbol X \Rightarrow \boldsymbol Σ_{\boldsymbol Y\boldsymbol Y} = \boldsymbol A \boldsymbol Σ_{\boldsymbol X\boldsymbol X} \boldsymbol A^T$
