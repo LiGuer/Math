@@ -60,7 +60,7 @@
               The Maximum entropy probability distribution with limited amplitude is Uniform distribution.
 
             - Maximum Entropy with limited power
-              $$h(X^N) ≤ N/2 \log(2 \pi |\sigma |^{1/N})$$
+              $$h(X^N) ≤ \frac{N}{2} \log(2 \pi |\sigma |^{\frac{1}{N}})$$
               The Maximum entropy probability distribution with limited power is Gauss distribution. 
 
         - Include
@@ -100,9 +100,9 @@
           - Entropy of discrete time Gauss information source
               $$
               \begin{align*}
-                h(X) &= 1/2 \log (2 \pi e \sigma ^2)  \tag{1D}\\
-                h(X) &= 1/2 \log (2 \pi e \sigma ^2)  \tag{Multi-dim independence}\\
-                h(x^N)&=N/2 \log (2 \pi e |\sigma |^{1/N})  \tag{Multi-dim correlation}
+                h(X) &= \frac{1}{2} \log (2 \pi e \sigma ^2)  \tag{1D}\\
+                h(X) &= \frac{1}{2} \log (2 \pi e \sigma ^2)  \tag{Multi-dim independence}\\
+                h(x^N)&=\frac{N}{2} \log (2 \pi e |\sigma |^{\frac{1}{N}})  \tag{Multi-dim correlation}
               \end{align*}
               $$
             
@@ -111,10 +111,10 @@
               $$
               \begin{align*}
                 h(x) &= -E_{\mathbb P(x)} (\log \mathbb P(x))  \\
-                  &= -E_{\mathbb P(x)} (-1/2 \log(2\pi \sigma ^2) - \log e · \frac{(x-\mu)^2}{2\sigma ^2})  \\
-                  &= 1/2 \log(2\pi \sigma ^2) + \log e · \frac{\mathbb E_{\mathbb P(x)} ((x-\mu)^2)}{2\sigma ^2}  \\
-                  &= 1/2 \log(2\pi \sigma ^2) + \log e · \frac{\sigma ^2}{2 \sigma ^2}  \\
-                  &= 1/2 \log(2\pi e \sigma ^2)
+                  &= -E_{\mathbb P(x)} (-\frac{1}{2} \log(2\pi \sigma ^2) - \log e · \frac{(x-\mu)^2}{2\sigma ^2})  \\
+                  &= \frac{1}{2} \log(2\pi \sigma ^2) + \log e · \frac{\mathbb E_{\mathbb P(x)} ((x-\mu)^2)}{2\sigma ^2}  \\
+                  &= \frac{1}{2} \log(2\pi \sigma ^2) + \log e · \frac{\sigma ^2}{2 \sigma ^2}  \\
+                  &= \frac{1}{2} \log(2\pi e \sigma ^2)
               \end{align*}
               $$
 
