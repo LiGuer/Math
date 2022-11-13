@@ -3,7 +3,7 @@
     $$
     \begin{align*}
       f(x) &= \sum_{i=0}^{n} a_i x^i  \tag{one variable}  \\
-      f(\boldsymbol x) &= \sum_{\boldsymbol i=(0,...,0)_n}^{(\dim,...,\dim)_n} (a_{\boldsymbol i} · \prod_{i_j \in \boldsymbol i, x_0 = 1}x_{i_j})  \tag{multi-variate}  
+      f(\boldsymbol x) &= \sum_{\boldsymbol i=(0,...,0)_n}^{(\dim,...,\dim)_n} \left(a_{\boldsymbol i} · \prod_{i_j \in \boldsymbol i, x_0 = 1}x_{i_j} \right)  \tag{multi-variate}  
     \end{align*}
     $$
 
@@ -36,27 +36,26 @@
                 \end{align*}
                 $$
 
-                - 有解
-                  - 有唯一解
-                    $$\boldsymbol x = \boldsymbol A^{-1} \boldsymbol b$$
-                    $\boldsymbol A$是方阵且非奇异
-                    $$\boldsymbol A \in C^{n×n}, |\boldsymbol A| ≠ 0$$
+                - 有唯一解
+                  $$\boldsymbol x = \boldsymbol A^{-1} \boldsymbol b$$
+                  $\boldsymbol A$是方阵且非奇异
+                  $$\boldsymbol A \in C^{n×n}, |\boldsymbol A| ≠ 0$$
                     
 
-                  - 有无穷个解  
-                    通解 $\boldsymbol x = \boldsymbol A^{-^{\{1\}}} \boldsymbol b + (\boldsymbol I - \boldsymbol A^{-^{\{1\}}} A) c$  
-                    特解 $\boldsymbol x = \boldsymbol A^{-^{\{1\}}} \boldsymbol b$  
-                    $\boldsymbol A^{-1}$不存在或无意义
+                - 有无穷个解  
+                  通解 $\boldsymbol x = \boldsymbol A^{-^{\{1\}}} \boldsymbol b + (\boldsymbol I - \boldsymbol A^{-^{\{1\}}} A) c$  
+                  特解 $\boldsymbol x = \boldsymbol A^{-^{\{1\}}} \boldsymbol b$  
+                  $\boldsymbol A^{-1}$不存在或无意义
 
-                    - 极小范数解
-                      $$
-                      \begin{align*}
-                        \min_{\boldsymbol x} \quad& ||\boldsymbol x||_2
-                        s.t. \quad& \boldsymbol A \boldsymbol x = \boldsymbol b
-                      \end{align*}
-                      $$
-                      $$\boldsymbol x = \boldsymbol A^{-^{\{1,3\}}} \boldsymbol b$$
-                      极小范数解唯一。
+                  极小范数解
+                    $$
+                    \begin{align*}
+                      \min_{\boldsymbol x} \quad& ||\boldsymbol x||_2
+                      s.t. \quad& \boldsymbol A \boldsymbol x = \boldsymbol b
+                    \end{align*}
+                    $$
+                    $$\boldsymbol x = \boldsymbol A^{-^{\{1,3\}}} \boldsymbol b$$
+                    极小范数解唯一。
                     
                 - 无解  
                   最小二乘解
@@ -88,8 +87,8 @@
             二次曲面:  
             $$
             \begin{align*}
-              &\{ \boldsymbol x \ |\ \boldsymbol x^T \boldsymbol A \boldsymbol x + \boldsymbol b \boldsymbol x + c = 0\}
-            \Leftrightarrow &\{ \boldsymbol x' \ |\ \boldsymbol x'^T \boldsymbol A' \boldsymbol x' = 0 \ |\  \boldsymbol x' = (\begin{matrix} \boldsymbol x \\ 1 \end{matrix})\}
+              &\{ \boldsymbol x \ |\ \boldsymbol x^T \boldsymbol A \boldsymbol x + \boldsymbol b \boldsymbol x + c = 0\} \\
+            \Leftrightarrow &\{ \boldsymbol x' \ |\ \boldsymbol x'^T \boldsymbol A' \boldsymbol x' = 0 \ |\  \boldsymbol x' = \left(\begin{matrix} \boldsymbol x \\ 1 \end{matrix}\right)\}
             \end{align*}
             $$
 
@@ -99,18 +98,18 @@
               求输入二次函数的零点集$\{x\}$  
               $$f(x) = a x^2 + b x + c = 0$$
 
-            - Algorithm
-              - 一元二次
-                $$
-                \begin{align*}
-                  x = \frac{- b \pm \sqrt{Δ}}{2 a}
-                  Δ = b^2 - 4 a c
-                \end{align*}
-                $$
-                - 解的性质
-                  - $Δ > 0$, 两个实数根
-                  - $Δ = 0$, 一个实数二重根
-                  - $Δ < 0$, 两个复数根
+            - Answer  
+              一元二次:
+              $$
+              \begin{align*}
+                x &= \frac{- b \pm \sqrt{Δ}}{2 a}\\
+                Δ &= b^2 - 4 a c
+              \end{align*}
+              $$
+              解的性质
+              - $Δ > 0$, 两个实数根
+              - $Δ = 0$, 一个实数二重根
+              - $Δ < 0$, 两个复数根
 
           - Include
             * Euclid Sphere
@@ -161,8 +160,8 @@
           - 解三次方程
             - Problem
 
-            - Algorithm
-              - 一元三次
+            - Answer
+              一元三次
 
 
     * 四次函数

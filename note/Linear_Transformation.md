@@ -4,16 +4,7 @@
     A kind of mapping $T$ from linear space $V$ to itself.  
     For all $x \in V$, there is a unique $y \in V$ corresponding to it, and the linear condition is satisfied
 
-    The linear transformation can be represented by a matrix composed of bases; linear transformation matrix.
-    $$T X = X A  \quad ; X = (x_1, ... , x_n)$$ 
-
   - Property
-    - operation 
-      - $(T_1 + T_2) X = X (A + B)$
-      - $(k\ T_1) X = X (k\ A)$
-      - $(T_1 T_2) X = X AB$
-      - $T_1^{-1} X = X A^{-1}$
-
     - Range 
       $$Range(T)=\{T x | x \in V\}$$
       In linear space,  
@@ -54,10 +45,10 @@
         The solution satisfying the following equation,
         $$ 
           \left\{\begin{matrix}
-            A X A = A
-            X A X = X
-            (A X)^H = A X
-            (X A)^H = A X
+            A X A = A\\
+            X A X = X\\
+            (A X)^H = A X\\
+            (X A)^H = A X\\
           \end{matrix}\right.
         $$
         When the rank of cols is full, $A^+ = (A^H A)^{-1} A^H$   

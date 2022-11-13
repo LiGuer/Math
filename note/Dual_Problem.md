@@ -84,8 +84,8 @@
           $$\max_{\boldsymbol λ, \boldsymbol ν} g(\boldsymbol λ, \boldsymbol ν) ≤ \min_{\boldsymbol x} f_0(\boldsymbol x)$$
           $\therefore$ 强对偶性成立, 且在$\boldsymbol x = \boldsymbol x^*$和$(\boldsymbol λ^*, \boldsymbol ν^*)$处取得原问题和对偶问题的最优值, 对偶间隙为零.  
         
-  - Note -- Lagrange 对偶问题理解 (Boyd,凸优化,233页)
-    \Fig "Lagrange对偶问题理解.jpg"
+  - Note -- Lagrange 对偶问题理解 (Boyd,凸优化,233页)  
+    [Lagrange对偶问题理解](../files/img/20220409.jpg)
 
     - 优化问题
       目标函数不一定是凸函数  

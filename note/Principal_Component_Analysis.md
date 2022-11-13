@@ -42,7 +42,8 @@
       covariance matrix of $Y$:
       $$
       \begin{align*}
-        Cov(Y, Y) &= \frac{1}{m} (Y-\bar Y) (Y-\bar Y)^T   \tag{Covariance}\\
+        Cov(Y, Y) 
+        &= \frac{1}{m} (Y-\bar Y) (Y-\bar Y)^T   \tag{Covariance}\\
         &= \frac{1}{m} Y Y^T   \tag{$\bar Y = 0$}\\
         &= \frac{1}{m} (PX) (PX)^T   \tag{Projection}\\
         &= \frac{1}{m} P X X^T P^T   \\
