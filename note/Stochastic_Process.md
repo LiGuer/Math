@@ -56,6 +56,9 @@
           - is real numbers
           - $≥ 0$
 
+  - Include
+    * Markov Chain 
+
   - Example
     - Simple process
       $$X(t, ζ) = X(ζ) f(t)$$

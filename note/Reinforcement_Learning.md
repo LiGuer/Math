@@ -24,7 +24,7 @@
       为了避免$T \to ∞, G_t \to ∞$, 引入折扣$γ \in [0,1]$,  
       $$G_t = \sum_{k=0}^∞ γ^k R_{t+k+1} = R_{t+1} + γ G_{t+1}$$
 
-    * Value function & Action-Value function
+    - Value function & Action-Value function
       - Define
         $$
         \begin{align*}

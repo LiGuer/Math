@@ -23,19 +23,6 @@
           - Inorder traversal
           - Postorder traversal
 
-        * Minimum Spanning Tree
-          - Purpose
-            Find a Tree on the Graph with the smallest sum of edge weights connected all nodes.
-
-          - Algorithm
-            * Prim Algorithm
-              - Greed by vertices, put the shortest edge $(u,v)$ of $u$ from the searched vertices into the result edge sequence every time, and $v$ does not belong to the searched vertices.
-              - Time complexity $O(E·logV)$
-
-            * Kruskal Algorithm
-              - Greed by edges
-              - Time complexity $O(E·logV)$
-
       - Include
         * Complete Binary Tree
           - Define  

@@ -1,4 +1,4 @@
-* Directed Acyclic Graph ; DAG
+* Directed Acyclic Graph
   - Define
     A directed graph without loops.
 

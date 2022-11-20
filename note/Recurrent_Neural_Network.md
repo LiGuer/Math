@@ -7,7 +7,7 @@
 
     * Gate Recurrent Unit ; GRU
 
-* Long Short Term Memory Network ; LSTM
+* Long Short Term Memory ; LSTM
   - Define  
     Input: a time series $x \in \mathbb R^{\dim_x × T_{seq}}$  
     Output: a time series $h \in \mathbb R^{\dim_x × T_{seq}}, h = \{h_1, ...,h_{T_{seq}}\}$. Sometimes, we can take a part or the last element $h_{T_{seq}}$ of the sequence $h$ as the output.  
@@ -75,7 +75,7 @@
       \end{align*}
       $$  
 
-* Gate Recurrent Unit Network ; GRU
+* Gate Recurrent Unit ; GRU
   - Define   
     Input: a time series $x \in \mathbb R^{\dim_x × T_{seq}}$  
     Output: a time series $h \in \mathbb R^{\dim_x × T_{seq}}, h = \{h_1, ...,h_{T_{seq}}\}$. Sometimes, we can take a part or the last element $h_{T_{seq}}$ of the sequence $h$ as the output.  

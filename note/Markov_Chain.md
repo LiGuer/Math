@@ -48,6 +48,21 @@
           - Define 
             $$\boldsymbol p_{\pi} = \boldsymbol T \boldsymbol p_{\pi}  \tag{$p_{\pi}$: Stationary Distribution}$$
 
+  - Example
+    * Random Walk
+      - Define  
+        For a squence $\{Y_i\}$ of iid. random variable with value $\{-1, +1\}$ and probability $\{1-p, p\}$, then the 1-dimensional random walk is the squence $\{X_0, X_1, ...\}, X_0 = 0$ of random variable such that
+        $$X_t = \sum_{i=1}^t Y_i$$
+
+    * Branching Process 
+      - Define  
+        Branching Process are used to medel population growth by reproduction. At the beginning, there is only one individual $Z_0 = 1$. In the next generation $n+1$, each offspring will reproduce randomly according to iid. random variable $X_{n,i}$. In branching process, the expected number of individuals in a particular $\mathbb E(Z_n)$ and the probability of ultimate extinction $\mathbb P(Z_n = 0)$ are central questions. The recurrence equation of branching process is 
+        $$Z_{n+1} = \sum_{i=1}^{Z_n} X_{n, i}$$
+        $Z_{n+1}$: the size of generation $n$ with $Z_0 = 1$.  
+        $X_{n, i}$: a random variable denoting the number of direct successors of member $i$ in generation $n$. And $X_{n,i}$ are iid. over all $n$ and $i$.  
+
+      - Property
+
           
 
         

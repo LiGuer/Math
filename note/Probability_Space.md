@@ -36,7 +36,7 @@
         - Theorem -- Central Limit Theorem
           $$
           \begin{align*}
-            \lim\limits_{n \to ∞} F_n(x) &= \lim\limits_{n \to ∞} \mathbb P(\frac{\sum\limits_{k=1}^n X_k - n μ}{\sqrt{n} σ} ≤ x)  \\
+            \lim\limits_{n \to ∞} F_n(x) &= \lim\limits_{n \to ∞} \mathbb P \left(\frac{\sum\limits_{k=1}^n X_k - n μ}{\sqrt{n} σ} ≤ x \right)  \\
             &= \int_{-∞}^x \frac{1}{\sqrt{2 π}} e^{-t^2 / 2} \mathrm d t  \\
             &= \Phi(x)
           \end{align*}
@@ -76,3 +76,8 @@
                 \mathbb P(A_i | B) &= \frac{\mathbb P(B | A_i) \mathbb P(A_i)}{\sum\limits_j \mathbb P(B|A_j) \mathbb P(A_j)}; \sum_j A_j = Ω
               \end{align*}
               $$
+
+  - Example
+    * Random Variable & Random Vector
+    * Stochastic Process
+    * Probability Distribution

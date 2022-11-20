@@ -64,7 +64,7 @@
           $$||A x||_V ≤ ||A||_M ||x||_V$$
 
   - Include
-    * Inner product space
+    * Inner Product Space
 
     * Complete Normed Linear Space ; Banach Space
     

@@ -1,4 +1,4 @@
-* Markov Reinforcement Learning & Markov Decision Process
+* Markov Decision Process
   - Define  
     Markov decision process is a discrete-time stochastic control process with a 4-tuple 
     $$<S, A, \mathbb P(S_t = s_t | S_{t-1} = s_{t-1}, A_{t-1} = a_{t-1}), \mathbb P(R_t = r_t| S_t = s_t, S_{t-1} = s_{t-1}, A_{t-1} = a_{t-1})>$$

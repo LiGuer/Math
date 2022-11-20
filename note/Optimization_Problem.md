@@ -166,4 +166,9 @@
         - Branch and Bound Method
 
     * Nonconvex Optimization Problem
+
+  - Property
+    * Lagrange Function
+    * Lagrange Dual function
+    * Dual Problem
     
