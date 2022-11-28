@@ -1,6 +1,7 @@
 * Measurable Space
   - Define  
     A Measurable Space is a pair $(E, \mathcal E)$, where $E$ is a set and $\mathcal E$ is its $\sigma$-algebra.   
+    
   - Include  
 
     * Measure  

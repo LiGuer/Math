@@ -1,11 +1,11 @@
 * Convolution Nerual Network ; CNN
-  * 卷积层
+  - Define 
     - Forward Propagation -- Convolution
       $$
       \begin{align*}
-        x * k = \left[y_{ij} | y_{ij} = \sum_{c=1}^{C_x} \sum_{p=1}^{H_x} \sum_{q=1}^{W_x} x_{c,i+p-1,j+q-1} × k_{cpq}\right]  \\
-        y_c = x * k_c + b_c  \\
-        y = {y_1, y_2, ... , y_n}  \\
+        x * k &= \left[y_{ij} | y_{ij} = \sum_{c=1}^{C_x} \sum_{p=1}^{H_x} \sum_{q=1}^{W_x} x_{c,i+p-1,j+q-1} × k_{cpq}\right]  \\
+        y_c &= x * k_c + b_c  \\
+        y &= {y_1, y_2, ... , y_n}  \\
       \end{align*}
       $$
 
@@ -14,8 +14,8 @@
         - padding 加边框宽度
           $$
           \begin{align*}
-            H_{out} = \frac{H_{in} - H_{kernel} + 2 · padding}{stride + 1}  \\
-            W_{out} = \frac{W_{in} -  W_{kernel} + 2 · padding}{stride + 1}   
+            H_{out} &= \frac{H_{in} - H_{kernel} + 2 · padding}{stride + 1}  \\
+            W_{out} &= \frac{W_{in} -  W_{kernel} + 2 · padding}{stride + 1}   
           \end{align*}
           $$
 
@@ -23,22 +23,28 @@
       $$
       \begin{align*}
         \frac{∂E}{∂y_l} &= \frac{∂E}{∂y_L}·\frac{∂y_L}{∂y{L-1}}· ... ·\frac{∂y_{l+1}}{∂y_l}  \\
-          &= δ_l = δ_{l+1}·\frac{∂y_{l+1}}{∂x_{l+1}} = δ_{l-1} * Rot_{π}(w_l)  \\
-        \frac{∂E}{∂k_l} &= \frac{∂E}{∂y_l} · \frac{∂y_l}{∂k_l} = δ_l·\frac{∂y_l}{∂k_l} = δ_l * x_l  \\
+        &= δ_l \\
+        &= δ_{l+1}·\frac{∂y_{l+1}}{∂x_{l+1}} \\
+        &= δ_{l+1} * Rot_{π}(w_l)  \\
+        \frac{∂E}{∂k_l} 
+        &= \frac{∂E}{∂y_l} · \frac{∂y_l}{∂k_l} \\
+        &= δ_l·\frac{∂y_l}{∂k_l}  \\
+        &= δ_l * x_l  \\
         \frac{∂E}{∂b_l} &= δ_l · \frac{∂y_l}{∂b_l} = \sum_x \sum_y δ_l
       \end{align*}
       $$
       其中,
       $$
       \begin{align*}
-        \frac{∂y_{lcij}}{∂k_{lcpq}} = x_{l,c,i+p-1,j+q-1}
-        \frac{∂y_{lc}}{∂k_{lcpq}} = \sum_{i=1}^{H_y} \sum_{j=1}^{W_y} x_{l,c,i+p-1,j+q-1}  \\
-        \frac{∂E}{∂k_{lcpq}} = \sum_{i=1}^{H_y} \sum_{j=1}^{W_y} δ_{lcij} × x_{l,c,i+p-1,j+q-1}  = δ_{lc} * x_{lc}  \\
-        \frac{∂E}{∂b_{lc}} = \sum_{i=1}^{H_y} \sum_{j=1}^{W_y} δ_{lcij} = \sum_x \sum_y δ_l
+        \frac{∂y_{lcij}}{∂k_{lcpq}} &= x_{l,c,i+p-1,j+q-1}  \\
+        \frac{∂y_{lc}}{∂k_{lcpq}} &= \sum_{i=1}^{H_y} \sum_{j=1}^{W_y} x_{l,c,i+p-1,j+q-1}  \\
+        \frac{∂E}{∂k_{lcpq}} &= \sum_{i=1}^{H_y} \sum_{j=1}^{W_y} δ_{lcij} × x_{l,c,i+p-1,j+q-1}  \\
+        &= δ_{lc} * x_{lc}  \\
+        \frac{∂E}{∂b_{lc}} &= \sum_{i=1}^{H_y} \sum_{j=1}^{W_y} δ_{lcij} = \sum_x \sum_y δ_l
       \end{align*}
       $$
 
-  \Include
+  - Include
     * Residual Module
       - Forward Propagation
         $$y = x + F(x, ω)$$

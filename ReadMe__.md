@@ -1,4 +1,10 @@
 
+* Calculus
+  * Limit
+  * Differential
+    * Derivative
+    * Gradient, Divergence, Curl
+  * Integral
 * Differential Equations
   * Ordinary Differential Equation
   * Partial Differential Equation
@@ -14,6 +20,9 @@
     * 半线性偏微分方程
     * 拟线性偏微分方程
     * 完全非线性偏微分方程
+* Guassian Process
+  * Gaussian Process Regression
+  * Least Square Method
 * Graph
   * Union-Find Sets
   * Euler Path
@@ -87,8 +96,7 @@
   * Back Propagation Neural Network
     * 全连接层
   * Convolution Nerual Network ; CNN
-    * 卷积层
-      * Residual Module
+    * Residual Module
   * Recurrent Neural Network ; RNN
     * Long Short Term Memory ; LSTM
     * Gate Recurrent Unit ; GRU
@@ -162,6 +170,7 @@
         * Stationary Distribution
       * Random Walk
       * Branching Process
+    * Gaussian Process
   * Probability Distribution
     * Discrete Probability Distribution
       * 0-1 distribution ; Bernoulli distribution
@@ -177,6 +186,8 @@
       * $Γ$ distribution
         * Exponential distribution
         * $\chi^2$ distribution
+* Regression
+  * Linear Regression
 * Reinforcement Learning
   * 单状态强化学习
   * Markov Decision Process

@@ -2,7 +2,7 @@
   - Define  
     Random Variable:
     $$X: Ω \to \mathbb R  \tag{Random Variable}$$
-    a random variable $X$ is a function from the sample space $Ω$ to the real numbers $\mathbb R$.
+    a random variable $X$ is a function from a sample space $Ω$ to the real numbers $\mathbb R$.
 
     Symbol:
       - $Ω$: sample space
