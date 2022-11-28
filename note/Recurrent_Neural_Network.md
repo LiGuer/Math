@@ -15,7 +15,7 @@
 
     For a moment $t$, the define of the cell of LSTM:
     $$h_t = f_{Cell}(x_t, h_{t-1})  \tag{a cell of LSTM in moment $t$}$$
-
+    
     $$
     \begin{align*}
       f_t &= \text{sigmoid}\left(W_f \left(\begin{matrix} h_{t-1} \\ x_t \end{matrix}\right) + b_f\right)  \tag{forget gate}\\
@@ -26,7 +26,7 @@
       h_t &= o_t \odot \text{tanh}(c_t)  \tag{hidden state}
     \end{align*}
     $$  
-
+    
     $$
     \begin{align*}  
       \Rightarrow\quad  \left(\begin{matrix} \tilde f_t \\ \tilde i_t \\ \tilde o_t \\ \tilde g_t \end{matrix}\right)  
@@ -36,8 +36,6 @@
       g_t &= \text{tanh} (\tilde g_t) 
     \end{align*}  
     $$  
-
-    [Long Short Term Memory Network (Code)](./files/code/Long_Short_Term_Memory_Network.py)
 
     |Symbols|Mean|
     |---|---|  
@@ -84,7 +82,6 @@
     For a moment $t$, the define of the cell of GRU:
     $$h_t = f_{Cell}(x_t, h_{t-1})  \tag{a cell of GRU in moment $t$}$$
 
-
     $$
     \begin{align*}
       \left(\begin{matrix} z_t \\ r_t\end{matrix}\right) &= \text{sigmoid}\left(W_{rz} \left(\begin{matrix} h_{t-1} \\ x_t \end{matrix}\right) + b_{rz}\right)  \tag{reset \& input gate}\\
@@ -92,8 +89,6 @@
       h_t &= (1 - z_t) \odot h_{t-1} + z_t \odot \tilde h_t  \tag{hidden state}
     \end{align*}
     $$  
-
-    [Gate Recurrent Unit Network (Code)](./files/code/Gated_Recurrent_Unit_Network.py)
 
     |Symbols|Mean|
     |---|---|  

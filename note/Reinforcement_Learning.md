@@ -49,6 +49,5 @@
         $$
         获得奖励的概率:
         $$\mathbb P (R_t | A_t)$$
- 
 
     * Markov Decision Process

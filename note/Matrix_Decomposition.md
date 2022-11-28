@@ -107,7 +107,6 @@
       - Define  
         $$A = U \left(\begin{matrix} Σ & 0 \\ 0 & 0 \end{matrix}\right) V^T$$
         将矩阵A化成两个Unitary矩阵$U, V$, 和一个非零奇异值组成的矩阵$Σ$的乘积. 
-          
 
         - Note
           $$\exists \text{Unitary Matrix} U, V => U^H A V = \left(\begin{matrix} Σ & 0 \\ 0 & 0 \end{matrix}\right)$$
