@@ -3,8 +3,9 @@
     $$L(\boldsymbol x, \boldsymbol λ, \boldsymbol ν) = f_0(\boldsymbol x) + \sum_i λ_i f_i(\boldsymbol x) + \sum_i ν_i h_i(\boldsymbol x)$$
     - $f_0, f_i, h_i$ 是标准形式优化问题的目标函数、约束函数.
 
-* Lagrange Dual function
-  - Define
+* Lagrange Dual function, Dual Problem
+  - Define  
+    Lagrange Dual function
     $$
     \begin{align*}
       g(\boldsymbol λ, \boldsymbol ν) &= \inf_{\boldsymbol x \in D}\ L(\boldsymbol x, \boldsymbol λ, \boldsymbol ν)  \\
@@ -12,8 +13,16 @@
     \end{align*}
     $$
 
+    Dual Problem
+    $$
+    \begin{align*}
+      \max_{\boldsymbol λ, \boldsymbol ν} \quad & g(\boldsymbol λ, \boldsymbol ν)  \\
+      s.t. \quad & \boldsymbol λ ⪰ 0
+    \end{align*}
+    $$
+
     Symbol:
-    - $L: \mathbb  R^n × \mathbb  R^m × \mathbb  R^p \to \mathbb  R,\quad  dom\ L: D × \mathbb  R^m × \mathbb  R^p$
+    $L: \mathbb  R^n × \mathbb  R^m × \mathbb  R^p \to \mathbb  R,\quad  dom\ L: D × \mathbb  R^m × \mathbb  R^p$
   
   - Property  
     - 即使原问题非凸, Dual function仍然是凹函数.
@@ -37,22 +46,13 @@
         \end{align*}
         $$
 
+    - Duality  
+      Weak Duality: $p^* ≥ d^*$ 一定存在
 
-* Dual Problem
-  - Define
-    $$
-    \begin{align*}
-      \max_{\boldsymbol λ, \boldsymbol ν} \quad & g(\boldsymbol λ, \boldsymbol ν)  \\
-      s.t. \quad & \boldsymbol λ ⪰ 0
-    \end{align*}
-    $$
+      Strong Duality: $p^* = d^*$
 
-  - Property
-    - Duality
-      - Strong duality: $p^* ≥ d^*$ 一定存在
-      - Weak duality: $p^* = d^*$
     - Slate 准则
-    - KKT最优性条件
+    * Karush-Kuhn-Tucker Optimality Conditions
       $$
       \begin{align*}
         f_i(\boldsymbol x^*) &≤ 0  \quad , i = 1,...,m  \tag{满足原问题约束}  \\
@@ -62,10 +62,11 @@
         ∇L(\boldsymbol x^*, \boldsymbol λ^*, \boldsymbol ν^*) &= ∇ f_0(\boldsymbol x^*) + \sum_i λ_i^* ∇ f_i(\boldsymbol x^*) + \sum_i ν_i^* ∇ h_i(\boldsymbol x^*) = 0  \tag{$L(\boldsymbol x, \boldsymbol λ^*, \boldsymbol ν^*)$ 在$\boldsymbol x^*$取极值}
       \end{align*}
       $$
-      其中, 目标函数$f_0$和约束函数$f_i, h_i$可微.  
+      Where, the objective function $f_0$ and constraint function $f_i, h_i$ are differentiable.  
       
-      - 若原问题是非凸, 若$\boldsymbol x^*$和$(\boldsymbol λ^*, \boldsymbol ν^*)$是原问题、对偶问题最优解, 则$\boldsymbol x^*, \boldsymbol λ^*, \boldsymbol ν^*$满足KKT条件.
-      - 若原问题是凸, $\boldsymbol x^*, \boldsymbol λ^*, \boldsymbol ν^*$满足KKT条件$<=> \boldsymbol x^*$和$(\boldsymbol λ^*, \boldsymbol ν^*)$是原问题、对偶问题最优解.
+      If the original problem is nonconvex, and $\boldsymbol x^*, (\boldsymbol λ^*, \boldsymbol ν^*)$ is the optimal solution of the original problem and dual problem $\Rightarrow (\boldsymbol x^*, \boldsymbol λ^*, \boldsymbol ν^*)$ meet the KKT conditions.
+      
+      If the original problem is convex, we have $(\boldsymbol x^*, \boldsymbol λ^*, \boldsymbol ν^*)$ meet the KKT conditions $\Leftrightarrow \boldsymbol x^*, (\boldsymbol λ^*, \boldsymbol ν^*)$ are the optimal solutions of the original problem and the dual problem respectively.
 
       - Proof
         - (1)(2) 式, 说明$\boldsymbol x^*$是原问题的可行解.
@@ -87,7 +88,7 @@
   - Note -- Lagrange 对偶问题理解 (Boyd,凸优化,233页)  
     [Lagrange对偶问题理解](../files/img/20220409.jpg)
 
-    - 优化问题
+    - 优化问题  
       目标函数不一定是凸函数  
       $$
       \begin{align*}
@@ -139,8 +140,8 @@
       图5. 对偶问题是"最大的最小值", Dual function的最大值, $\max_{\boldsymbol λ, \boldsymbol ν} \inf_{\boldsymbol x}\ L(\boldsymbol x, \boldsymbol λ, \boldsymbol ν)$.  
       即, 找到可行集$G$下半部分的一条斜向下的切线, 使其与纵坐标的交点的值最大. 如图中$d^*$所示.
 
-    - 强对偶性判定
-      弱对偶性: 一定有$p^* ≥ d^*$  
+    - 强对偶性判定  
+      弱对偶性: 一定有$p^* ≥ d^*$    
       强对偶性: $p^* = d^*$  
-      图6. 图中显示了该问题的对偶性强弱, 因为最优对偶间隙$p^* - d^* > 0$, 故该问题不满足强对偶性.
+      图6. 图中显示了该问题的对偶性强弱, 因为最优对偶间隙$p^* - d^* > 0$, 故该问题不满足强对偶性.  
 

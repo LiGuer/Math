@@ -99,7 +99,7 @@
         $$
         \begin{align*}
           f_X(x) &= \frac{1}{\sqrt{2 π} \sigma} e^{-\frac{(x - μ)^2}{2 \sigma^2}} \quad; x \in (-\infty, +\infty)  \\
-          f_{\boldsymbol X}(\boldsymbol x) &= \frac{1}{(2 π)^{n/2} |\boldsymbol Σ|^{1/2}} e^{-\frac{(\boldsymbol x - \boldsymbol μ)\boldsymbol Σ^{-1}(\boldsymbol x - \boldsymbol μ)^T}{2}} \tag{Multivariate Normal distribution }
+          f_{\boldsymbol X}(\boldsymbol x) &= \frac{1}{(2 π)^{\frac{n}{2}} |\boldsymbol Σ|^{\frac{1}{2}}} e^{-\frac{(\boldsymbol x - \boldsymbol μ)\boldsymbol Σ^{-1}(\boldsymbol x - \boldsymbol μ)^T}{2}} \tag{Multivariate Normal distribution }
         \end{align*}
         $$
 
@@ -108,43 +108,52 @@
           $$μ = 0, \sigma^2 = 1$$
 
       - Property  
-        | property | value |
-        |---|---|
-        | Mean | $\mathbb E(x) = μ$ |
-        | Variance | $\begin{array}{ll} D(x) = \sigma^2 \\ D(\boldsymbol x) = \boldsymbol Σ \end{array}$ |
-        |||
+        - basic parameters 
+          | property | value |
+          |---|---|
+          | Mean | $\mathbb E(x) = μ$ |
+          | Variance | $\begin{array}{ll} D(x) = \sigma^2 \\ D(\boldsymbol x) = \boldsymbol Σ \end{array}$ |
+          |||
 
-        - Proof  
-          $$
-          \begin{align*}
-            D(x) &= \frac{1}{(2 π)^{D/2}} \frac{1}{|\boldsymbol Σ|^{1/2}} \sum_{i=1}^D \sum_{j=1}^D \boldsymbol u_i \boldsymbol u_j^T \int e^{-\sum_{k=1}^D \frac{\boldsymbol y_k^2}{2 λ_k}} y_i y_j \mathrm d \boldsymbol y   \\
-              &= \frac{1}{(2 π)^{D/2}} \frac{1}{|\boldsymbol Σ|^{1/2}} \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T \int e^{-\sum_{k=1}^D \frac{y_k^2}{2 λ_k}} y_i^2 \mathrm d \boldsymbol y  \tag{$i ≠ j, \boldsymbol u_i \boldsymbol u_j^T=0, \boldsymbol u_i \boldsymbol u_j$ 正交}  \\
-              &= \frac{1}{(2 π)^{D/2}} \frac{1}{|\boldsymbol Σ|^{1/2}} \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T \int \prod_{k=1}^D e^{-\frac{y_k^2}{2 λ_k}} y_i^2 \mathrm d \boldsymbol y   \\
-              &= \frac{1}{(2 π)^{D/2}} \frac{1}{|\boldsymbol Σ|^{1/2}} \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T \left(\int_{-\infty}^{+\infty} e^{-\frac{y_i^2}{2 λ_i}} y_i^2 \mathrm d y_i × \prod_{k=1, k ≠ i}^D \int_{-\infty}^{+\infty} e^{-\frac{y_X^2}{2 λ_k}} \mathrm d y_k \right)  \tag{积分乘法结合律}  \\
-              &= \frac{1}{(2 π)^{D/2}} \frac{1}{|\boldsymbol Σ|^{1/2}} \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T \left((2 π λ_i)^{1 / 2} · λ_i × \prod_{k=1, k ≠ i}^D(2 π λ_k)^{1 / 2} \right)  \tag{见下面推导}  \\
-              &= \frac{1}{(2 π)^{D/2}} \frac{1}{|\boldsymbol Σ|^{1/2}}  · ((2 π)^{D/2} \prod_{k=1}^D λ_k) · (\sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T λ_i)   \\
-              &= \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T λ_i  \tag{$\prod_{k=1}^D λ_k=|\boldsymbol Σ|^{1/2}$}  \\
-              &= \boldsymbol Σ
-          \end{align*}
-          $$
+          - Proof  
+            $$
+            \begin{align*}
+              D(x) &= \frac{1}{(2 π)^{\frac{D}{2}}} \frac{1}{|\boldsymbol Σ|^{\frac{1}{2}}} \sum_{i=1}^D \sum_{j=1}^D \boldsymbol u_i \boldsymbol u_j^T \int e^{-\sum\limits_{k=1}^D \frac{\boldsymbol y_k^2}{2 λ_k}} y_i y_j \mathrm d \boldsymbol y   \\
+                &= \frac{1}{(2 π)^{\frac{D}{2}}} \frac{1}{|\boldsymbol Σ|^{\frac{1}{2}}} \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T \int e^{-\sum\limits_{k=1}^D \frac{y_k^2}{2 λ_k}} y_i^2 \mathrm d \boldsymbol y  \tag{$i ≠ j, \boldsymbol u_i \boldsymbol u_j^T=0, \boldsymbol u_i \boldsymbol u_j$ 正交}  \\
+                &= \frac{1}{(2 π)^{\frac{D}{2}}} \frac{1}{|\boldsymbol Σ|^{\frac{1}{2}}} \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T \int \prod_{k=1}^D e^{-\frac{y_k^2}{2 λ_k}} y_i^2 \mathrm d \boldsymbol y   \\
+                &= \frac{1}{(2 π)^{\frac{D}{2}}} \frac{1}{|\boldsymbol Σ|^{\frac{1}{2}}} \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T \left(\int_{-\infty}^{+\infty} e^{-\frac{y_i^2}{2 λ_i}} y_i^2 \mathrm d y_i × \prod_{k=1, k ≠ i}^D \int_{-\infty}^{+\infty} e^{-\frac{y_X^2}{2 λ_k}} \mathrm d y_k \right)  \tag{积分乘法结合律}  \\
+                &= \frac{1}{(2 π)^{\frac{D}{2}}} \frac{1}{|\boldsymbol Σ|^{\frac{1}{2}}} \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T \left((2 π λ_i)^{\frac{1}{2}} · λ_i × \prod_{k=1, k ≠ i}^D(2 π λ_k)^{\frac{1}{2}} \right)  \tag{见下面推导}  \\
+                &= \frac{1}{(2 π)^{\frac{D}{2}}} \frac{1}{|\boldsymbol Σ|^{\frac{1}{2}}}  · \left((2 π)^{\frac{D}{2}} \prod_{k=1}^D λ_k \right) · \left(\sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T λ_i\right)   \\
+                &= \sum_{i=1}^D \boldsymbol u_i \boldsymbol u_i^T λ_i  \tag{$\prod_{k=1}^D λ_k=|\boldsymbol Σ|^{\frac{1}{2}}$}  \\
+                &= \boldsymbol Σ
+            \end{align*}
+            $$
 
-          when $k = i$,
-          $$
-          \begin{align*}
-            \int_{-\infty}^{+\infty} e^{-\frac{y_λ^2}{2 λ_i}} y_i^2 \mathrm d y_i &=(λ_i \sqrt{2 λ_i}) · \int_{-\infty}^{+\infty} \left(\frac{y_i^2}{2 λ_i} \right)^{1/2} e^{-\frac{y_λ^2}{2 λ_i}} \mathrm d \frac{y_i^2}{2 λ_i}   \\
-            &= (λ_i \sqrt{2 λ_i}) · 2 Γ(3/2)  \tag{$Γ(z) = \int_0^{+\infty} x^{z-1} e^{-x} \mathrm d x$}  \\
-            &= \sqrt{2 π λ_i} · λ_i  \tag{$Γ(3/2) = \frac{\sqrt{π}}{2}$}
-          \end{align*}
-          $$
+            when $k = i$,
+            $$
+            \begin{align*}
+              \int_{-\infty}^{+\infty} e^{-\frac{y_λ^2}{2 λ_i}} y_i^2 \mathrm d y_i &=(λ_i \sqrt{2 λ_i}) · \int_{-\infty}^{+\infty} \left(\frac{y_i^2}{2 λ_i} \right)^{\frac{1}{2}} e^{-\frac{y_λ^2}{2 λ_i}} \mathrm d \frac{y_i^2}{2 λ_i}   \\
+              &= (λ_i \sqrt{2 λ_i}) · 2 Γ(3/2)  \tag{$Γ(z) = \int_0^{+\infty} x^{z-1} e^{-x} \mathrm d x$}  \\
+              &= \sqrt{2 π λ_i} · λ_i  \tag{$Γ(3/2) = \frac{\sqrt{π}}{2}$}
+            \end{align*}
+            $$
 
-          when $k ≠ i$,
-          $$
-          \begin{align*}
-            \int_{-\infty}^{+\infty} e^{-\frac{y_λ^2}{2 λ_k}} \mathrm d y_k &=(\sqrt{\frac{λ_k}{2}}) · \int_{-\infty}^{+\infty} \left(\frac{y_k^2}{2 λ_k} \right)^{-1/2} e^{-\frac{y_λ^2}{2 λ_k}} \mathrm d \frac{y_k^2}{2 λ_k}   \\
-            &= \left(\sqrt{\frac{λ_k}{2}}\right) · 2 Γ(1/2)  \tag{$Γ(z) = \int_0^{+\infty} x^{z-1} e^{-x} \mathrm d x$}  \\
-            &= \sqrt{2 π λ_k}  \tag{$Γ(1/2) = \sqrt{π}$}
-          \end{align*}
-          $$
+            when $k ≠ i$,
+            $$
+            \begin{align*}
+              \int_{-\infty}^{+\infty} e^{-\frac{y_λ^2}{2 λ_k}} \mathrm d y_k &=(\sqrt{\frac{λ_k}{2}}) · \int_{-\infty}^{+\infty} \left(\frac{y_k^2}{2 λ_k} \right)^{-\frac{1}{2}} e^{-\frac{y_λ^2}{2 λ_k}} \mathrm d \frac{y_k^2}{2 λ_k}   \\
+              &= \left(\sqrt{\frac{λ_k}{2}}\right) · 2 Γ(\frac{1}{2})  \tag{$Γ(z) = \int_0^{+\infty} x^{z-1} e^{-x} \mathrm d x$}  \\
+              &= \sqrt{2 π λ_k}  \tag{$Γ(\frac{1}{2}) = \sqrt{π}$}
+            \end{align*}
+            $$
+
+        - Conditional Distributions  
+          A multivariable $\boldsymbol x$ is partitioned as follows
+          $$\boldsymbol x = \left(\begin{matrix}x_1 \\ x_2\end{matrix}\right) \sim \mathcal N \left(\left(\begin{matrix}\boldsymbol \mu_1 \\ \boldsymbol \mu_2\end{matrix}\right), \left(\begin{matrix} \boldsymbol \Sigma_{11} & \boldsymbol \Sigma_{12}\\ \boldsymbol \Sigma_{21} & \boldsymbol \Sigma_{22}\end{matrix}\right)\right)$$
+
+          Then the distribution of $\boldsymbol x_1$ conditional on $\boldsymbol x_2 = a$ is still a multivariate normal 
+          $$(\boldsymbol x_1\ |\ \boldsymbol x_2 = \boldsymbol a) \sim \mathcal N\left(\boldsymbol \mu_1 + \boldsymbol \Sigma_{12} \boldsymbol \Sigma_{22}^{-1} (\boldsymbol a - \boldsymbol \mu_2), \boldsymbol \Sigma_{11} - \boldsymbol \Sigma_{12} \boldsymbol \Sigma_{22}^{-1} \boldsymbol \Sigma_{21} \right)$$
+
     * Rayleigh  distribution 
       - Define  
         $$
@@ -164,7 +173,7 @@
         |||
 
         when $α=1$, $Γ$ distribution 退化为Exponential distribution;  
-        when $α=n/2, β=1/2$, $Γ$ distribution 退化为$\chi^2$ distribution.
+        when $α=\frac{n}{2}, β=\frac{1}{2}$, $Γ$ distribution 退化为$\chi^2$ distribution.
 
       * Exponential distribution 
         - Define  
@@ -180,7 +189,7 @@
 
       * $\chi^2$ distribution 
         - Define
-          $$\frac{1}{2^{n / 2} Γ(n / 2)} x^{n / 2 - 1} e^{-x / 2}$$
+          $$\frac{1}{2^{\frac{n}{2}} Γ(\frac{n}{2})} x^{\frac{n}{2} - 1} e^{-x / 2}$$
 
         - Property
           | property | value |

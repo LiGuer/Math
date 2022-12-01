@@ -34,7 +34,42 @@
         \end{align*}
         $$
 
-      - Problem -- Solving convex optimization problems
+      - Problem -- Solving Convex Optimization Problems
+
+        - Problem -- Unconstrained Convex Optimization Problems
+          $\min_{\.x}\ f(\.x)$
+          其中$f(\.x)$是可微凸函数
+
+          最优性条件: $∇ f(\.x^*) = 0$
+
+          - Algorithm
+            - Gradient Descent Method
+              $$x_{k+1} = x_k - λ ∇ f(x_k)$$
+
+            - Steepest Descent Method
+              $$x_{k+1} = x_k + \arg\min \{ (∇ f(x_k))^T v\ |\ ||v|| = 1 \}$$
+
+            - Newton Iteration Method
+              $$x_{k+1} = x_k - \frac{1}{∇^2 f(x)} ∇ f(x_k)$$
+
+            - Quasi-Newton Method
+
+            - Block Coordinate Descent Method
+
+        - Problem -- Solving Convex Optimization Problems with Equality Constraints
+
+        - Property
+          - KKT Conditions
+            $$\begin{align*}
+              f_i(\.x^*) &≤ 0  \\
+              \.A \.x &= \.b  \\
+              \.λ^* &⪰ 0  \\
+              λ_i^* f_i(\.x^*) &= 0  \\
+              ∇ L = ∇ f_0(\.x^*) + \sum_{i=1}^m λ_i^* ∇ f_i(\.x^*) + \.A^T \.v^* &= 0
+            \end{align*}$$
+
+        - Algorithm
+          * Interior Point Method
 
       - Include
         * Linear Programming
@@ -89,6 +124,11 @@
                     & s ⪰ 0, x^+ ⪰ 0, x^- ⪰ 0
                 \end{align*}
                 $$
+
+          - Algorithm -- Solving Linear Programming
+            * Simplex Method
+
+              Due to the feasible solution set of linear programming is a high-dimensional simplex (the simplest polyhedron), and the optimal solution is on the vertex or boundary of the polyhedron, not inside the polyhedron. Therefore, we can find the optimal solution by walking along each vertex of the simplex.
 
         * Linear Fractional Programming
           - Define
@@ -169,6 +209,7 @@
 
   - Property
     * Lagrange Function
-    * Lagrange Dual function
-    * Dual Problem
+    * Lagrange Dual function, Dual Problem
+
+  
     
