@@ -37,10 +37,10 @@
       - Problem -- Solving Convex Optimization Problems
 
         - Problem -- Unconstrained Convex Optimization Problems
-          $\min_{\.x}\ f(\.x)$
-          其中$f(\.x)$是可微凸函数
+          $\min_{\boldsymbol x}\ f(\boldsymbol x)$
+          其中$f(\boldsymbol x)$是可微凸函数
 
-          最优性条件: $∇ f(\.x^*) = 0$
+          最优性条件: $∇ f(\boldsymbol x^*) = 0$
 
           - Algorithm
             - Gradient Descent Method
@@ -60,13 +60,13 @@
 
         - Property
           - KKT Conditions
-            $$\begin{align*}
-              f_i(\.x^*) &≤ 0  \\
-              \.A \.x &= \.b  \\
-              \.λ^* &⪰ 0  \\
-              λ_i^* f_i(\.x^*) &= 0  \\
-              ∇ L = ∇ f_0(\.x^*) + \sum_{i=1}^m λ_i^* ∇ f_i(\.x^*) + \.A^T \.v^* &= 0
-            \end{align*}$$
+            $$\begin{align*}\left\{\begin{matrix}
+              f_i(\boldsymbol x^*) ≤ 0  \\
+              \boldsymbol A \boldsymbol x = \boldsymbol b  \\
+              \boldsymbol λ^* ⪰ 0  \\
+              λ_i^* f_i(\boldsymbol x^*) = 0  \\
+              ∇ L = ∇ f_0(\boldsymbol x^*) + \sum_{i=1}^m λ_i^* ∇ f_i(\boldsymbol x^*) + \boldsymbol A^T \boldsymbol v^* = 0
+            \end{matrix}\right.\end{align*}$$
 
         - Algorithm
           * Interior Point Method

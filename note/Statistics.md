@@ -1,19 +1,58 @@
 * Statistics
-  - Define
-    - Population 
-    - Sampling 
+  - Concept
+    * Population
+      - Define  
+        All possible observations in experiments. 
+    
+    * Sample
+      - Define  
+        For a random variable $X$ with distribution function $F$, if $X_1, X_2,..., X_n$ are iid. random variables with distribution $F$, they are called simple random samples of $n$ capacity obtained from population $X$. Their observed values $x_1, x_2,..., x_n$ are called independent sample values.
+
+    * Sample Statistic
+      - Define  
+        For samples $X_1, X_2,..., X_n$ from Population $X$, Statistic is a function $g(X_1, ..., X_n)$ (is still a random variable) without any unknown parameter.
+
+      - Property
+        * Sampling Distribution  
+          - Define
+            Sampling Distribution is the distribution of Sample Statistic.
+
+          - Include
+            * $\chi^2$ distribution 
+            * Student's t-distribution
+            * F-distribution
+
+      - Include
+        * Sample Mean   
+          $$\bar X = \frac{1}{n} \sum_{i=1}^n X_i$$
+
+        * Sample Variance , Sample Standard Deviation  
+          $$\begin{align*}
+            S^2 
+            &= \frac{1}{n-1} \sum_{i=1}^n (X_i - \bar X)^2 \\
+            &= \frac{1}{n-1} \left(\sum_{i=1}^n X_i^2 - n \bar X^2\right)  \tag{Sample Variance}\\
+            S &= \sqrt{S^2}  \tag{Sample Standard Deviation}\\
+          \end{align*}$$
+
+        * Sample k-order Moment
+          $$\hat A_k = \frac{1}{n} \sum\limits_{i=0}^n X_i^k$$
+
+        * Sample k-order Central Moment
+          $$\hat B_k = \frac{1}{n} \sum\limits_{i=0}^n (X_i - \hat \mu)^k$$
 
   - Problem 
     * Parameter Estimation
       - Include 
         * Point Estimation
+
         * Interval estimation
+
     * Hypothesis Testing
 
 
 * Point Estimation  
-  - Define  
-    Best estimate with a single value $\hat \theta$ of an unknown population parameter $\theta$ from samples $\{X_1, ..., X_n\}$.
+  - Purpose  
+    If the form of the distribution function $F(X; \theta)$ of Population $X$ be known where $\theta$ is the parameters to be estimated, and is the parameter to be estimated, the purpose of Point Estimation is to construct an appropriate Sample Statistic $\hat \theta(X_1, X_2, ..., X_n)$ and use its observed value $\hat \theta(x_1, x_2, ..., x_n)$ as a approximate value of unknown parameter $\theta$ from samples $\{X_1, ..., X_n\}$.
 
   - Property
     - Biasness
@@ -60,16 +99,23 @@
 
     - Efficiency
 
-  - Example
-    |Name|Expression| 
-    |---|---|
-    |Sample Mean|$\hat \mu = \frac{1}{n} \sum\limits_{i=0}^n X_i$|
-    |Sample Variance|$\hat \sigma =  \frac{1}{n-1} \sum\limits_{i=1}^n (X_i - \hat \mu)$|
-    |Sample k-order Moment|$\hat A_k = \frac{1}{n} \sum\limits_{i=0}^n X_i^k$|
-    |Sample k-order Central Moment|$\hat B_k = \frac{1}{n} \sum\limits_{i=0}^n (X_i - \hat \mu)^k$|
-    |||
-
   - Algorithm -- Solve Point Estimation  
-    * Moment Estimation
+    * Moment Estimation  
+      For Moment of Population,
+      $$\mu_l = \mathbb E(\mu_l) = \sum_{x\in range(x)} x^l \mathbb P(x ; \theta_1, ..., \theta_k)$$
+
+      and Sample Moments converge to the corresponding Population Moment in probability,
+      $$A_l = \frac{1}{n} \sum_{i=1}^n X_i^l \stackrel{\text{in probability}}{\longrightarrow} \mu_l$$
+
+      we express and estimate the Estimator $\hat \theta_i$ called Moment Estimation of the parameters $\theta_i$ by Moments through using the Sample Moments $A_l$ as the estimator of the corresponding Population Moment $\mu_l$,
+      $$\left\{\begin{matrix}\mu_1 = \mu_1(\theta_1, ..., \theta_k)\\ \vdots \\ \mu_k = \mu_k(\theta_1, ..., \theta_k)\end{matrix}\right. \Rightarrow \left\{\begin{matrix}\theta_1 = \theta_1(\mu_1, ..., \mu_k) \\ \vdots \\ \theta_k = \theta_k(\mu_1, ..., \mu_k)\end{matrix}\right.$$
+      $$\Rightarrow \hat \theta_i = \theta_i (A_1, A_2, ..., A_k) \tag{Moment Estimation}$$
       
-    * Maximum Likelihood Estimation
+    * Maximum Likelihood Estimation  
+      We take the value that maximizes the probability of joint occurrence of all samples $\{X_1, ..., X_n\}$ as the Estimator $\hat \theta_i$ of parameters $\theta_i$, i.e. arguments of the Maximum Likelihood $\mathbb P(x_1, ..., x_n; \theta)$,
+      $$\begin{align*}
+        \hat \theta
+        &= \arg\max_{\theta \in \Theta}\quad \mathbb P(x_1, ..., x_n; \theta) \\
+        &= \arg\max_{\theta \in \Theta}\quad \prod_{i=1}^n \mathbb P(x_i ; \theta)  \\
+        &= \arg\max_{\theta \in \Theta}\quad \sum_{i=1}^n \log \left(\mathbb P(x_i ; \theta)\right)
+      \end{align*}$$

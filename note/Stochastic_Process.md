@@ -60,12 +60,30 @@
     * Markov Chain 
     * Gaussian Process
 
+    * Poisson Process  
+      - Define  
+        $$N(t) = \sum_{n=1}^\infty u(t - T(n)) \quad; f_T(t;n) = \frac{(λ t)^{n-1}}{(n-1)!} λ e^{-λ t} u(t)$$
+
+    * Wiener Process 
+      - Define  
+        The Wiener process $\{W(t) \ |\ t \ge 0\}$ is a stochastic process such that,
+        - $W(0) = 0$
+        - $W$ has independent increments, $\forall t > s \ge 0$, i.e. the future increments $W(t+\Delta t) - W(t), \Delta t \ge 0$ are independent of the past values $W_s$.
+        - $W(t) - W(s) \sim \mathcal N(0, \sigma^2(t-s)) \quad; \forall t > s \ge 0, \sigma > 0$
+        - $W$ has continuous paths, $W(t)$ is continuous in $t$ 
+
+      - Note  
+        Random walk is a discrete version of Wiener Process, and Wiener process is a limit of random walk.
+
+      - Property
+        $$\mathbb E(W(t)) = 0$$
+        $$Var_{W}(t) = \sigma^2 t$$
+        $$Corr_{W}(t_1, t_2) = Cov_W(t_1, t_2) = \sigma^2 \min \{t_1, t_2\} \quad; t_1, t_2 \ge 0$$
+
   - Example
     - Simple process
       $$X(t, ζ) = X(ζ) f(t)$$
 
     - Random Sine Wave
       $$X(t, ζ) = A(ζ) \sin(\omega_0 t + \Theta(ζ))$$
-      
-    - Possion Counting process
-      $$N(t) = \sum_{n=1}^\infty u(t - T(n)) \quad; f_T(t;n) = \frac{(λ t)^{n-1}}{(n-1)!} λ e^{-λ t} u(t)$$
+
