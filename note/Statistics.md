@@ -112,10 +112,19 @@
       $$\Rightarrow \hat \theta_i = \theta_i (A_1, A_2, ..., A_k) \tag{Moment Estimation}$$
       
     * Maximum Likelihood Estimation  
-      We take the value that maximizes the probability of joint occurrence of all samples $\{X_1, ..., X_n\}$ as the Estimator $\hat \theta_i$ of parameters $\theta_i$, i.e. arguments of the Maximum Likelihood $\mathbb P(x_1, ..., x_n; \theta)$,
+      We take the value that maximizes the probability of joint occurrence of all samples $\{X_1, ..., X_n\}$ as the Estimator $\hat \theta_i$ of parameters $\theta_i$, i.e. arguments of the Maximum Likelihood $\mathbb P(x_1, ..., x_n| \theta)$,
       $$\begin{align*}
         \hat \theta
-        &= \arg\max_{\theta \in \Theta}\quad \mathbb P(x_1, ..., x_n; \theta) \\
-        &= \arg\max_{\theta \in \Theta}\quad \prod_{i=1}^n \mathbb P(x_i ; \theta)  \\
-        &= \arg\max_{\theta \in \Theta}\quad \sum_{i=1}^n \log \left(\mathbb P(x_i ; \theta)\right)
+        &= \arg\max_{\theta \in \Theta}\quad \mathbb P(x_1, ..., x_n| \theta) \\
+        &= \arg\max_{\theta \in \Theta}\quad \prod_{i=1}^n \mathbb P(x_i | \theta)  \\
+        &= \arg\max_{\theta \in \Theta}\quad \sum_{i=1}^n \log \mathbb P(x_i | \theta) 
+      \end{align*}$$
+
+    * Maximum A Posteriori Estimation
+      $$\begin{align*}
+        \hat \theta
+        &= \arg\max_{\theta \in \Theta}\quad \mathbb P(\theta | x_1, ..., x_n) \\
+        &= \arg\max_{\theta \in \Theta}\quad \frac{\mathbb P(x_1, ..., x_n| \theta)\mathbb P(\theta)}{\mathbb P(x_1, ..., x_n)} \\
+        &= \arg\max_{\theta \in \Theta}\quad \mathbb P(\theta) \prod_{i=1}^n \mathbb P(x_i | \theta)  \\
+        &= \arg\max_{\theta \in \Theta}\quad \left(\sum_{i=1}^n \log  \mathbb P(x_i | \theta) \right) + \log \mathbb P(\theta)
       \end{align*}$$

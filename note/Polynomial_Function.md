@@ -8,7 +8,7 @@
     $$
 
   - Include
-    * 线性函数 (一次函数)
+    * Linear Function  
       - Define
         $$
         \begin{align*}
@@ -18,58 +18,63 @@
         $$
 
       - Property
-        * 线性函数的零点集
-        
-          - 解线性方程
-            - Problem  
-              $$\boldsymbol A \boldsymbol x = \boldsymbol b$$
-              知$\boldsymbol A, \boldsymbol b$ 求 $\boldsymbol x$.
+        - 线性函数的零点集, Solving Linear Equations
+          - Problem  
+            $$\boldsymbol A \boldsymbol x = \boldsymbol b$$
 
-            - Property
-              - 解的存在性  
-                $$
-                \begin{align*}
-                  \left\{\begin{matrix}
-                    rank((\boldsymbol A\ \boldsymbol b)) = rank(\boldsymbol A) \quad \text{有解}  \\
-                    rank((\boldsymbol A\ \boldsymbol b)) > rank(\boldsymbol A) \quad \text{无解}
-                  \end{matrix}\right.
-                \end{align*}
-                $$
+            Know $\boldsymbol A, \boldsymbol b$ and Solve $\boldsymbol x$. Where, $\boldsymbol A \in \mathbb R^{m \times n}$, $\boldsymbol x \in \mathbb R^{n}$, $\boldsymbol b \in \mathbb R^m$, $n$ is the number of unknown number, $m$ is the number of linear equations.
 
-                - 有唯一解
-                  $$\boldsymbol x = \boldsymbol A^{-1} \boldsymbol b$$
-                  $\boldsymbol A$是方阵且非奇异
-                  $$\boldsymbol A \in C^{n×n}, |\boldsymbol A| ≠ 0$$
-                    
+          - Property : Existence of Solutions  
+            $$\begin{align*}
+              \left\{\begin{matrix}
+                rank((\boldsymbol A\ \boldsymbol b)) = rank(\boldsymbol A) &= n& \quad \text{Unique Solution}  \\
+                rank((\boldsymbol A\ \boldsymbol b)) = rank(\boldsymbol A) &< n& \quad \text{Infinite Solutions}  \\
+                rank((\boldsymbol A\ \boldsymbol b)) > rank(\boldsymbol A) &&\quad \text{Unsolvable}
+              \end{matrix}\right.
+            \end{align*}$$
 
-                - 有无穷个解  
-                  通解 $\boldsymbol x = \boldsymbol A^{-^{\{1\}}} \boldsymbol b + (\boldsymbol I - \boldsymbol A^{-^{\{1\}}} A) c$  
-                  特解 $\boldsymbol x = \boldsymbol A^{-^{\{1\}}} \boldsymbol b$  
-                  $\boldsymbol A^{-1}$不存在或无意义
+            - Proof  
+              if $rank((\boldsymbol A\ \boldsymbol b)) > rank(\boldsymbol A)$  
+              $\Rightarrow$ $(\boldsymbol a_1,...,\boldsymbol a_n)$ and $b$ is linearly independent  
+              $\Rightarrow$ $\nexists \boldsymbol x \in \mathbb R^{n}$ let $x_1 \boldsymbol a_1 + ... + x_n \boldsymbol a_n = b$.  
+              $\Rightarrow$ Unsolvable
 
-                  极小范数解
-                    $$
-                    \begin{align*}
-                      \min_{\boldsymbol x} \quad& ||\boldsymbol x||_2
-                      s.t. \quad& \boldsymbol A \boldsymbol x = \boldsymbol b
-                    \end{align*}
-                    $$
-                    $$\boldsymbol x = \boldsymbol A^{-^{\{1,3\}}} \boldsymbol b$$
-                    极小范数解唯一。
-                    
-                - 无解  
-                  最小二乘解
-                    $$\min_{\boldsymbol x} \quad ||\boldsymbol A \boldsymbol x - \boldsymbol b||_2$$
-                    $$\tilde{\boldsymbol x} = \boldsymbol A^{-^{\{1,4\}}} \boldsymbol b$$
+              if $rank((\boldsymbol A\ \boldsymbol b)) = rank(\boldsymbol A) < n$  
+              $\Rightarrow$ $\exists u \in \mathbb R^{n-1}, k \in [1, n]$ let $\boldsymbol a_k = \sum\limits_{i=1,i\neq k}^n u_i \boldsymbol a_i$  
+              $\Rightarrow$ $\exists c_1, c_2 \in \mathbb R, c_1 + c_2 = 1$ and $\exists x^*$ is a special solution, let $b = \left(c_1 x_k^* a_k + c_2 x_k^* \sum\limits_{i=1,i\neq k}^n u_i \boldsymbol a_i \right) + \sum\limits_{i=1,i\neq k}^n x_i^* \boldsymbol a_i$  
+              $\Rightarrow$ Infinite Solutions
 
-                  极小最小二乘解  
-                    $$
-                    \begin{align*}
-                      \min_{\boldsymbol x} \quad& ||\boldsymbol A \boldsymbol x - \boldsymbol b||_2  \\
-                      \min_{\boldsymbol x} \quad& ||\boldsymbol x||_2
-                    \end{align*}
-                    $$
-                    $$\tilde{\boldsymbol x} = \boldsymbol A^+ \boldsymbol b$$
+              for the same reason, if $rank((\boldsymbol A\ \boldsymbol b)) = rank(\boldsymbol A) = n$  
+              $\Rightarrow$ Unique Solution
+
+          - Solving  
+            - Unique Solution  
+              if $rank(\boldsymbol A) = n$ , then $\boldsymbol A^{-1}$ exists and
+              $$\boldsymbol x = \boldsymbol A^{-1} \boldsymbol b$$
+              
+            - Infinite Solutions    
+              General Solution $\boldsymbol x = \boldsymbol A^{-^{\{1\}}} \boldsymbol b + (\boldsymbol I - \boldsymbol A^{-^{\{1\}}} \boldsymbol A) \boldsymbol c$  
+              Special Solution $\boldsymbol x = \boldsymbol A^{-^{\{1\}}} \boldsymbol b$  
+
+              Minimal Norm Solution. The minimum norm solution is unique.
+              $$\begin{align*}
+                \min_{\boldsymbol x} \quad& ||\boldsymbol x||_2  \\
+                s.t. \quad& \boldsymbol A \boldsymbol x = \boldsymbol b
+              \end{align*}$$
+              $$\boldsymbol x = \boldsymbol A^{-^{\{1,3\}}} \boldsymbol b$$
+                
+            - Unsolvable  
+              Approximate solution $\tilde{\boldsymbol x}$ by least square,
+              $$\min_{\tilde{\boldsymbol x}} \quad ||\boldsymbol A \tilde{\boldsymbol x} - \boldsymbol b||_2$$
+              $$\tilde{\boldsymbol x} = \boldsymbol A^{-^{\{1,4\}}} \boldsymbol b$$
+
+              Minimal norm Approximate solution $\tilde{\boldsymbol x}$ by least square,
+              $$\begin{align*}
+                \min_{\tilde{\boldsymbol x}} \quad& ||\boldsymbol A \tilde{\boldsymbol x} - \boldsymbol b||_2  \\
+                \min_{\tilde{\boldsymbol x}} \quad& ||\tilde{\boldsymbol x}||_2
+              \end{align*}$$
+              
+              $$\tilde{\boldsymbol x} = \boldsymbol A^+ \boldsymbol b$$
 
     * 二次函数
       - Define

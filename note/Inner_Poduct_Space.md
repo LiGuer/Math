@@ -2,7 +2,7 @@
   - Define   
     The space of inner product is defined.
     
-  - Include
+  - Concept
     * Inner product
       - Define   
         Operations that meet the following conditions:
@@ -18,3 +18,6 @@
         - Geometric Interpretation:  
           $\left<x, y \right>$ means the length of $x$ projection toward $y$ multiply length of $y$;   
 					or the length of $y$ projection toward $x$ multiply length of $x$.
+
+  - Include
+    * Complete Inner Product Space ; Hilbert Space
