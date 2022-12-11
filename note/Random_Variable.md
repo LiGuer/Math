@@ -122,8 +122,7 @@
           - Include
             * Correlation & Covariance  
               - Define 
-                $$
-                \begin{align*}
+                $$\begin{align*}
                   Corr(X,Y) &= \mathbb E(X Y)  &\tag{Correlation}  \\
 
                   Cov(X,Y) 
@@ -137,12 +136,22 @@
 
                   \boldsymbol Σ_{\boldsymbol X\boldsymbol X} &= \mathbb E((\boldsymbol X - \bar{\boldsymbol X}) (X - \bar{\boldsymbol X})^T)  \tag{AutoCovariance matrix}\\
                   &= \left(\begin{matrix} E((X_i - \bar X_i) (X_j - \bar X_j)) & ... \\ \vdots & \ddots \end{matrix}\right)  
-                \end{align*}
-                $$
+                \end{align*}$$
 
               - Include
                 * Correlation Coefficient
-                  $$\rho = \frac{Cov(X,Y)}{Cov(X,X) Cov(Y,Y)}$$
+                  - Define
+                    $$\begin{align*}
+                      \rho 
+                      &= \frac{Cov(X,Y)}{Cov(X,X) Cov(Y,Y)}  \\
+                      &= \frac{\mathbb E(XY) - \mathbb E(X) \mathbb E(Y)}{\sqrt{\mathbb E(X^2) - \mathbb E(X)^2} \sqrt{\mathbb E(Y^2) - \mathbb E(Y)^2}}
+                    \end{align*}$$
+
+                  - Property
+                    - $\rho_{XY} \in [-1, 1]$, Correlations equal to +1 or −1 correspond to data points lying exactly on a line.
+                    - $\rho_{XY} = \rho_{YX}$
+                    - $\rho_{XY} = \rho_{(a + b X)\ (c + d Y)} \quad; b, d > 0$  
+                      it is invariant under separate changes in location and scale in the two variables.
 
               - Property
                 - $Cov(X,Y) = Cov(Y,X)$

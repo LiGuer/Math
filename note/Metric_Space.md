@@ -30,11 +30,12 @@
 
     - Lipschitz Continuity $\Rightarrow$ Uniform Continuity $\Rightarrow$ Continuity
 
-    - Contraction mapping  
-      A mapping $f: X \to X$ is contraction if there existss some $\lambda \in [0, 1)$ such that
+    - Contraction Mapping  
+      A mapping $f: X \to X$ is contraction if there exists $\lambda \in [0, 1)$ such that
       $$d(f(x), f(y)) \le \lambda d(x, y)$$
 
-    - Contraction mapping theorem  
-      For a complete matric space, if $f: X \to X$ is a contraction, then $f$ has a unique fixed point $x$.
+    - Contraction Mapping Theorem , Banach Fixed-point Theorem  
+      For a complete matric space, if $f: X \to X$ is a contraction, then $f$ has a unique fixed point $x^* \in X$,
+      $$f(x^*) = x^*,\quad \lim\limits_{n \to \infty} f^n(x_0) = x^* ,\forall x_0 \in X $$
 
 
