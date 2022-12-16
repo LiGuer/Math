@@ -149,7 +149,7 @@
 
         - Conditional Distributions  
           A multivariable $\boldsymbol x$ is partitioned as follows
-          $$\boldsymbol x = \left(\begin{matrix}x_1 \\ x_2\end{matrix}\right) \sim \mathcal N \left(\left(\begin{matrix}\boldsymbol \mu_1 \\ \boldsymbol \mu_2\end{matrix}\right), \left(\begin{matrix} \boldsymbol \Sigma_{11} & \boldsymbol \Sigma_{12}\\ \boldsymbol \Sigma_{21} & \boldsymbol \Sigma_{22}\end{matrix}\right)\right)$$
+          $$\boldsymbol x = \left(\begin{matrix}\boldsymbol x_1 \\ \boldsymbol x_2\end{matrix}\right) \sim \mathcal N \left(\left(\begin{matrix}\boldsymbol \mu_1 \\ \boldsymbol \mu_2\end{matrix}\right), \left(\begin{matrix} \boldsymbol \Sigma_{11} & \boldsymbol \Sigma_{12}\\ \boldsymbol \Sigma_{21} & \boldsymbol \Sigma_{22}\end{matrix}\right)\right)$$
 
           Then the distribution of $\boldsymbol x_1$ conditional on $\boldsymbol x_2 = a$ is still a multivariate normal 
           $$(\boldsymbol x_1\ |\ \boldsymbol x_2 = \boldsymbol a) \sim \mathcal N\left(\boldsymbol \mu_1 + \boldsymbol \Sigma_{12} \boldsymbol \Sigma_{22}^{-1} (\boldsymbol a - \boldsymbol \mu_2), \boldsymbol \Sigma_{11} - \boldsymbol \Sigma_{12} \boldsymbol \Sigma_{22}^{-1} \boldsymbol \Sigma_{21} \right)$$

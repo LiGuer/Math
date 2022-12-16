@@ -1,8 +1,34 @@
 * Linear Transformation
   - Define
-    $$T(k x + l y) = k(T x) + l(T y)$$
-    A kind of mapping $T$ from linear space $V$ to itself.  
-    For all $x \in V$, there is a unique $y \in V$ corresponding to it, and the linear condition is satisfied
+    $$T(k \boldsymbol x + l \boldsymbol y) = k(T \boldsymbol x) + l(T \boldsymbol y)$$
+    Linear Transformation is a mapping $T: V \to V$ for a linear space $V$, $\forall \boldsymbol x \in V$ there is a unique $\boldsymbol y \in V$ corresponding to it, and the linear condition is satisfied.
+
+    We can represent Linear Transformation by matrix $\boldsymbol A$ and matrix multilpy, where the matrix $\boldsymbol A$ can be obtained by the unit base vectors $(\boldsymbol e_1, ..., \boldsymbol e_n)$ after transformation, 
+    $$T(\boldsymbol x) = \boldsymbol A \boldsymbol x$$
+
+    $$\boldsymbol A = (T(\boldsymbol e_1), ..., T(\boldsymbol e_n))$$
+
+    - Proof  
+      We assume $\boldsymbol A = (T(\boldsymbol e_1), ..., T(\boldsymbol e_n))$, then 
+
+      Proof $T(\boldsymbol e_i) = \boldsymbol A \boldsymbol e_i$, 
+      $$\begin{align*}
+        T(\boldsymbol e_i) 
+        &= (T(\boldsymbol e_1), ..., T(\boldsymbol e_n)) (0,...,0,1_i,0,...,0)^T  \\
+        &= \boldsymbol A \boldsymbol e_i
+      \end{align*}$$
+
+      Proof $T(\boldsymbol x) = \boldsymbol A \boldsymbol x$,   
+      $$\begin{align*}
+        \boldsymbol x 
+        &= \sum_{i=1}^{\dim} x_i \boldsymbol e_i \\
+        \Rightarrow T(\boldsymbol x)
+        &= T \left(\sum_{i=1}^{\dim} x_i \boldsymbol e_i \right)  \\
+        &= \sum_{i=1}^{\dim} x_i T(\boldsymbol e_i)  \tag{Linear Transformation}\\
+        &= \sum_{i=1}^{\dim} x_i \boldsymbol A \boldsymbol e_i   \tag{$T(\boldsymbol e_i) = \boldsymbol A \boldsymbol e_i$}\\
+        &= \boldsymbol A \boldsymbol E \boldsymbol x  \\
+        &= \boldsymbol A \boldsymbol x
+      \end{align*}$$
 
   - Property
     - Range 

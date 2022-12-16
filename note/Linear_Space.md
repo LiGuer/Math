@@ -16,41 +16,59 @@
     |||
 
   - Property
-    - Linear Independence / Linear Correlation
-      $$\nexists / \exists\ a ≠ 0 \Rightarrow x = \sum_{i=1}^n a_i x_i = 0$$ 
+    * Linear Independence & Linear Dependence
+      - Define  
+        For a vector group $(\boldsymbol x_1, ... , \boldsymbol x_n)$, we said  
+
+        Linear Independence,
+        $$\nexists\ \boldsymbol a ≠ \boldsymbol 0 \Rightarrow \sum_{i=1}^n a_i \boldsymbol x_i = \boldsymbol 0$$ 
+
+        Linear Dependence,
+        $$\exists\ \boldsymbol a ≠ \boldsymbol 0 \Rightarrow \sum_{i=1}^n a_i \boldsymbol x_i = \boldsymbol 0$$ 
 
     - Dimension  
       In linear space, the maximum number of vectors contained in a linearly independent vector group.
 
     * Base 
       - Define
-        $$\ x = \sum_{i=1}^n a_i x_i, \forall x \in V$$
-        Basis is a linearly independent vector group $X = (x_1, ... , x_n)$, All vectors in the linear space are linear combinations of the vector group.
+        $$\begin{align*}
+          \boldsymbol v 
+          &= \sum_{i=1}^n a_i \boldsymbol x_i \quad, \forall \boldsymbol v \in V  \\
+          &= \boldsymbol X \boldsymbol a
+        \end{align*}$$
+        Base is a linearly independent vector group $\boldsymbol X = (\boldsymbol x_1, ... , \boldsymbol x_n)$, All vectors in the linear space are linear combinations of the vector group.
 
         Symbol:
-        - $x_i$: Base vector
+        - $\boldsymbol x_i$: Base vector
         - $a_i$: coordinate
 
       - Property 
-        - Base transformation  
-          $$Y = X C$$
-          Transformation matrix between new and old bases.
-
-          - Property  
-            The base transformation matrix is nonsingular.
-
-        - Coordinate transformation
-          $$a_x = C a_y$$
+        - Base Transformation & Coordinate Transformation  
+          Base transformation, is a transformation between new bases $\boldsymbol Y$ and old bases $\boldsymbol X$, where $\boldsymbol C$ is the Transformation Matrix.
+          $$\boldsymbol Y = \boldsymbol X \boldsymbol C$$
+          
+          Coordinate Transformation, is solving a new coordinate $\boldsymbol a_y$ in new base $\boldsymbol Y$ from old coordinate $\boldsymbol a_x$ in old base $\boldsymbol X$.
+          $$\boldsymbol a_x = \boldsymbol C \boldsymbol a_y$$
+          
           
           - Proof
-            $$v = X a_x = Y a_y = X C a_y \Rightarrow a_x = C a_y$$
+            $$\begin{align*}
+              \boldsymbol v 
+              &= \boldsymbol X \boldsymbol a_x  \\
+              &= \boldsymbol Y \boldsymbol a_y  \\ 
+              &= \boldsymbol X \boldsymbol C \boldsymbol a_y  \\ 
+              \Rightarrow \boldsymbol a_x &= \boldsymbol C \boldsymbol a_y
+            \end{align*}$$
+
+          - Property  
+            The base transformation matrix $\boldsymbol C$ is nonsingular.
 
         - Span
-          $$Span(x_1,...,x_n) = \{x | x = \sum_{i=1}^n a_i x_i\}$$ 
+          $$Span(\boldsymbol x_1,...,\boldsymbol x_n) = \left\{\boldsymbol v | \boldsymbol v = \sum_{i=1}^n a_i \boldsymbol x_i \right\}$$ 
           A representation of a linear space given by a basis vector.
 
     * Linear Subspace
-      - Define
+      - Define  
         A nonempty set in a linear space that is closed to linear operations.
         - 加法封闭 $x,y\in V_1 ,\quad x+y \in V_1$
         - 数乘封闭 $x \in V_1, k x \in V_1$

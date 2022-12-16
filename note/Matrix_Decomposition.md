@@ -89,41 +89,56 @@
         初等行变换, 取A左侧rank(A)列作为F, 则
         $$A \to \left(\begin{matrix} G \\ 0 \end{matrix}\right)$$
 
-    * Eigenvalue Decomposition
+    * Eigenvalue Decomposition & Singular Value Decomposition
       - Define  
-        $$A = Q \Lambda Q^{-1}$$  
+        **Eigenvalue Decomposition**, for a square matrix $\boldsymbol A \in \mathbb R^{n \times n}$, 
+        $$\begin{align*}
+          \boldsymbol A 
+          &= \boldsymbol Q \boldsymbol \Lambda \boldsymbol Q^{-1}  \\
+          &= \boldsymbol Q \boldsymbol \Lambda \boldsymbol Q^{\mathrm T}  \\
+        \end{align*}$$  
+
+        where, $\boldsymbol Q$ is an orthogonal matrix $\boldsymbol Q^{\mathrm T} \boldsymbol Q = \boldsymbol I$ composed of eigenvectors $\boldsymbol v$, $\Lambda$ is composed of eigenvalues $\lambda$, 
+        $$\begin{align*}
+          \boldsymbol Q &= (\boldsymbol v_1, ..., \boldsymbol v_n)  \\
+          \boldsymbol \Lambda &= \left(\begin{matrix} \lambda_1 && 0 \\ &\ddots \\ 0 && \lambda_n \end{matrix}\right)
+        \end{align*}$$
 
         - Proof
-          $$
-          \begin{align*}
-            A v &= \lambda v \\
-            \Rightarrow A (v_1, ..., v_n) &= (v_1, ..., v_n) \left(\begin{matrix} \lambda_1 && 0 \\ &\ddots \\ 0 && \lambda_n \end{matrix}\right)  \\
-            A &= (v_1, ..., v_n) \left(\begin{matrix} \lambda_1 && 0 \\ &\ddots \\ 0 && \lambda_n \end{matrix}\right) (v_1, ..., v_n)^{-1}  \\
-            A &= Q \Lambda Q^{-1}
-          \end{align*}
-          $$
+          $$\boldsymbol A \boldsymbol v_i = \lambda_i \boldsymbol v_i$$
+          $$\begin{align*}
+            \Rightarrow \boldsymbol A (\boldsymbol v_1, ..., \boldsymbol v_n) &= (\boldsymbol v_1, ..., \boldsymbol v_n) \left(\begin{matrix} \lambda_1 && 0 \\ &\ddots \\ 0 && \lambda_n \end{matrix}\right)  \\
+            \boldsymbol A &= (\boldsymbol v_1, ..., \boldsymbol v_n) \left(\begin{matrix} \lambda_1 && 0 \\ &\ddots \\ 0 && \lambda_n \end{matrix}\right) (\boldsymbol v_1, ..., \boldsymbol v_n)^{-1}  \\
+            \boldsymbol A &= \boldsymbol Q \Lambda \boldsymbol Q^{-1}
+          \end{align*}$$
 
-    * Singular Value Decomposition ; SVD
-      - Define  
-        $$A = U \left(\begin{matrix} Σ & 0 \\ 0 & 0 \end{matrix}\right) V^T$$
-        将矩阵A化成两个Unitary矩阵$U, V$, 和一个非零奇异值组成的矩阵$Σ$的乘积. 
+        **Singular Value Decomposition**, for a matrix $\boldsymbol A \in \mathbb R^{m \times n}$,  
+        $$\boldsymbol A = \boldsymbol U \left(\begin{matrix} \boldsymbol \Sigma & \boldsymbol 0 \\ \boldsymbol 0 & \boldsymbol 0 \end{matrix}\right) \boldsymbol V^{\mathrm H}$$
+
+        where, $\boldsymbol U \in \mathbb R^{m \times m}, \boldsymbol V \in \mathbb R^{n \times n}$ are unitary matrixs $\boldsymbol U^{\mathrm H} \boldsymbol U = \boldsymbol I, \boldsymbol V^{\mathrm H} \boldsymbol V = \boldsymbol I$, $\boldsymbol \Sigma$ is composed of nonzero singular values.
 
         - Note
-          $$\exists \text{Unitary Matrix} U, V => U^H A V = \left(\begin{matrix} Σ & 0 \\ 0 & 0 \end{matrix}\right)$$
+          $$\exists \text{Unitary Matrix} U, V \Rightarrow U^H A V = \left(\begin{matrix} Σ & 0 \\ 0 & 0 \end{matrix}\right)$$
 
-      - Algorithm
-        - $A^T A$ 计算特征值 $λ$, 特征向量$x$
-        - $V = ( \frac{x_1}{|x_1|}, ... ,\frac{x_n}{|x_n|} ), \quad Σ = diag(\sqrt{λ_1}, ... ,\sqrt{λ_n})$
-        - $U_1 = A V Σ^{-1}$, 计算正交矩阵$U$
-        - $ A = U \left(\begin{matrix} Σ & 0 \\ 0 & 0 \end{matrix}\right) V^T $
+      - Algorithm  
+        $A^{\mathrm T} A$ 计算特征值 $λ$, 特征向量$v'$, 并归一化求得 $\boldsymbol V, \boldsymbol Σ, \boldsymbol U$,
+
+        $$(\boldsymbol A^{\mathrm T} \boldsymbol A) \boldsymbol v'_i = \lambda_i \boldsymbol v'_i$$
+
+        $$\begin{align*}
+          \boldsymbol V &= \left(\frac{\boldsymbol v'_1}{\|\boldsymbol v'_1\|_2}, ... ,\frac{\boldsymbol v'_n}{\|\boldsymbol v'_n\|_2} \right)  \\
+          \boldsymbol Σ &= \text{diag}\left(\sqrt{λ_1}, ... ,\sqrt{λ_n}\right)  \\
+          \boldsymbol U' &= \boldsymbol A \boldsymbol V \boldsymbol Σ^{-1}  \\
+          \boldsymbol U &= \left(\frac{\boldsymbol u'_1}{\|\boldsymbol u'_1\|_2}, ... ,\frac{\boldsymbol u'_n}{\|\boldsymbol u'_n\|_2} \right)  
+        \end{align*}$$
 
       - Property
         $$
         \begin{align*}
           Range(A) &= Span(u_1, ..., u_r)  \\
           Null (A) &= Span(v_{r+1}, ... , v_n)  \\
-          Range(A^T) &= Span(v_1, ..., v_r)  \\
-          Null (A^T) &= Span(u_{r+1}, ... , u_m)  \\
+          Range(A^{\mathrm T}) &= Span(v_1, ..., v_r)  \\
+          Null (A^{\mathrm T}) &= Span(u_{r+1}, ... , u_m)  \\
           A &= \sum_{i=1}^{r} σ_i u_i v_i^H
         \end{align*}
         $$
