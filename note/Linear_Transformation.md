@@ -52,13 +52,16 @@
     - Invariant Subspace
       $$\forall x \in V_1, V_1 \subseteq V, T x \in V_1$$
 
-    * Eigenvalues, Eigenvectors
+    * Eigenvalues & Eigenvectors
       - Define
-        $$T x = λ x$$
+        $$\boldsymbol A \boldsymbol x = λ \boldsymbol x$$
+        
         - $x$: Eigenvectors, a vector whose direction does not change before and after linear transformation;  
         - $λ$: Eigenvalues, proportion of length change of eigenvector after linear transformation.
 
       - Property
+        * Eigenvalue Decomposition & Singular Value Decomposition
+        
         - Characteristic polynomial
           $$\varphi(λ) = |λ I - A| = λ^n + a_1 λ^{n-1} + ... + a_{n-1} λ + a_n$$
 

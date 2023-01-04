@@ -1,19 +1,28 @@
 * Graph 
   - Define  
-    $G = (V, E)$  
-    $V$: vertex set  
-    $E$: edge set, a set of paired vertices  
-    $w: E \to \mathbb R$: weight of edge
+    $$G = (V, E)$$  
 
-    Undirected Garph
+    |Symbol|Means|
+    |---|---|
+    |$V$|Vertex set |
+    |$E = \{(v_i, v_j)\ \|\ v_i, v_j \in V\}$|Edge set, a set of paired vertices|
+    |$w: E \to \mathbb R$|weight of edge|  
+    |||
+
+    Undirected Garph  
     Directed Graph
 
   - Perperty  
-    - Degree
-    - Representation
-      - Adjasency Matrix
+    - Degree  
+      Degree of a node refers to the number of edges connecting this node. 
 
-      - Adjasency List
+    - Representation by Adjasency Matrix  
+      Due to the discreteness of vertices, we can represente the weight of edge $w: E \to \mathbb R$ by Matrix $\boldsymbol G \in \mathbb R^{n \times n}$.
+      
+      $$w(v_i, v_j) \Rightarrow G_{ij}$$
+
+      $$\boldsymbol G = \left(\begin{matrix} w(v_1, v_1) & \cdots & w(v_1, v_n) \\ \vdots&\ddots &\vdots \\ w(v_n, v_1) & \cdots & w(v_n, v_n) \end{matrix}\right)$$
+
     - Connectivity
       - Problem: Determine connectivity
         - Algoritm

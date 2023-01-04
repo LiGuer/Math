@@ -45,6 +45,6 @@
 * Season Autoregressive Integrated Moving Average ; Season-ARIMA
   - Purpose  
     $SARIMA(p, d, q)(P, D, Q)_m$:  
-    $$\left(1 - \sum_{i=1}^p \alpha_i L^i \right) \left(1 - \sum_{i=1}^P \Alpha_i L^{i·m} \right) (1 - L)^d (1 - L^{m})^D X_t = \left(1 + \sum_{i=1}^{q} \theta_i L^i \right) \left(1 + \sum_{i=1}^{Q} \Theta_i L^{i·m} \right) \epsilon_t$$ 
+    $$\left(1 - \sum_{i=1}^p \alpha_i L^i \right) \left(1 - \sum_{i=1}^P A_i L^{i·m} \right) (1 - L)^d (1 - L^{m})^D X_t = \left(1 + \sum_{i=1}^{q} \theta_i L^i \right) \left(1 + \sum_{i=1}^{Q} \Theta_i L^{i·m} \right) \epsilon_t$$ 
 
-    using $ARIMA(p, d, q)$ to fit the time series with Seasonality $\{X_1, ..., X_t\}$ and find the value of parameter $\alpha_i, \theta_i, \Alpha_i, \Theta_i$.
+    using $ARIMA(p, d, q)$ to fit the time series with Seasonality $\{X_1, ..., X_t\}$ and find the value of parameter $\alpha_i, \theta_i, A_i, \Theta_i$.

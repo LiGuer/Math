@@ -112,6 +112,9 @@
             \boldsymbol A &= \boldsymbol Q \Lambda \boldsymbol Q^{-1}
           \end{align*}$$
 
+        - Note  
+          The geometric significance of Eigenvalue Decomposition is that a linear transformation $\boldsymbol A \boldsymbol x$ is equivalent to (1) $\boldsymbol Q^{-1} \boldsymbol x$, convert to a new coordinate system with eigenvectors of $\boldsymbol A$ as unit bases; (2)$\boldsymbol \Lambda (\boldsymbol Q^{-1} \boldsymbol x)$, a scale transform; (3)$\boldsymbol Q (\boldsymbol \Lambda \boldsymbol Q^{-1} \boldsymbol x)$, convert to original coordinate system.
+
         **Singular Value Decomposition**, for a matrix $\boldsymbol A \in \mathbb R^{m \times n}$,  
         $$\boldsymbol A = \boldsymbol U \left(\begin{matrix} \boldsymbol \Sigma & \boldsymbol 0 \\ \boldsymbol 0 & \boldsymbol 0 \end{matrix}\right) \boldsymbol V^{\mathrm H}$$
 

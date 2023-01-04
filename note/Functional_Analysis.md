@@ -11,6 +11,8 @@
 
   * Cross Correlation & Convolution
     - Define  
+      Cross Correlation and Convolution, are a measure of similarity (through inner product) of two funcions $f, g$ of the displacement $t \in \mathbb R$ of one relative to the other.
+        
       $$\begin{align*}
       Corr(f(t), g(t)) 
         &= \sum_{t = -\infty}^{\infty} f(\tau) g(t + \tau)  \tag{Cross Correlation}  \\
