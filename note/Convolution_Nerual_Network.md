@@ -3,21 +3,26 @@
     - Forward Propagation -- Convolution
       $$
       \begin{align*}
-        x * k &= \left[y_{ij} | y_{ij} = \sum_{c=1}^{C_x} \sum_{p=1}^{H_x} \sum_{q=1}^{W_x} x_{c,i+p-1,j+q-1} × k_{cpq}\right]  \\
+        x * k &= \left(y_{ij} \ |\ y_{ij} = \sum_{c=1}^{C_x} \sum_{p=1}^{H_x} \sum_{q=1}^{W_x} x_{c,i+p-1,j+q-1} × k_{cpq}\right)  \\
         y_c &= x * k_c + b_c  \\
         y &= {y_1, y_2, ... , y_n}  \\
       \end{align*}
       $$
 
-      - Symbols 
-        - $\{H, W, C\}$ 张量高度、宽度、通道数, kernel 卷积核
-        - padding 加边框宽度
-          $$
-          \begin{align*}
-            H_{out} &= \frac{H_{in} - H_{kernel} + 2 · padding}{stride + 1}  \\
-            W_{out} &= \frac{W_{in} -  W_{kernel} + 2 · padding}{stride + 1}   
-          \end{align*}
-          $$
+
+      |symbol|meaning|
+      |---|---|
+      |$\{H, W, C\}$|张量高度、宽度、通道数|
+      |$kernel$| 卷积核 |
+      |$padding$| 加边框宽度 |
+      |||
+
+      $$
+      \begin{align*}
+        H_{out} &= \frac{H_{in} - H_{kernel} + 2 · padding}{stride + 1}  \\
+        W_{out} &= \frac{W_{in} -  W_{kernel} + 2 · padding}{stride + 1}   
+      \end{align*}
+      $$
 
     - Back Propagation -- Convolution
       $$
@@ -60,3 +65,10 @@
         $$
           \frac{∂ \epsilon}{∂ x_l} = \frac{\epsilon}{x_L} \frac{∂ x_L}{x_l} = ∂\frac{∂ \epsilon}{∂ x_L} \left(1 + \frac{∂}{∂ x_l} \sum_{i=l}^{L-1} F(x_i, w_i)\right)
         $$
+
+  - Algorithm -- compute convolution
+    * Img2Col convolutional algorithm  
+      $$\boldsymbol Y = \boldsymbol g * \boldsymbol d = \text{Img2Col}(g) \times \text{Img2Col}(d)$$
+
+    * Winograd convolutional algorithm
+      $$\boldsymbol Y = \boldsymbol g * \boldsymbol d = \boldsymbol A^T ((\boldsymbol G \boldsymbol g \boldsymbol G^T) \odot (\boldsymbol B^T \boldsymbol d \boldsymbol B)) \boldsymbol A$$

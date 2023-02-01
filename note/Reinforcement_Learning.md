@@ -51,3 +51,7 @@
         $$\mathbb P (R_t | A_t)$$
 
     * Markov Decision Process
+
+  - Algorithm
+    * Minimax
+    * Monte Carlo Tree Search

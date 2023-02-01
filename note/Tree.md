@@ -19,9 +19,35 @@
 
       - Property
         * Traversal of Tree
-          - Preorder traversal
-          - Inorder traversal
-          - Postorder traversal
+          - Depth-First Traversal
+            - Preorder Traversal
+              ```c
+              void traversal(Node* root, vector<Node*> arr) {
+                arr.push_back(root);
+                traversal(root->left);
+                traversal(root->right);
+              }
+              ```
+
+            - Inorder Traversal
+              ```c
+              void traversal(Node* root, vector<Node*> arr) {
+                traversal(root->left);
+                arr.push_back(root);
+                traversal(root->right);
+              }
+              ```
+
+            - Postorder Traversal
+              ```c
+              void traversal(Node* root, vector<Node*> arr) {
+                traversal(root->left);
+                traversal(root->right);
+                arr.push_back(root);
+              }
+              ```
+
+          - Breadth-First Traversal: level trversal
 
       - Include
         * Complete Binary Tree

@@ -15,6 +15,25 @@
     | Distributivity of scalar multiplication with respect to field addition | $(a+b)x = ax+bx$ |
     |||
 
+  - Concept
+    * Matrix 
+      - Define
+        - addition
+          $$\boldsymbol A_{m \times n} + \boldsymbol B_{m \times n} = \boldsymbol C_{m \times n}$$
+          $$c_{ij} = a_{ij} + b_{ij}$$
+
+        - number multiplication
+          $$k \boldsymbol A_{m \times n} = (k a_{ij})$$
+
+        - multiplication
+          $$\boldsymbol A_{m \times n} \times \boldsymbol B_{n \times p} = \boldsymbol C_{m \times p}$$
+          $$c_{ij} = \sum_{k \in 1:n} a_{ik} b_{kj}$$
+
+      - Property
+
+        - Algorithm: computer matrix mutiplication
+          * General Matrix Multiplication
+
   - Property
     * Linear Independence & Linear Dependence
       - Define  

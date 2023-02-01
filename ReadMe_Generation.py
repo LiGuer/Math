@@ -36,7 +36,7 @@ for file_name in os.listdir('note'):
             stack.pop()
             stack_tab.pop()
 
-        if(s[tab] == '*'):
+        if(s[tab] == '*' and s[tab+1] == ' '):
             tail = len(s) - 1
             while(tail >= tab and s[tail] == ' '):
                 tail -= 1

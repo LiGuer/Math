@@ -22,6 +22,16 @@ namespace Matrix {
 		return ans;
 	}
 
+	inline double dot(vector<double>& a, vector<double>& b) {
+		if (a.size() != b.size())
+			exit(-1);
+		double ans = 0;
+
+		for (int i = 0; i < a.size(); i++)
+			ans += a[i] * b[i];
+		return ans;
+	}
+
 	/*----------------范数 [ norm ||x|| ]----------------*/
 	inline double norm(Mat<>& a) {
 		return sqrt(dot(a, a));
