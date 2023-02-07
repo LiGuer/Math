@@ -2,7 +2,7 @@
 #define MATRIX_DECOMPOSE_H
 #include "Mat.h"
 #include "Init.h"
-#include "Operate/Basic.h"
+#include "BasicOperate.h"
 #include "Transform.h"
 #include "Submatrix.h"
 /*

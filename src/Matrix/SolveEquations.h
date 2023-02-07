@@ -2,7 +2,7 @@
 #define MATRIX_SOLVE_EQUATIONS_H
 #include "Mat.h"
 #include "Init.h"
-#include "Operate/Basic.h"
+#include "BasicOperate.h"
 #include "Decompose.h"
 
 namespace Matrix {

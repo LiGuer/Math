@@ -21,5 +21,3 @@
     * Directed Tree
       - Define  
         A directed acyclic graph with one and only one incoming edge per node except that root node has no incoming edge.
-
-    * Linked List

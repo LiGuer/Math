@@ -37,12 +37,27 @@ namespace Matrix {
 		return sqrt(dot(a, a));
 	}
 
+	inline double norm(vector<double>& a) {
+		return sqrt(dot(a, a));
+	}
+
 	inline double norm(Mat<>& a, const char* ctrl) {
 		return sqrt(dot(a, a)); //####
 	}
 
 	/*---------------- 归一化 -----------------*/
 	inline Mat<>& normalize(Mat<>& a) {
+		double t = norm(a);
+		if (t == 0)
+			return a;
+
+		for (int i = 0; i < a.size(); i++)
+			a[i] /= t;
+
+		return a;
+	}
+
+	inline vector<double>& normalize(vector<double>& a) {
 		double t = norm(a);
 		if (t == 0)
 			return a;

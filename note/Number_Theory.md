@@ -26,7 +26,7 @@
         - Property
           -  The Fundamental Theorem of Arithmetic  
             Any integer $n$ greater than $1$ can be uniquely expressed in the form of prime $p_i$ product.   
-            $$n = \prod_i p_i^{α_i} \quad n \in \mathbb Z, n > 1$$
+            $$n = \prod_i p_i^{\alpha_i} \quad n \in \mathbb Z, n > 1$$
 
           - Resolving prime factor  
             Pollard Rho algorithm

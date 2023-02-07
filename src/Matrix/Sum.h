@@ -1,8 +1,8 @@
 #ifndef MATRIX_OPERATE_SUM_H
 #define MATRIX_OPERATE_SUM_H
-#include "../Mat.h"
-#include "../Init.h"
-#include "Basic.h"
+#include "Mat.h"
+#include "Init.h"
+#include "BasicOperate.h"
 
 namespace Matrix {
 	/******************************************************************************

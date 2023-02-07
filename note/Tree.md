@@ -62,3 +62,5 @@
 
               - Proof
                 $$\sum_{i=0}^h 2^i = \frac{1 - 2^h}{1 - 2} = 2^h - 1  \tag{geometric sequence summation}$$
+
+        * Linked List

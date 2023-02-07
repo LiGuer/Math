@@ -55,11 +55,29 @@ namespace Matrix {
 		return ans;
 	}
 
+	inline vector<double>& add(vector<double>& ans, vector<double>& a, vector<double>& b) {
+		if (a.size() != b.size() || a.size() != ans.size())
+			exit(-1);
+
+		for (int i = 0; i < a.size(); i++)
+			ans[i] = a[i] + b[i];
+		return ans;
+	}
+
 	/*----------------减法 [ sub - ]----------------*/
 	inline Mat<>& sub(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
 		ans.alloc(a.rows, a.cols);
+
+		for (int i = 0; i < a.size(); i++)
+			ans[i] = a[i] - b[i];
+		return ans;
+	}
+
+	inline vector<double>& sub(vector<double>& ans, vector<double>& a, vector<double>& b) {
+		if (a.size() != b.size() || a.size() != ans.size())
+			exit(-1);
 
 		for (int i = 0; i < a.size(); i++)
 			ans[i] = a[i] - b[i];
@@ -81,7 +99,6 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------乘法 [ mul × ]----------------*/
 	inline vector<double>& mul(vector<double>& ans, Mat<>& a, vector<double>& b) {
 		if (a.cols != b.size())
 			exit(-1);

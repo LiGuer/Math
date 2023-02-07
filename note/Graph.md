@@ -2,6 +2,8 @@
   - Define  
     $$G = (V, E)$$  
 
+    Graph is a group consist of vertex set $V$ and edge set $E$ with weights of edges $w: E \to \mathbb R$.
+
     |Symbol|Means|
     |---|---|
     |$V$|Vertex set |
@@ -9,8 +11,11 @@
     |$w: E \to \mathbb R$|weight of edge|  
     |||
 
-    Undirected Garph  
-    Directed Graph
+    Undirected Garph, is a type of graph that does not distingush the direction of edges.
+    $$E = \{\{v_i, v_j\}\ |\ v_i, v_j \in V\}$$
+
+    Directed Graph, is a type of graph that distingush the direction of edges.
+    $$E = \{(v_i, v_j)\ |\ v_i, v_j \in V\}$$
 
   - Perperty  
     - Degree  
@@ -34,12 +39,33 @@
   - Include
     * Tree
     * Directed Acyclic Graph
+
     * Bipartite Graph
-  
+      - Define
+        $$(X, Y, E)$$
+        $$X, Y \subset V, X \cup Y = V$$
+        The vertex set of a graph is divided into two disjoint subsets $X, Y$
+        $$E = \{(x_i, y_j) \ |\ x_i \in X, y_j \in Y\}$$
+        Edges only exist between point sets $X, Y$, not within them
+
+      - Property
+        - Matching: A subgraph of a bipartite graph, and any two edges in the edge set of the subgraph are not attached to the same vertex;  
+          We set $M$ is a sub-graph of a bipartite graph $G$, 
+          $\forall e_i, e_j \in E_M, e_i \neq e_j, then\ e_i(1)  \neq e_j(1), e_i(2) \neq e_j(2)$
+
+          - Maximum Matching: The matching with maximum number of edges $\arg\max_{M \subseteq G} \quad \text{number}(E_M)$
+          - Perfect Matching: All vertexs are in the edges of matching.
+
+          - Problem: Search Maximum Matching
+            - Algorithm
+              - Hungarian Algorithm
+
   - Problem
     - Traversal
-      - Depth First Search
-      - Breadth First Search
+      - Depth-First Search  
+        
+      - Breadth-First Search
+
     * Shortest Paths
 
     * Minimum Spanning Tree
@@ -96,4 +122,28 @@
 
           - Property: Time complexity $O(E·logV)$
 
-    * Maximum Flow
+    * Network Flow Problem
+      - Purpose
+        We set $G'$ is a sub-graph of $G$, 
+        $$\begin{align*}
+          w'(u, v) \le w(u, v)  \tag{Flow constraint}\\
+          \sum_i w'(u, v_i) = \sum_i w'(v_i, u)  \quad; u \neq s, u \neq e  \tag{非源、汇点进出流量相等}
+        \end{align*}$$
+
+      - Include
+        - Maximum Flow Problem
+          - Purpose
+            $$\begin{align*}
+              \max \quad & \sum_i w'(v_i, e) = w'(s, v_i)  \tag{源、汇点最大流量}\\
+              s.t. \quad & w'(u, v) ≤ w(u, v)  \tag{Flow constraint}\\
+                &\sum_i w'(u, v_i) = \sum_i w'(v_i, u)  \quad ; u \neq s, u \neq e  \tag{非源、汇点进出流量相等}
+            \end{align*}$$
+
+          - Algorithm
+            - Dinic Algorithm
+
+        - Minimum Cost Problem
+
+    * Travelling Salesman Problem  
+      - Purpose  
+        Find the shortest closed path traversing all given points.

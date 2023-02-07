@@ -24,6 +24,19 @@ namespace Matrix {
 		return ans;
 	}
 
+	inline vector<double>& cross(vector<double>& ans, vector<double>& a, vector<double>& b) {
+		if (a.size() != b.size())
+			exit(-1);
+
+		vector<double> ansTmp(a.size());
+		ansTmp[0] = a[1] * b[2] - a[2] * b[1];
+		ansTmp[1] = a[2] * b[0] - a[0] * b[2];
+		ansTmp[2] = a[0] * b[1] - a[1] * b[0];
+
+		ans = ansTmp;
+		return ans;
+	}
+
 	inline Mat<>& cross_(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows)
 			exit(-1);
