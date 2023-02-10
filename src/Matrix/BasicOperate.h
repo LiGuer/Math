@@ -121,6 +121,12 @@ namespace Matrix {
 		return ans;
 	}
 
+	inline vector<double>& mul(vector<double>& ans, const double a, vector<double>& b) {
+		for (int i = 0; i < ans.size(); i++)
+			ans[i] = a * b[i];
+		return ans;
+	}
+
 	/*----------------元素乘 [ elementMul × ]----------------*/
 	inline Mat<>& elementMul(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)

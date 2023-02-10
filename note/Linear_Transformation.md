@@ -133,9 +133,12 @@
       * 初等旋转变换
         - Define  
           初等旋转变换矩阵:  
+
           $$T_{ij} = \left(\begin{matrix}
-            \boldsymbol  I \\ & cos θ|_{(i,i)}&  & \sin θ|_{(i,j)} \\ & & \boldsymbol  I \\ & -\sin θ|_{(j,i)} & & \cos θ|_{(j,j)} \\ & & & & \boldsymbol  I
+            \boldsymbol  I \\ & cos \theta |_{(i,i)}&  & \sin \theta |_{(i,j)} \\ & & \boldsymbol  I \\ & -\sin \theta |_{(j,i)} & & \cos \theta |_{(j,j)} \\ & & & & \boldsymbol  I
           \end{matrix}\right)$$
+
+          where $\theta$ is the angle of clockwise rotation between dimension $i$ and $j$.
 
       * 初等反射变换
         - Define  
