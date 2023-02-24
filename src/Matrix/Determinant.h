@@ -26,7 +26,7 @@ namespace Matrix {
 		return det(a);
 	}
 
-	/*----------------行列式 [ det |x| ]----------------*/
+	/*---------------- determinant ----------------*/
 	inline double det(Mat<>& a) {
 		if (a.rows != a.cols)
 			exit(-1);
@@ -60,7 +60,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*--------------伴随矩阵 [ adjugate A* ]----------------*/
+	/*-------------- adjugate matrix ----------------*/
 	inline Mat<>& adjugate(Mat<>& ans, Mat<>& a) {
 		Mat<> ansTmp(a.rows, a.cols);
 		for (int i = 0; i < a.rows; i++)

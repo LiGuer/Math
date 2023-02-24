@@ -44,13 +44,26 @@
         $(a · c) % b = 1$, 则$c$是$a$在$mod\ b$下的逆元$a^{-1}$
 
     - Problem
-      * Congruence Equations
-        - Purpose
-          $$\begin{align*}
-            \left\{\begin{matrix} x \% m_1 = a_1 \\ \vdots \\ x \% m_n = a_n \end{matrix}\right.
-          \end{align*}$$
+      * Linear Diophantine Equation
+      * Congruence Equation
+        - Define  
+          Solve the unknown $0 \le x < m, x \in \mathbb Z$ 
+          $$f(x) \% m = b$$ 
 
-          $$x = k \prod_{i=1}^n m_i + \sum_{i=1}^n a_i \left(\prod_{j=1, j≠i}^n m_j\right) \left(\prod_{j=1, j≠i}^n m_j\right)^{-1}$$
+        - Include
+          * Linear Congruence Equation
+            - Define  
+              A type of Congruence Equation with $f(x) = a x$.
+              $$(a x) \% m = b$$
+
+            - Include
+              * System of Linear Congruence Equations
+                - Purpose
+                  $$\begin{align*}
+                    \left\{\begin{matrix} x \% m_1 = a_1 \\ \vdots \\ x \% m_n = a_n \end{matrix}\right.
+                  \end{align*}$$
+
+                  $$x = k \prod_{i=1}^n m_i + \sum_{i=1}^n a_i \left(\prod_{j=1, j≠i}^n m_j\right) \left(\prod_{j=1, j≠i}^n m_j\right)^{-1}$$
 
       * Power Module
         - Purpose

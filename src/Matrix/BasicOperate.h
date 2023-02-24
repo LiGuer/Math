@@ -10,13 +10,14 @@ using namespace std;
 namespace Matrix {
 /******************************************************************************
 * 
-*                    基本运算
+*                    Basic operations of matrix
 * 
 ******************************************************************************/
 
-	/*----------------负 [ negative - ]----------------*/
+	/*---------------- negative ----------------*/
 	inline Mat<>& negative(Mat<>& ans, Mat<>& a) {
 		ans.alloc(a.rows, a.cols);
+
 		for (int i = 0; i < a.size(); i++)
 			ans[i] = -a[i];
 		return ans;
@@ -24,14 +25,14 @@ namespace Matrix {
 
 	inline Mat<>& operator-(Mat<>& a) {
 		Mat<> ans;
-
 		ans.alloc(a.rows, a.cols);
+
 		for (int i = 0; i < a.size(); i++)
 			ans[i] = -a[i];
 		return ans;
 	}
 
-	/*----------------转置 ----------------*/
+	/*---------------- transpose ----------------*/
 	inline Mat<>& transpose(Mat<>& ans, Mat<>& a) {
 		Mat<> ansTmp(a.cols, a.rows);
 
@@ -43,7 +44,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------加法 [ add + ]----------------*/
+	/*---------------- addition ----------------*/
 	inline Mat<>& add(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
@@ -64,7 +65,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------减法 [ sub - ]----------------*/
+	/*---------------- subtraction ----------------*/
 	inline Mat<>& sub(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
@@ -84,7 +85,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------乘法 [ mul × ]----------------*/
+	/*---------------- multiplication ----------------*/
 	inline Mat<>& mul(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.cols != b.rows)
 			exit(-1);
@@ -112,7 +113,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------数乘 [ mul × ]----------------*/
+	// scalar multiplication
 	inline Mat<>& mul(Mat<>& ans, const double a, Mat<>& b) {
 		ans.alloc(b.rows, b.cols);
 
@@ -127,7 +128,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------元素乘 [ elementMul × ]----------------*/
+	/*---------------- multiplication of elements, Hadamard product ----------------*/
 	inline Mat<>& elementMul(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
@@ -138,7 +139,16 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------元素除 [ elementDiv / ]----------------*/
+	inline vector<double>& elementMul(vector<double>& ans, vector<double>& a, vector<double>& b) {
+		if (a.size() != b.size())
+			exit(-1);
+
+		for (int i = 0; i < ans.size(); i++)
+			ans[i] = a[i] * b[i];
+		return ans;
+	}
+
+	/*---------------- division of elements ----------------*/
 	inline Mat<>& elementDiv(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
@@ -149,18 +159,14 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*
-	 * Binarization 
-	 */
-	inline Mat<>& binarization(Mat<>& ans, Mat<>& a, double threshold = 0.5) {
-		ans.alloc(a.rows, a.cols);
+	inline vector<double>& elementDiv(vector<double>& ans, vector<double>& a, vector<double>& b) {
+		if (a.size() != b.size())
+			exit(-1);
 
-		for (int i = 0; i < a.size(); i++)
-			ans(i) = a(i) >= threshold ? 1 : 0;
-
+		for (int i = 0; i < ans.size(); i++)
+			ans[i] = a[i] / b[i];
 		return ans;
 	}
-
 
 }
 #endif

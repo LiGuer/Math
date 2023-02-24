@@ -3,38 +3,42 @@
 
 #include <float.h>
 #include <algorithm>
+#include <functional>
 #include <complex>
 #include "../Matrix/Matrix.h"
 #include "../Tensor/Tensor.h"
 #include "../Function/SolvePolynomialEquation.h"
 
 using namespace std;
+using namespace Matrix;
 
 #define PI 3.141592653589
+#define EPS 10e-4
 
+/*#############################################################################
+* 
+*						Intersect
+* 
+##############################################################################*/
 namespace Intersect {
-	
-extern double eps;
 
-/*---------------- 求交点 ----------------*/
 // Line
-bool Segments(Mat<>& p1, Mat<>& p2, Mat<>& p3, Mat<>& p4);		// 判断线段与线段相交
+bool Segments(vector<double>& p1, vector<double>& p2, vector<double>& p3, vector<double>& p4);
 
 // Plane
-double RayPlane		(Mat<>& raySt, Mat<>& ray, Mat<>& a, double b);							//求交-射线与平面
-double RayPlane		(Mat<>& raySt, Mat<>& ray, double& A, double& B, double& C, double& D);	//求交-射线与平面(3D)
-double RayCircle	(Mat<>& raySt, Mat<>& ray, Mat<>& center, double& R, Mat<>& normal);	//求交-射线与圆
-double RayTriangle	(Mat<>& raySt, Mat<>& ray, Mat<>& p1, Mat<>& p2, Mat<>& p3);			//求交-射线与三角面
-double RayPolygon	(Mat<>& raySt, Mat<>& ray, Mat<>* p,  int n);							//求交-射线与多边面
-double RayPlaneShape(Mat<>& raySt, Mat<>& ray, Mat<>& center, Mat<>& normal, Mat<>& one, bool(*f)(double, double));//求交-射线与平面图案
+double RayPlane		(vector<double>& raySt, vector<double>& ray, vector<double>& a, double b);	
+double RayPlane		(vector<double>& raySt, vector<double>& ray, double& A, double& B, double& C, double& D);
+double RayCircle	(vector<double>& raySt, vector<double>& ray, vector<double>& center, double& R, vector<double>& normal);
+double RayTriangle	(vector<double>& raySt, vector<double>& ray, vector<double>& p1, vector<double>& p2, vector<double>& p3);
+double RayPolygon	(vector<double>& raySt, vector<double>& ray, vector<double>* p,  int n);
+double RayPlaneShape(vector<double>& raySt, vector<double>& ray, vector<double>& center, vector<double>& normal, vector<double>& one, bool(*f)(double, double));
 
-// Body
-double RayQuadric(Mat<>& raySt, Mat<>& ray, Mat<>& center, Mat<>& PInv);					//求交-射线与二次曲面
-double RaySphere	(Mat<>& raySt, Mat<>& ray, Mat<>& center, double& R);					//求交-射线与球面
-double RaySphere	(Mat<>& raySt, Mat<>& ray, Mat<>& center, double& R, bool(*f)(double, double));			//求交-射线与球面图案
-double RayCuboid	(Mat<>& raySt, Mat<>& ray, Mat<>& p1, Mat<>& p2, Mat<>& p3);			//求交-射线与矩体
-double RayCuboid	(Mat<>& raySt, Mat<>& ray, Mat<>& pmin, Mat<>& pmax);					//求交-射线与矩体 (轴对齐)
-double RayTorus		(Mat<>& raySt, Mat<>& ray, Mat<>& center, double R, double r);			//求交-射线与圆环 (轴对齐)
+// Surface of Body
+double RayQuadric   (vector<double>& raySt, vector<double>& ray, vector<double>& center, vector<double>& PInv);
+double RaySphere	(vector<double>& raySt, vector<double>& ray, vector<double>& center, double& R);
+double RaySphere	(vector<double>& raySt, vector<double>& ray, vector<double>& center, double& R, bool(*f)(double, double));
+double RayCuboid	(vector<double>& raySt, vector<double>& ray, vector<double>& p1, vector<double>& p2, vector<double>& p3);
+double RayCuboid	(vector<double>& raySt, vector<double>& ray, vector<double>& pmin, vector<double>& pmax);
+double RayTorus		(vector<double>& raySt, vector<double>& ray, vector<double>& center, double R, double r);
 }
-
 #endif

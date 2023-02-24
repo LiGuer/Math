@@ -26,6 +26,20 @@ namespace Matrix {
 		return ans;
 	}
 
+	inline double max(vector<double>& a) {
+		double ans = a[0];
+		for (int i = 1; i < a.size(); i++)
+			ans = ans >= a[i] ? ans : a[i];
+		return ans;
+	}
+
+	inline double min(vector<double>& a) {
+		double ans = a[0];
+		for (int i = 1; i < a.size(); i++)
+			ans = ans <= a[i] ? ans : a[i];
+		return ans;
+	}
+
 	inline double max(Mat<>& a, int& index) {
 		double ans = a[0];
 		index = 0;

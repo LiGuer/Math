@@ -64,3 +64,21 @@
         delete nd;
       }
       ``` 
+
+    - reverse the linked list
+      ```cpp
+      Node* reverse(Node* head) {
+          Node* p1 = head,
+              * p2 = head->next, 
+              * p3;
+          p1->next = NULL;
+
+          while(p2 != NULL) {
+              p3 = p2->next;
+              p2->next = p1;
+              p1 = p2;
+              p2 = p3;
+          }
+          return p1;
+      }
+      ```

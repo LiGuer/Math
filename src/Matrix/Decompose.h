@@ -5,20 +5,23 @@
 #include "BasicOperate.h"
 #include "Transform.h"
 #include "Submatrix.h"
-/*
- * 矩阵分解
- */
-namespace Matrix{
-void LUP(Mat<>& A, Mat<>& L, Mat<>& U, Mat<>& P);	// LUP 上下三角分解
-														// LU  上下三角对角分解
-														// GGT 对称三角分解
-void QR (Mat<>& A, Mat<>& Q, Mat<>& R);					// QR  正交三角分解
-void SVD(Mat<>& A, Mat<>& U, Mat<>& S, Mat<>& V);		// SVD 奇异值分解
-														// FG  满秩分解
 
 /******************************************************************************
-* LUP 上下三角分解
+* 
+* Matrix Decomposition
+* 
 ******************************************************************************/
+namespace Matrix{
+void LUP(Mat<>& M, Mat<>& L, Mat<>& U, Mat<>& P);	// LUP 
+													// LU  
+													// GGT 
+void QR (Mat<>& M, Mat<>& Q, Mat<>& R);				// QR  
+void SVD(Mat<>& M, Mat<>& U, Mat<>& S, Mat<>& V);	// SVD 
+													// FG  
+
+/*
+ * LUP lower–upper decomposition
+ */
 inline void LUP(Mat<>& a, Mat<>& L, Mat<>& U, Mat<>& P) {
     if (a.rows != a.cols)
         exit(-1);
@@ -65,9 +68,9 @@ inline void LUP(Mat<>& a, Mat<>& L, Mat<>& U, Mat<>& P) {
             if (i > j) L(i, j) = A(i, j);
             else	   U(i, j) = A(i, j);
 }
-/******************************************************************************
-* QR  正交三角分解
-******************************************************************************/
+/*
+ *  QR decomposition, orthogonal triangular decomposition
+ */
 inline void QR(Mat<>& A, Mat<>& Q, Mat<>& R) {
     R = A;
     Q.zero(A.rows);

@@ -34,6 +34,20 @@ namespace Matrix {
 	}
 
 	/*----------------拼接----------------*/
+	inline Mat<>& assign(Mat<>& ans, initializer_list<vector<double>> list) {
+		ans.alloc(list.begin()->size(), list.size());
+		int cur = 0;
+
+		for (auto e = list.begin(); e != list.end(); ++e) {
+			for (int i = 0; i < e->size(); i++) {
+				ans(i, cur) = (*e)[i];
+			}
+			cur++;
+		}
+
+		return ans;
+	}
+
 	inline Mat<>& rowStack(Mat<>& ans, Mat<>& a, Mat<>& b) {
 		if (a.cols != b.cols)
 			exit(-1);
@@ -48,7 +62,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	inline Mat<>& rowStack(Mat<>& ans, std::initializer_list<Mat<>> list) {
+	inline Mat<>& rowStack(Mat<>& ans, initializer_list<Mat<>> list) {
 		return ans;
 	}
 
@@ -66,7 +80,7 @@ namespace Matrix {
 		return ans;
 	}
 
-	inline Mat<>& colStack(Mat<>& ans, std::initializer_list<Mat<>> list) {
+	inline Mat<>& colStack(Mat<>& ans, initializer_list<Mat<>> list) {
 		return ans;
 	}
 
@@ -82,7 +96,6 @@ namespace Matrix {
 				ansTmp(i, j) = a[i];
 		return ans.eatMat(ansTmp);
 	}
-
 
 }
 #endif

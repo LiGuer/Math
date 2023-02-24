@@ -11,7 +11,7 @@ namespace Matrix {
 * 
 ******************************************************************************/
 
-	/*----------------内积 [ dot · ]----------------*/
+	/*---------------- inner product  ----------------*/
 	inline double dot(Mat<>& a, Mat<>& b) {
 		if (a.rows != b.rows || a.cols != b.cols)
 			exit(-1);
@@ -32,20 +32,24 @@ namespace Matrix {
 		return ans;
 	}
 
-	/*----------------范数 [ norm ||x|| ]----------------*/
+	/*---------------- norm ----------------*/
 	inline double norm(Mat<>& a) {
 		return sqrt(dot(a, a));
+	}
+
+	inline double norm(Mat<>& a, const char ctrl) {
+		return sqrt(dot(a, a)); //####
 	}
 
 	inline double norm(vector<double>& a) {
 		return sqrt(dot(a, a));
 	}
 
-	inline double norm(Mat<>& a, const char* ctrl) {
+	inline double norm(vector<double>& a, const int n) {
 		return sqrt(dot(a, a)); //####
 	}
 
-	/*---------------- 归一化 -----------------*/
+	/*---------------- normalize -----------------*/
 	inline Mat<>& normalize(Mat<>& a) {
 		double t = norm(a);
 		if (t == 0)

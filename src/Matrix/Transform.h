@@ -4,9 +4,12 @@
 #include "Init.h"
 #include "BasicOperate.h"
 #include "Inner.h"
-/*
- * 线性变换
- */
+
+/****************************************************************
+* 
+* Construction of linear transformation matrix
+* 
+****************************************************************/
 namespace Matrix{
 Mat<>& rotate	(int i, int j, double theta, 		Mat<>& T);	// 旋转
 Mat<>& rotate	(Mat<>& theta, 						Mat<>& T);	// 旋转

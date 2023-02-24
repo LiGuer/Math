@@ -16,8 +16,15 @@
     |||
 
   - Concept
+    * Vector
+      - Define
+        $$\mathbb R^{n}, n \in \mathbb Z$$
+
     * Matrix 
       - Define
+        $$\mathbb R^{m \times n}, m, n \in \mathbb Z$$
+        
+      - Operation
         - addition
           $$\boldsymbol A_{m \times n} + \boldsymbol B_{m \times n} = \boldsymbol C_{m \times n}$$
           $$c_{ij} = a_{ij} + b_{ij}$$
@@ -28,6 +35,10 @@
         - multiplication
           $$\boldsymbol A_{m \times n} \times \boldsymbol B_{n \times p} = \boldsymbol C_{m \times p}$$
           $$c_{ij} = \sum_{k \in 1:n} a_{ik} b_{kj}$$
+
+        - multiplication of elements, Hadamard product
+          $$\boldsymbol A_{m \times n} \odot \boldsymbol B_{m \times n} = \boldsymbol C_{m \times n}$$
+          $$c_{ij} = a_{ij} b_{ij}$$
 
       - Property
 

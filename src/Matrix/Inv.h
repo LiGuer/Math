@@ -7,7 +7,7 @@
 
 namespace Matrix {
 
-/*----------------取逆 [ inv x^{-1} ]----------------*/
+/*---------------- Inverse ----------------*/
 	inline Mat<>& inv(Mat<>& ans, Mat<>& a) {
 		if (a.rows != a.cols)
 			exit(-1);
@@ -48,7 +48,7 @@ namespace Matrix {
 		return ans;
 	}
 
-/*----------------伪逆 [ x^+ ]----------------*/
+/*---------------- Pseudo-inverse ----------------*/
 	inline Mat<>& pinv(Mat<>& ans, Mat<>& a) {
 		Mat<> aT;
 		transpose(aT, a);

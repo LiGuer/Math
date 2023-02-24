@@ -10,11 +10,13 @@
   - Include
     * Simplex
       - Define  
-        $$C = \text{conv} \{v_0, ..., v_k\} = \left\{\sum_{i=0}^k \theta_i v_i \ |\ \theta ⪰ 0, \boldsymbol 1^T \theta=1 \right\}$$
+        $$C = \text{conv} (\{v_1, ..., v_k\}) = \left\{\sum_{i=1}^k \theta_i v_i \ |\ \theta ⪰ 0, \boldsymbol 1^T \theta=1 \right\}$$
 
-        Simplex is a tpye of polyhedron with $n+1$ vertices in $n$-dimensional space.
+        Simplex is a tpye of polyhedron with $n+1$ vertices in $n$-dimensional space. Where $\{v_1, ..., v_k \ |\ k = n + 1\}$ are affinely independent points.
 
       - Include 
+        * Point
+        * Line Segment
         * Triangle
           - Define 
           - Property
@@ -32,4 +34,4 @@
               $$S = \sqrt{q(q-a)(q-b)(q-c)}$$
               $$q = \frac{a + b + c}{2}$$ 
 
-
+        * Tetrahedron

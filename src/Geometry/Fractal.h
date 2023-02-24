@@ -8,6 +8,8 @@
 
 #define PI 3.141692653589
 
+using namespace std;
+
 namespace Fractal {
 /*
  *  Mandelbrot Set
@@ -128,39 +130,6 @@ Mat<>& PerlinNoise(Mat<>& output, int frequency) {
 			);
 	return output;
 }
-
-/*
- *  三维分形树 Fractal Tree 3D
- */
-void FractalTree3D(std::vector<Mat<>>& linesSt, std::vector<Mat<>>& linesEd, int level, double alpha, int fork = 3) {
-	if (level <= 0) return;
-	// 确定旋转矩阵
-	Mat<> st = linesSt.back(), ed = linesEd.back(), direction, rotateAxis, rotateMat, zAxis(3); zAxis = { 0, 0, 1 };
-	direction.sub(ed, st);
-	if (direction[0] != 0 || direction[1] != 0) {
-		Matrix::rotate(
-			rotateAxis.cross(direction, zAxis),
-			-acos(direction.dot(direction, zAxis) / direction.norm()),
-			rotateMat.E(4)
-		); rotateMat.block(1, 3, 1, 3, rotateMat);
-	}
-	else rotateMat.E(3);
-	//递归
-	double Lenth = direction.norm(); 
-	Mat<> endPoint(3);
-	for (int i = 0; i < fork; i++) {
-		endPoint = {
-			sin(alpha) * cos((double)i * 2 * PI / fork),
-			sin(alpha) * sin((double)i * 2 * PI / fork),
-			cos(alpha)
-		};
-		endPoint.add(ed, endPoint.mul(0.7 * Lenth, endPoint.mul(rotateMat, endPoint)));
-		linesSt.push_back(ed);
-		linesEd.push_back(endPoint);
-		FractalTree3D(linesSt, linesEd, level - 1, alpha);
-	}
-}
-
 
 }
 #endif

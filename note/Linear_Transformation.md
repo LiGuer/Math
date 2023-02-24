@@ -130,9 +130,9 @@
           $$A A^T = I$$
           $$A A^H = I$$
 
-      * 初等旋转变换
+      * Rotation Transformation
         - Define  
-          初等旋转变换矩阵:  
+          Rotation Transformation Matrix:  
 
           $$T_{ij} = \left(\begin{matrix}
             \boldsymbol  I \\ & cos \theta |_{(i,i)}&  & \sin \theta |_{(i,j)} \\ & & \boldsymbol  I \\ & -\sin \theta |_{(j,i)} & & \cos \theta |_{(j,j)} \\ & & & & \boldsymbol  I
@@ -140,7 +140,7 @@
 
           where $\theta$ is the angle of clockwise rotation between dimension $i$ and $j$.
 
-      * 初等反射变换
+      * Reflection Transformation
         - Define  
           $$y = H x = (I - 2 e_2 e_2^T) x$$
           - Proof  
@@ -151,10 +151,10 @@
             \end{align*}
             $$
 
-    * 对称变换
+    * Symmetry Transformation
       - Define
         $$<T x, y> = <x, T y>$$
-        对称矩阵:
+        Symmetry Matrix:
           $$A^T = A$$
           $$A^H = A$$
 
@@ -184,7 +184,7 @@
         斜切变换矩阵:  
           单位矩阵的第(i,j)个元素改为斜切比率 $a_{ij}$
 
-    * 缩放变换
+    * Scale Transformation
       - Define  
-        缩放变换矩阵:
+        Scale Transformation Matrix:
         $$T = \left(\begin{matrix} Δx_1 \\ & Δx_2 \\ & & \ddots \\ & & & Δx_n \end{matrix}\right)$$

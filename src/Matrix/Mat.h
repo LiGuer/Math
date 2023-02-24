@@ -1,9 +1,7 @@
 ﻿#ifndef MATRIX_MAT_H
 #define MATRIX_MAT_H
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
+
+#include <vector>
 #include <initializer_list>
 
 template <class T = double>
@@ -14,7 +12,7 @@ public:
 	int rows = 0, 
 		cols = 0;
 
-	/*---------------- 构造/析构 ----------------*/
+	/*---------------- constructor, destructor ----------------*/
 	Mat() { 
 		; 
 	}
@@ -31,12 +29,7 @@ public:
 		set(_rows, _cols, _data); 
 	}
 
-	Mat(const Mat& a) {			//复制式构造函数
-		*this = a;
-	}
-
-	Mat(std::initializer_list<T> a) {
-		alloc(a.size());
+	Mat(const Mat& a) {			//copy constructor
 		*this = a;
 	}
 
@@ -44,12 +37,17 @@ public:
 		delete data; 
 	}
 
-	/*---------------- 元素数量 ----------------*/
+	/*---------------- property ----------------*/
+	// size of elements
 	inline int size() const {
 		return rows * cols;
 	}
 
-	/*---------------- 索引元素 (先纵再横)----------------*/
+	inline bool empty() {
+		return size() == 0 ? true : false;
+	}
+
+	/*---------------- index (先纵再横)----------------*/
 	inline T& operator[](int i) { 
 		return data[i];
 	}
@@ -62,24 +60,25 @@ public:
 		return data[x * cols + y]; 
 	}
 
-	inline void i2xy(int& i, int& x, int& y) {
-		x = i / cols;
-		y = i % cols;
+	inline void i2rc(int i, int& r, int& c) {
+		r = i / cols;
+		c = i % cols;
 	}
 
-	inline int  i2x(int i) {
+	inline int  i2r(int i) {
 		return i / cols;
 	}
 
-	inline int  i2y(int i) {
+	inline int  i2c(int i) {
 		return i % cols;
 	}
 
-	inline int xy2i(int x, int y) {
-		return x * cols + y;
+	inline int rc2i(int r, int c) {
+		return r * cols + c;
 	}
 
-	/*---------------- 分配空间 ----------------*/
+	/*---------------- initial ----------------*/
+	// alloc memory space
 	Mat& alloc(const int _rows, const int _cols = 1) {
 		if (_rows != rows || _cols != cols) {
 			if (data != NULL)
@@ -92,7 +91,33 @@ public:
 		return *this;
 	}
 
-	/*---------------- 赋值 ----------------*/ //不能赋值自己
+	// clear the data
+	inline Mat& zero() {
+		memset(data, 0, sizeof(T) * size());
+		return *this;
+	}
+
+	Mat& zero(const int _rows, const int _cols = 1) {
+		alloc(_rows, _cols);
+		zero();
+		return *this;
+	}
+
+	// set the parameters with data existed 
+	Mat& set(const int _rows, const int _cols, T* _data) {
+		zero(_rows, _cols);
+		memcpy(data, _data, sizeof(T) * size());
+		return *this;
+	}
+
+	Mat& set_(const int _rows, const int _cols, T* _data) {
+		rows = _rows;
+		cols = _cols;
+		data = _data;
+		return *this;
+	}
+
+	/*---------------- assignment ----------------*/ //不能赋值自己
 	Mat& operator=(const Mat& a) {
 		if (a.data == NULL)
 			return *this;
@@ -109,25 +134,30 @@ public:
 		return *this;
 	}
 
+	Mat& operator=(const std::vector<T>& x) {
+		int n = x.size();
+		alloc(n);
+
+		for (int i = 0; i < n; i++) {
+			data[i] = x[i];
+		}
+
+		return *this;
+	}
+
 	Mat& operator=(T x) {
 		return fill(x);
 	}
 
-	Mat& set(const int _rows, const int _cols, T* _data) {
-		zero(_rows, _cols);
-		memcpy(data, _data, sizeof(T) * size());
+	inline Mat& fill(const T& a) {
+		for (int i = 0; i < size(); i++)
+			data[i] = a;
 		return *this;
 	}
 
-	Mat& set_(const int _rows, const int _cols, T* _data) {
-		rows = _rows;
-		cols = _cols;
-		data = _data;
-		return *this;
-	}
-
-	/*---------------- 改变矩阵形状 ----------------*/
-	Mat& reshape(int _rows, int _cols) {
+	/*---------------- basic operation ----------------*/
+	// 改变矩阵形状
+	Mat& reshape(int _rows, int _cols = 1) {
 		if(_rows * _cols != size())
 			exit(-1);
 		
@@ -137,40 +167,21 @@ public:
 		return *this;
 	}
 
-	/*---------------- 零元/清零 ----------------*/
-	inline Mat& zero() {
-		memset(data, 0, sizeof(T) * size());
-		return *this;
-	}
-
-	Mat& zero(const int _rows, const int _cols = 1) {
-		alloc(_rows, _cols);
-		zero();
-		return *this;
-	}
-
-	/*---------------- 填充  ----------------*/
-	inline Mat& fill(const T& a) {
-		for (int i = 0; i < size(); i++)
-			data[i] = a;
-		return *this;
-	}
-
-	/*----------------判断相等 [ ==/!= ]----------------*/
+	// compare
 	bool operator==(const Mat& a) {
 		if (rows != a.rows || cols != a.cols)
 			return false;
 		return memcmp(data, a.data, size() * sizeof(T)) == 0 ? true : false;
 	}
 
-	/*---------------- 判断出界 ----------------*/
+	// judge whether cross the border
 	inline bool isOut(int _rows, int _cols) {
 		if (_rows < 0 || _rows >= rows) return true;
 		if (_cols < 0 || _cols >= cols) return true;
 		return false;
 	}
 
-	/*---------------- 吃掉另一个矩阵(指针操作)  ----------------*/
+	// transfer data by pointers
 	inline Mat& eatMat(Mat& a) {
 		if (data != NULL)
 			delete data;
@@ -180,23 +191,6 @@ public:
 		rows = a.rows;
 		cols = a.cols;
 		a.rows = a.cols = 0;
-
-		return *this;
-	}
-
-	/*---------------- 交换数据 ----------------*/
-	Mat& swap(Mat& a) {
-		T* tmp = a.data;
-		a.data = data;
-		data = tmp;
-
-		int t = a.rows;
-		a.rows = rows;
-		rows = t;
-
-		t = a.cols;
-		a.cols = cols;
-		cols = t;
 
 		return *this;
 	}
