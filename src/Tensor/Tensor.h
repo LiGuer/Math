@@ -1,16 +1,16 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
+#include <vector>
+
 template<class T = double>
 class Tensor {
 public:
 	/*
-	 * 核心数据
-	 *		Data堆叠方向: 低维优先
+	 * 核心数据, Data堆叠方向: 低维优先
 	 */
-	T* data = NULL;	
-	int* dim = NULL;										//{x, y, z, ...}
-	int dimNum = 0, num = 0;
+	std::vector<T> data;
+	std::vector<int> dim;
 	
 	/*---------------- 构造/析构函数 ----------------*/
 	Tensor() { ; }
@@ -20,13 +20,20 @@ public:
 	~Tensor() { delete data; }
 
 
-	/*---------------- 尺寸 ----------------*/
+	/*---------------- porperty ----------------*/
 	inline int size() {
-		return num;
+		return data.size();
+	}
+
+	inline bool empty() {
+		return data.empty();
 	}
 
 	/*---------------- 分配空间 ----------------*/
-	Tensor& alloc(int _dimNum, int* _dim) {
+	Tensor& alloc(std::vector<int>& _dim) {
+		int _dimNum = _dim.size(), 
+			 dimNum =  dim.size();
+
 		if (dimNum != _dimNum
 		||  memcmp(dim, _dim, dimNum * sizeof(int)) != 0
 		) {

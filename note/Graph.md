@@ -89,7 +89,7 @@
           Greed by vertices, put the shortest edge $(u,v)$ of $u$ from the searched vertices into the result edge sequence every time, and $v$ does not belong to the searched vertices. $T_{\min, k}$ refers to a sub-tree of $T_{\min}$ with $k+1$ vertices and $k$ edges.
 
           $$\begin{align*} 
-            T_{\min, 0} &= (v_1, \empty)  \tag{initial}\\
+            T_{\min, 0} &= (\{v_1\}, \empty)  \tag{initial}\\
             T_{\min, n} &= T_{\min}  \tag{answer}
           \end{align*}$$
 
@@ -101,7 +101,7 @@
             & v_k \notin V^{(T_{\min, k-1})}  \\
             & v' \in V^{(T_{\min, k-1})}
           \end{align*}$$
-          $$T_{\min, k} = T_{\min, k-1} + (v_k, e_k)$$
+          $$T_{\min, k} = T_{\min, k-1} + (\{v_k\}, \{e_k\})$$
 
           - Property: Time complexity $O(E·logV)$
 
@@ -109,16 +109,16 @@
           Greed by edges. $T_{\min, k}$ refers to a sub-tree of $T_{\min}$ with $k$ edges.
 
           $$\begin{align*} 
-            T_{\min, 0} &= (\empty, \empty)  \tag{initial}\\
+            T_{\min, 0} &= (V^{(G)}, \empty)  \tag{initial}\\
             T_{\min, n} &= T_{\min}  \tag{answer}
           \end{align*}$$
 
           $$\begin{align*}
             e_k =& \arg\min_{e_k \in E^{(G)}}\quad w(e_k)  \\
-            &s.t. \quad  e_k[1] \notin V^{(T_{\min, k-1})} \text{\quad or \quad} e_k[2] \notin V^{(T_{\min, k-1})}
+            &s.t. \quad \nexists \text{ path } \in T_{\min, k-1} \text{ , lets } e_k[1] \to e_k[2]
           \end{align*}$$
 
-          $$T_{\min, k} = T_{\min, k-1} + (\{e_k[1], e_k[2]\}, e_k)$$
+          $$T_{\min, k} = T_{\min, k-1} + (\{e_k\})$$
 
           - Property: Time complexity $O(E·logV)$
 

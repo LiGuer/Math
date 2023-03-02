@@ -1,7 +1,7 @@
 # **Matrix**
 
 # Note
-[Linear_Space](../../note/Linear_Space.md)
+[Linear Space](../../note/Linear_Space.md)
 
 # Basic Struct  
 |Structure|Mean|
@@ -32,7 +32,7 @@ just like ```std::vector<T>```
   * whether empty ```empty()```
 * index
   * $\boldsymbol v_i$ ```[int]```, ```(int)```
-  * $\boldsymbol M_{i,j}$, ```(int, int)```
+  * $\boldsymbol M_{i,j}$ ```(int, int)```
   * $i \to (r, c)$ ```i2rc(int, int&, int&)```, ```i2r(int)```, ```i2c(int)```
   * $(r, c) \to i$ ```rc2i(int, int&, int&)```
 * assignment ```=```
