@@ -68,9 +68,7 @@
     - reverse the linked list
       ```cpp
       Node* reverse(Node* head) {
-          Node* p1 = head,
-              * p2 = head->next, 
-              * p3;
+          Node* p1 = head, * p2 = head->next, * p3;
           p1->next = NULL;
 
           while(p2 != NULL) {

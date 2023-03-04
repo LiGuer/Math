@@ -1,6 +1,6 @@
 * Graph 
   - Define  
-    $$G = (V, E)$$  
+    $$G = (V, E)  \tag{Graph}$$  
 
     Graph is a group consist of vertex set $V$ and edge set $E$ with weights of edges $w: E \to \mathbb R$.
 
@@ -14,7 +14,7 @@
     Undirected Garph, is a type of graph that does not distingush the direction of edges.
     $$E = \{\{v_i, v_j\}\ |\ v_i, v_j \in V\}$$
 
-    Directed Graph, is a type of graph that distingush the direction of edges.
+    Directed Graph, is a type of graph that distingush the direction of edges and its edge set is a set of ordered pairs.
     $$E = \{(v_i, v_j)\ |\ v_i, v_j \in V\}$$
 
   - Perperty  
@@ -37,6 +37,9 @@
     * Euler Path
 
   - Include
+    * Complete Graph
+      - Define  
+        Complete Graph is a undirected graph in which every pair of vertices is adjacent.  
     * Tree
     * Directed Acyclic Graph
 
