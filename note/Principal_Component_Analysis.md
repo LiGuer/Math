@@ -1,4 +1,4 @@
-* Principal Component Analysis ; PCA
+* Principal Component Analysis , PCA
   - Purpose  
     (input) sample points $\boldsymbol X = (\boldsymbol x_1,...,\boldsymbol x_K), \boldsymbol x \in \mathbb R^n$
 

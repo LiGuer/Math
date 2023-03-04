@@ -1,4 +1,4 @@
-* Autoregressive Integrated Moving Average ; ARIMA
+* Autoregressive Integrated Moving Average , ARIMA
   - Purpose  
     $ARIMA(p, d, q):$ 
     $$\left(1 - \sum_{i=1}^p \alpha_i L^i \right) (1 - L)^d X_t = \left(1 + \sum_{i=1}^{q} \theta_i L^i \right) \epsilon_t$$ 

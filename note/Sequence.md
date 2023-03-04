@@ -1,6 +1,5 @@
 * Sequence 
-  - Set
-    ;
+  - Define
   - Problem 
     * Sort
     * Longest Subsequence Problem
@@ -17,7 +16,7 @@
             Dynamic programming,
             $$\begin{align*}
               f(s,e) &= \left\{\begin{matrix}
-                f(s-1,e+1) + 2 \quad & f(s,e) > 0 \ and\  a_{s-1} = a_{e+1}  \\
+                f(s-1,e+1) + 2 \quad & f(s,e) > 0 \ \text{and}\  a_{s-1} = a_{e+1}  \\
                 0 \quad & other.
                 \end{matrix}\right.  \\
               f(s,s) &= 1  \tag{initial}  \\
@@ -34,42 +33,29 @@
 
     * Sequence Matching
       - Purpose  
-        (input) $a, b \quad ; b \subseteq a$  
-        find $\min\ k$, let $b = a_{k:k+n_b-1}$
-
-      - Property  
-        if $b_{1:i} = a_{k:k+i-1}$, and $l_i = \text{Maximum public prefix length}(b_{1:i})$
+        For two given sequences $a, b$, where $\text{number}(b) \le \text{number}(a)$, and we aim to find the first place where $b$ matching the successive subsequence of $a$.
         $$\begin{align*}
-          b_{1:l_i} &= a_{((k+i-1)-l_i+1):(k+i-1)}  \\
-          b_{1:l'} &≠ a_{((k+i-1)-l'+1):(k+i-1)}  \quad ; l' > l        
+          \min\quad& k \\
+          s.t.\quad& b = a_{k:k+n_b-1}
         \end{align*}$$
 
-      - Algorithm
-        * Knuth-Morris-Pratt Algorithm
-          $$\begin{matrix}
-            b_{1:i} = a_{k:k+i-1} &\ and\ & b_{i+1} &= a_{k+i} & \Rightarrow & b_{1:i+1} &=& a_{k:k+i}  \\
-            b_{1:i} = a_{k:k+i-1} &\ and\ & b_{g(i)+1} &= a_{k+i} & \Rightarrow  & b_{1:g(i)+1} &=& a_{(k+i)-g(i)+1:k+i}  \\
-            b_{1:i} = a_{k:k+i-1} &\ and\ & b_{g(g(i))+1} &= a_{k+i} & \Rightarrow  & b_{1:g(g(i))+1} &=& a_{(k+i)-g(g(i))+1:k+i}  \\
-            &&&... & \Rightarrow &...&&  \\
-            & & b_{1} &= a_{k+1} & \Rightarrow  & b_{1:1} &=& a_{k+i:k+i}  \\
-            & & b_{1} &≠ a_{k+1} & \Rightarrow  & b_{1:1} &≠& a_{k+i:k+i}  \\
-          \end{matrix}$$
+      - Property  
+        - The next place possible matched is $k+i-l_i$, from the place $k$ in $a$ and $b_{1:i} = a_{k:k+i-1}$.
 
+          $$l_i = \text{length}_\text{Longest Prefix-Suffix}(b_{1:i})$$
+          $$\begin{align*}
+            b_{1:i} = a_{k:k+i-1} \Rightarrow
+            b_{1:l_i} &= a_{k+i-l_i:k+i-1}  \tag{match}\\
+            b_{1:l'} &≠ a_{k+i-l':k+i-1}  \quad ; l' > l_i  \tag{mismatch}
+          \end{align*}$$
+
+      - Algorithm
+        * Knuth-Morris-Pratt Algorithm  
+          For a place $k$ in sequence $a$ and $b_{1:i} = a_{k:k+i-1}$, we judge whether is the matched place. If not, we use the property above to arrive the place $k'$ possible matched and do the same thing, untill find the answer.
+          $$\begin{matrix}
+            k \gets& k+i-l_i \quad; b_{i+1} \neq a_{k+i}\\
+            i \gets& i+1 \quad; b_{i+1} = a_{k+i}\\
+          \end{matrix}$$
+          
   - Include 
     * Deque
-      - Define
-        Deque is a finite sequence that only allow to insert and delete elements from its head and tail.
-
-      - Include
-        * Queue
-          - Define
-            Queue is a finite sequence that only allow to insert elements from its tail and delete elements from its head. (First-in first-out.)
-
-        * Stack
-          - Define
-            Stack is a finite sequence that only allow to insert and delete elements from its head. (First-in last-out.)
-
-          - Include
-            * Monotone Stack 
-              - Define
-                A stack that maintain its elements in a monotone order.

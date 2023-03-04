@@ -2,9 +2,9 @@
   - Include
     * Longest Common Subsequence
       - Purpose  
-        input: sequence $a, b$
+        For a given sequence $a, b$, 
         $$\begin{align*}
-          \max_{x}  \quad & \text{number}(x)  \\
+          \arg\max_{x}  \quad & \text{number}(x)  \\
           s.t. \quad & x \subseteq a  \\
             & x \subseteq b
         \end{align*}$$
@@ -46,33 +46,36 @@
 
     * Longest Ascending Subsequence
       - Purpose  
-        (input) sequence $a$
+        For a given sequence $a$
         $$\begin{align*}
-          \max_{x \subseteq a}  \quad &  number(x)  \\
-          s.t. \quad & x_i < x_{i+1} \quad ; i \in 1:number(x)
+          \max_{x \subseteq a}  \quad & \text{number}(x)  \\
+          s.t. \quad & x_i < x_{i+1} \quad ; i \in 1:\text{number}(x)
         \end{align*}$$
         
       - Algorithm  
         $$\begin{align*}
-          f(n) = max(f(i), max(f(j)) + 1) \quad ; j < i \ and\ a_j < a_i  \\
+          f(n) = \max(f(i), \max(f(j)) + 1) \quad ; j < i \ \text{and}\ a_j < a_i  \\
           f(1) = 1  \tag{initial}
         \end{align*}$$
         $f(n)$: 以$a_n$为结尾的最长上升子序列的长度.
 
-    * Longest Public Prefix
+    * Longest Prefix-Suffix
       - Purpose  
-        (input) sequence $a$
+        For a given sequence $a$, we aim to find the maximum length $k^*$ of the prefix and suffix of itself, where the prefix equals suffix.
         $$\begin{align*}
           \max \quad & k  \\
-          s.t. \quad & a_{1:k} = a_{n-k+1:n}
+          s.t. \quad & a_{1:k} = a_{n-k+1:n}  \tag{prefix = suffix}
         \end{align*}$$
 
       - Algorithm  
+        For each place $n$ and the successive subsequence $a_{1:n}$ of $a$, we iterative search as follows until the condition is met 
         $$\begin{align*}
-          f(n) = \left\{\begin{matrix}
+          f(n) = k_n^* = \left\{\begin{matrix}
             f(n-1) + 1  \quad &;  a_n = a_{f(n-1) + 1}  \\
             f(f(n-1)) + 1 \quad &; a_n = a_{f(f(n-1)) + 1}  \\
             \vdots & \vdots  \\
             0  \quad &; other
           \end{matrix}\right.
         \end{align*}$$
+
+        $f(n)$ means maximum prefix-suffix length $k_n^*$ for the successive subsequence $a_{1:n}$ of $a$.
