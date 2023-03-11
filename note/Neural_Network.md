@@ -59,4 +59,6 @@
 
     * Graph Nerual Network ; GNN
 
+    * Self-Attention
+
 

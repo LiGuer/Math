@@ -42,8 +42,18 @@
         $$\text{rotate}(s_1, \boldsymbol a, \theta_{1}, \theta_{2}) \subseteq s$$
     * Translator
 
+    * Fractal
+
   - Problem
     * Intersection Problem
 
     * Marching Cubes
     * Delaunay Triangulation
+      - Define   
+        Delaunay Triangulation is a triangulation method which the circumscribed circle of each triangle does not contain any point.
+      - Process
+        - Initial, select an initial triangle that encloses all of the input points.
+        - For each remaining point, find the triangle that contains it using a point location data structure such as a quadtree or a k-d tree.
+        - Create a new triangle connecting the new point to the vertices of the containing triangle.
+        - Flip any edges that violate the Delaunay property (i.e., any edges whose endpoints do not form the circumcircle of any triangle in the current triangulation).
+        - Repeat steps 2-4 for all remaining points.

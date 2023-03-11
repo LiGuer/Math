@@ -7,7 +7,7 @@
       - When the random sample $ζ$ is determined, the random process degenerates into a continuous time function
 
   - Property
-    * Correlation function & Covariance function
+    * Correlation Function & Covariance Function
       - Define  
         $$
         \begin{align*} 
@@ -36,49 +36,37 @@
 
     - Independence
 
-    * Strictly Stationarity
-      - Define 
-        $$\mathbb P (x(t_1), ... , x(t_n)) = \mathbb P (x(t_1+τ), ..., x_(t_n+τ)) \quad ;\forall τ, t_1, ..., t_n \in \mathbb R, \quad n \in \mathbb N$$
-        Time shift invariance, Statistical properties do not change over time.
+  - Include
+    * Stationary Process & Weakly Stationary Process
+      - Define  
 
-        - Note  
-          The random sampling at any interval and in any order on the time series has time shift invariance.
+        $$\mathbb P (x(t_1), ... , x(t_n)) = \mathbb P (x(t_1+\tau), ..., x(t_n+\tau)) \quad ;\forall \tau, t_1, ..., t_n \in \mathbb R, n \in \mathbb N  \tag{Stationary}$$
+        Stationary process is a stochastic process in which the joint distribution of any set of time-indexed random variables is invariant to shifts in time (the statistical properties of the process are constant over time).
 
-    * Weak-sense Stationarity
-      - Define 
-        $$R_{XX}(t_1 - t_2 ,0) = R_{XX}(t_1, t_2) \quad; \forall t_1, t_2 \in \mathbb R$$ 
+        $$R_{XX}(t_1 - t_2 ,0) = R_{XX}(t_1, t_2) \quad; \forall t_1, t_2 \in \mathbb R  \tag{Weakly Stationary}$$ 
+        Weakly stationary process is a stochastic process in which the mean, variance and autocovariance (or autocorrelation) of the process are constant over time, but the joint distribution of the variables may depend on the time index.
+
   
       - Property
         - Power Spectral Density  
-          Power Spectral Density is the Fourier transform of autocorrelation function of Weak-sense stationary process.
+          Power Spectral Density is the Fourier transform of autocorrelation function of Weak-sense stationary process.  
+          Power Spectral Density consists of real numbers greater than 0.
 
-          Property:
-          - is real numbers
-          - $≥ 0$
-
-  - Include
-    * Markov Chain 
+    * Markov Process
     * Gaussian Process
-
-    * Poisson Process  
+    * Autoregressive Process
       - Define  
-        $$N(t) = \sum_{n=1}^\infty u(t - T(n)) \quad; f_T(t;n) = \frac{(λ t)^{n-1}}{(n-1)!} λ e^{-λ t} u(t)$$
+        $$X_t = \epsilon_t + \alpha_0 + \sum\limits_{i=1}^p \alpha_i X_{t-i}  \tag{Autoregressive}$$  
 
-    * Wiener Process 
+        Autoregressive Process is a discrete-time stochastic process in which the current value of a time series variable depends linearly on its past values. Where $p$ is the order of autoregressive process, which means the length of the associated historical value.
+
+    * Martingale 
       - Define  
-        The Wiener process $\{W(t) \ |\ t \ge 0\}$ is a stochastic process such that,
-        - $W(0) = 0$
-        - $W$ has independent increments, $\forall t > s \ge 0$, i.e. the future increments $W(t+\Delta t) - W(t), \Delta t \ge 0$ are independent of the past values $W_s$.
-        - $W(t) - W(s) \sim \mathcal N(0, \sigma^2(t-s)) \quad; \forall t > s \ge 0, \sigma > 0$
-        - $W$ has continuous paths, $W(t)$ is continuous in $t$ 
+        Martingale is a discrete-time stochastic process that satisfies for any time $n$,
+        $$\mathbb E(|X_n|) < \infty$$
+        $$\mathbb E(X_{n+1} \ |\ X_1, ..., X_n) = X_n$$
 
-      - Note  
-        Random walk is a discrete version of Wiener Process, and Wiener process is a limit of random walk.
-
-      - Property
-        $$\mathbb E(W(t)) = 0$$
-        $$Var_{W}(t) = \sigma^2 t$$
-        $$Corr_{W}(t_1, t_2) = Cov_W(t_1, t_2) = \sigma^2 \min \{t_1, t_2\} \quad; t_1, t_2 \ge 0$$
+        The second condition means that the conditional expected value of the next observation, given all the past observations, is equal to the most recent observation.
 
   - Example
     - Simple process
@@ -86,4 +74,6 @@
 
     - Random Sine Wave
       $$X(t, ζ) = A(ζ) \sin(\omega_0 t + \Theta(ζ))$$
+
+    * Stochastic Point Process
 

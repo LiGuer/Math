@@ -55,5 +55,5 @@
 
             * Tanglecube
               - Define
-                $$\sum_{i=1}^3 \left(x_i^4 - 5 x_i^2 \right) + 11.8 = 0  \tag{Tanglecube}$$   
+                $$\left\{\boldsymbol x \ |\ \sum_{i=1}^3 \left(x_i^4 - 5 x_i^2 \right) + 11.8 = 0 \right\}  \tag{Tanglecube}$$   
           

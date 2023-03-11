@@ -15,7 +15,7 @@
     $$\boldsymbol X = (X_1, ... , X_n)^T  \tag{Random Vector}$$ 
 
   - Property
-    * Probability Mass function  
+    * Probability Mass Function  
       - Define   
         for a discrete Random Variable $X$
         $$\mathbb P(X = x)$$
@@ -27,7 +27,7 @@
         - Sums to 1
           $$\sum_i \mathbb P(X = x_i) = 1$$ 
 
-    * Cumulative Distribution function
+    * Cumulative Distribution Function
       - Define  
         $$
         \begin{align*}

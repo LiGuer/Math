@@ -1,7 +1,7 @@
 * Shortest Paths
   - Problem  
     For a graph $G = (V, E)$ with edge weight $w : E \to \mathbb R$, we aim to find the minimum sum of edge weights of path $P(v_s, v_e)$ from $v_s \to v_e$, 
-    $$P(v_s, v_e) = (e_{1}^{(P)}, ..., e_{m}^{(P)} \ |\ e_{i}^{(P)} \in E, e_{1}^{(P)}[1] = v_{s}, e_{m}^{(P)}[2] = v_{e})$$
+    $$P(v_s, v_e) = \left(e_{1}^{(P)}, ..., e_{m}^{(P)} \ |\ e_{i}^{(P)} \in E, e_{1}^{(P)}[1] = v_{s}, e_{m}^{(P)}[2] = v_{e} \right) \tag{Path}$$
     
     $$\begin{align*}
     d(v_s, v_e) = \min_{P} \quad& \sum_{e_{i}^{(P)} \in P} w(e_{i}^{(P)}) \\
@@ -74,5 +74,8 @@
       ```
 
     * Dijkstra
-
+      - Process 
+        - Initially, we mark all nodes as unvisited and set the distance from source node to the itself to zero, and the distance to all other nodes to infinity.
+        - Select the unvisited node with the smallest distance from source node (the first selected node is source node itself), mark it as visited, and update the distance of all nodes through the new node accordingly.
+        - Repeat above step until the destination node is visited or there are no more unvisited nodes.
     * Bellman Ford
