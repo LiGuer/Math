@@ -15,6 +15,7 @@
 * [Combinatorics](note/Combinatorics.md)
   * [Counting](note/Combinatorics.md)
   * [Permutation & Conbination](note/Combinatorics.md)
+* [Complex Number](note/Complex_Number.md)
 * [Differential Equations](note/Differential_Equation.md)
   * [Ordinary Differential Equation](note/Differential_Equation.md)
   * [Partial Differential Equation](note/Differential_Equation.md)
@@ -328,3 +329,4 @@
       * [Maximum A Posteriori Estimation](note/Statistics.md)
     * [Interval estimation](note/Statistics.md)
   * [Hypothesis Testing](note/Statistics.md)
+* [Trigonometric Function & Hyperbolic Function](note/Trigonometric_Function.md)

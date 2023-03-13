@@ -1,6 +1,9 @@
 #ifndef MATRIX_INIT_H
 #define MATRIX_INIT_H
 #include "Mat.h"
+
+using namespace std;
+
 namespace Matrix {
 /******************************************************************************
 * 
@@ -30,12 +33,25 @@ inline Mat<>& rands(Mat<>& a, double st, double ed) {
 }
 
 /*---------------- Linear spacing vector ----------------*/
-inline Mat<>& linspace(Mat<>& a, double xs, double xe, int n = 1) {
-	double dx = (xe - xs) / n;
+inline Mat<>& linspace(Mat<>& a, double xs, double xe, int n = 2) {
+	double dx = (xe - xs) / (n - 1);
 	a.alloc(n);
-	for (int i = 0; i < a.size(); i++)
+
+	for (int i = 0; i < n; i++)
 		a[i] = xs + dx * i;
-	a(a.size() - 1) = xe;
+	a[n - 1] = xe;
+
+	return a;
+}
+
+inline vector<double>& linspace(vector<double>& a, double xs, double xe, int n = 2) {
+	double dx = (xe - xs) / (n - 1);
+	a.resize(n);
+
+	for (int i = 0; i < n - 1; i++)
+		a[i] = xs + dx * i;
+	a[n - 1] = xe;
+
 	return a;
 }
 
