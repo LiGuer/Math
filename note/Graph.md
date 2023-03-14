@@ -32,9 +32,23 @@
       - Problem: Determine connectivity
         - Algoritm
           * Union-Find Sets
+            - Define
+              Union-Find Sets is a data structure that maintains a collection of disjoint sets, each containing a number of elements. It provides two operations: Union and Find.
+
+              The Union operation takes two elements from different sets and merges them into a single set.  
+              The Find operation is used to determine which set an element belongs to. It takes an element as input and returns a representative element of the set containing that element.  
+
     - Directivity
     - Acyclicity
-    * Euler Path
+    * Euler Path & Euler Graph
+      - Define  
+        Euler path is a path in a graph that passes through every edge exactly once. If the path starts and ends at the same vertex, it is called an Euler circuit. A graph that has an Euler circuit is called an Eulerian graph, while a graph that has an Euler path but not an Euler circuit is called a semi-Eulerian graph. 
+
+      - Property
+        - The existence of an Euler path or circuit in a connected undirected graph depends on the degree of the vertices. For a graph to have an Euler circuit, every vertex must have an even degree. For a connected undirected graph to have an Euler path, exactly two vertices must have an odd degree (all other vertices must have even degree).
+
+      - Problem: search Euler Path
+        - Hierholzer's algorithm 
 
   - Include
     * Complete Graph

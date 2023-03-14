@@ -1,5 +1,8 @@
 * Differential Equations
   * Ordinary Differential Equation  
+    - Define
+      $$f \left(x, y, \frac{\mathrm d y}{\mathrm d x}, \frac{\mathrm d^2 y}{\mathrm dx^2}, ..., \frac{\mathrm d^n y}{\mathrm d x^n} \right) = 0$$ 
+      Ordinary differential equation (ODE) is an equation that relates an unknown function $y$ to its derivatives with respect to a single independent variable $x$.  
 
     - Algorithm: Runge Kutta Method  
       常微分方程组
@@ -21,8 +24,10 @@
 
   * Partial Differential Equation
     - Define  
-      $$F(D^k u(x), ... , D^2 u(x), u(x), x) = 0$$
-      $$F: R^{n^k} × R^{n^{k-1}} × R^n × R × \Omega \to R \quad; x \in \Omega; u: \Omega \to R$$
+      $$f \left(D^k u(x), ... , D^2 u(x), u(x), x \right) = 0$$
+      $$f: \mathbb R^{n^k} \times \mathbb R^{n^{k-1}} \times \mathbb R^n \times \mathbb R \times \Omega \to \mathbb R \quad; x \in \Omega; u: \Omega \to \mathbb R$$
+
+      Partial differential equation (PDE) is an equation that relates an unknown function $u$ of two or more variables to its partial derivatives with respect to those variables.
 
     - Include
       * Linear partial differential equation
@@ -32,7 +37,7 @@
       * Second order nonlinear partial differential equation
         - Define
           $$\sum_{ij} a_{ij}(x) \frac{∂^2 u}{∂ x_i ∂ x_j} + \sum_i b_i(x) \frac{∂ u}{∂ x_i} + c(x) u(x) = f(x)$$
-          系数矩阵 $A(x) = (a_{ij}(x))_{m×m}$
+          系数矩阵 $A(x) = (a_{ij}(x))_{m \times m}$
 
         - Include
 

@@ -1,4 +1,4 @@
-* Complex Number
+* Complex Field
   - Define
     $$\mathbb C = \{a + b i \ |\ a, b \in \mathbb R ,i^2  = 1\}\tag{complex field}$$  
 
