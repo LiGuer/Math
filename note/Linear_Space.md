@@ -1,6 +1,7 @@
 * Linear Space
   - Define  
-    A non empty set with addition and number multiplication, and satisfying:
+    $$(\mathbb R, V, +, \cdot)$$ 
+    Linear Space is non empty set with addition and number multiplication, and satisfying:
     |Axiom|Meaning|
     |---|---|
     | 加法封闭 | $x+y \in V$ |

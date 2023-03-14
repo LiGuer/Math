@@ -1,87 +1,17 @@
 * Abstract Algebra
-  * Group
-    - Define  
-      Group is a pair $(G, \cdot)$, where $G$ is a set, $\cdot$ is a binary operation, and satisfy:
-      - closure: $a, b \in G \Rightarrow a \cdot b \in G$
-      - associative law $(a \cdot b) \cdot c = a \cdot (b \cdot c)$
-      - exists identity element, $\exists 1: x \cdot 1 = 1 \cdot x = x$
-      - exists inverse element, $\exists x^{-1}: x \cdot x^{-1} = x^{-1} \cdot x = 1$
-    
-    - Property
-      - $1$ is unique
-        - Proof
-          $1_1 = 1_1 \cdot 1_2 = 1_2$
-      - The inverse of each element is unique.
-      - Absorbing Element
-        $$x \cdot 0 = 0 \cdot x = 0  \quad; \forall x \in G  \tag{absorbing element}$$   
-      - $\forall a \in G, (a^{-1})^{-1} = a$
-      - $\forall a,b \in G, (a \cdot b)^{-1} = b^{-1} \cdot a^{-1}$
-      - $\forall a,b,c \in G, a\cdot b = a \cdot c  \quad\Rightarrow\quad b = c$
-      - $\forall a,b,c \in G, b\cdot a = c \cdot a  \quad\Rightarrow\quad b = c$ 
+  - Concept
+    * Algebra Structure
+      - Define  
+        An algebraic structure consists of a nonempty set $A$ (called the underlying set, carrier set or domain), a collection of operations on $A$ (typically binary operations such as addition and multiplication), and a finite set of identities, known as axioms, that these operations must satisfy.
 
-      * Subgroup
-        - Define  
-          $$H \subseteq G, H \neq \emptyset, (H, \cdot) \text{ is group } \quad\Rightarrow\quad H \le G  \tag{Subgroup}$$  
-
-          For a group $(G, \cdot)$ and a nonempty subset $H$ of $G$, if $(H, \cdot)$ is also group, then $(H, \cdot)$ is a subgroup of $(G, \cdot)$.
-
-        - Property
-          - $1 \le G, G \le G$
-
-    - Include
-      * Commutative Group , Abelian Group
-        - Define   
-          Commutative Group is a Group satisfied commutative law,
-          $$a \cdot b = b \cdot a$$
-
-    - Example 
-      * Symmetric Group
-        - Define  
-          $$S_n = (\{f: X \to X\}, \circ)$$ 
-          Symmetric group on a finite set $X$ is the group whose elements are all bijective functions $f: X \to X$ and whose group operation is that of function composition $f_1 \circ f_2 = f_1(f_2(\cdot))$. Where $n$ is the degree of symmetric group, that is, the number of elements in set $X$.
-
-        - Property
-          - Cayley's theorem: every group $G$ is isomorphic to a subgroup of a symmetric group.
-
-        - Example 
-          * Permutation Group
-            - Define  
-              Permutation group is a group $G$ whose elements are permutations of a given set $M$ and whose group operation is the composition of permutations in $G$ (which are thought of as bijective functions from the set $M$ to itself).  
-
-            - Property
-              - every group is isomorphic to some permutation group.
-
-  * Ring
-    - Define  
-      Ring is a pair $(G, +, \cdot)$, where $G$ is a set, $\cdot$ and $+$ are binary operations, and satisfy:  
-      - $(G, +)$ is a commutative group
-      - $(G, \cdot)$ is a monoid
-        - $(G, \cdot)$ satisfies associative law, $a \cdot (b \cdot c) = (a \cdot b) \cdot c$
-        - $(G, \cdot)$ exists multiplicative identity, $\exist 1: 1 \cdot x = x \cdot 1 = x, \forall x \in G$
-      - Distributive law: multiplication is distributive with respect to addition,
-        $$\begin{align*}
-          a \cdot (b + c) &= a \cdot b + a \cdot c  \\
-          (b + c) \cdot a &= b \cdot a + c \cdot a
-        \end{align*}$$
-
-    - Include
-      * Commutative Ring
-        - Define  
-          A Ring satisfying commutative law.
-          $$a \cdot b = b \cdot a \quad; \forall a, b \in G$$
-
-        - include
-          * Integer Ring
-
-      * Field
-        - Define  
-          Field is a ring that satisfies the existence of multiplicative inverses for every nonzero element. 
-
-        - Example
-          * Real Field  
-          * Complex Field 
-
-  * Lattice 
-    - Define
-    - Include
-      * Boolean Algebra  
+      - Include
+        * Group
+        * Ring
+        * Lattice 
+          - Define
+          - Example
+            * Boolean Algebra  
+        * Module
+          - Define
+          - Example
+            * Linear Space
