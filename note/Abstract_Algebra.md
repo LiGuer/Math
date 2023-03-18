@@ -13,5 +13,7 @@
             * Boolean Algebra  
         * Module
           - Define
+            $$(\mathbb R, S, +, \cdot)$$  
+            
           - Example
             * Linear Space

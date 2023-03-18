@@ -15,16 +15,6 @@
   - Concept
     * Common Divisor & Common Multiple
     * Prime
-      - Define  
-        A number that can only be divided by $1$ and itself.
-
-      - Property
-        -  The Fundamental Theorem of Arithmetic  
-          Any integer $n$ greater than $1$ can be uniquely expressed in the form of prime $p_i$ product.   
-          $$n = \prod_i p_i^{\alpha_i} \quad n \in \mathbb Z, n > 1$$
-
-        - Resolving prime factor  
-          Pollard Rho algorithm
 
   - Property  
     - /

@@ -1,21 +1,22 @@
 * Bipartite Graph
   - Define
     $$(X, Y, E)  \tag{Bipartite Graph}$$
-    $$X, Y \subset V, X \cup Y = V$$
-    $$E = \{(x_i, y_j) \ |\ x_i \in X, y_j \in Y\}  \tag{Edge set}$$
+    $$X, Y \subset V, X \cup Y = V  \tag{vertex sets}$$
+    $$E = \{(x_i, y_j) \ |\ x_i \in X, y_j \in Y\}  \tag{edge set}$$
 
-    For a Bipartite Graph, The vertex set of a graph is divided into two disjoint subsets $X, Y$. And, edges in Bipartite Graph only exist between point sets $X, Y$, not within them.
+    For a Bipartite Graph, The vertex set $V$ of a graph is divided into two disjoint subsets $X, Y$. And, edges in Bipartite Graph only exist between point sets $X, Y$, not within them.
 
   - Property
-    - Matching  
-      A subgraph of a bipartite graph, and any two edges in the edge set of the subgraph are not attached to the same vertex;  
-      We set $M$ is a sub-graph of a bipartite graph $G$, 
-      $\forall e_i, e_j \in E_M, e_i \neq e_j, then\ e_i(1)  \neq e_j(1), e_i(2) \neq e_j(2)$
+    - Representation, a bipartite graph can be represented by a matrix $M \in \mathbb R^{m \times n}$ with each value $M_{ij}$ refer to the edge weight between $x_i$ and $y_j$, where $m$ is the element number of $X$ and $n$ is that of $Y$.
+      $$f:(X \times Y) \to \mathbb R \quad\Rightarrow\quad \mathbb R^{m \times n}$$ 
 
-      - Maximum Matching: The matching with maximum number of edges $\arg\max_{M \subseteq G} \quad \text{number}(E_M)$
-      - Perfect Matching: All vertexs are in the edges of matching.
-
+    - Matching of Bipartite Graph  
       - Problem: Search Maximum Matching
-        - Algorithm
-          - Hungarian Algorithm
-          - Hopcroft-Karp Algorithm
+        - Property
+          - The maximum matching of bipartite graphs equivalents to a network flow model.  
+            Connect the source point to all points on the left and all points on the right to the sink, with a capacity of $1$. The original edge is connected from left to right, with a capacity of $1$. The maximum flow is the maximum match. 
+
+        * Hungarian Algorithm , Kuhn-Munkres Algorithm
+          - Process
+
+        - Hopcroft-Karp Algorithm

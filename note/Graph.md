@@ -50,6 +50,19 @@
       - Problem: search Euler Path
         - Hierholzer's algorithm 
 
+    * Matching of Graph
+      - Define  
+        $$\forall e_i, e_j \in M \subseteq E, e_i \neq e_j \quad\Rightarrow\quad v(e_i, 1) \neq v(e_i, 2) \neq v(e_j, 1) \neq v(e_j, 2)  \tag{Matching}$$ 
+        Matching of a graph is a set of edges $M \subseteq E$ that have no common points between any two edges.
+
+      - Include
+        - Maximum Matching  
+          $$M^* = \arg\max_{M} \quad \text{number}(M) \tag{Maximum Matching}$$ 
+          Maximum Matching is a matching with the largest number of matching edges among all matches in a graph.
+        - Perfect Matching  
+          $$V^{(G)} = v(M^*)$$ 
+          Perfect Matching is a matching that all vertices of the graph are in it.
+
   - Include
     * Complete Graph
       - Define  

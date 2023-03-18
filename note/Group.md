@@ -27,6 +27,16 @@
       - Property
         - $1 \le G, G \le G$
 
+    * Group Homomorphism
+      - Define
+        $$f: G \to H$$
+        Group Homomorphism is a function $f$ from a group $(G, \cdot)$ to another group $(H, *)$ such that for all $u, v \in G$ it hold that,
+        $$f(u \cdot v) = f(u) * f(v) \quad, \forall u, v \in G$$  
+
+      - Property
+        * Isomorphism of Groups  
+          If Group Homomorphism of $G, H$ is a Bijection, the groups $G, H$ are called isomorphic.
+
   - Include
     * Commutative Group , Abelian Group
       - Define   

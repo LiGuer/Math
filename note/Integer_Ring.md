@@ -14,7 +14,7 @@
       - Property
         - $f(1) = 1$
 
-      - Include
+      - Example
         * Eular Function
           - Define  
             The number of coprimes with $n$ in positive integers less than $n$.
@@ -25,3 +25,5 @@
               n &= \prod_i p_i^{k_i}  \\
               \phi(n) &= n \prod_{p|n} (1 - 1/p)  
             \end{align*}$$
+
+        * Möbius Function

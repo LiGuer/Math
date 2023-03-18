@@ -1,7 +1,7 @@
 * Linear Space
   - Define  
-    $$(\mathbb R, V, +, \cdot)$$ 
-    Linear Space is non empty set with addition and number multiplication, and satisfying:
+    $$(\mathbb R, V, +, \cdot)  \tag{Linear Space}$$ 
+    Linear Space is non empty set with addition and scalar multiplication, and satisfying:
     |Axiom|Meaning|
     |---|---|
     | 加法封闭 | $x+y \in V$ |
@@ -16,6 +16,13 @@
     | Distributivity of scalar multiplication with respect to field addition | $(a+b)x = ax+bx$ |
     |||
 
+    addition,
+    $$\boldsymbol A_{m \times n} + \boldsymbol B_{m \times n} = \boldsymbol C_{m \times n}  \tag{addition}$$
+    $$c_{ij} = a_{ij} + b_{ij}$$
+
+    scalar multiplication,
+    $$k \boldsymbol A_{m \times n} = (k a_{ij})_{m \times n}  \tag{scalar multiplication}$$
+
   - Concept
     * Vector
       - Define
@@ -26,13 +33,6 @@
         $$\mathbb R^{m \times n}, m, n \in \mathbb Z$$
         
       - Operation
-        - addition
-          $$\boldsymbol A_{m \times n} + \boldsymbol B_{m \times n} = \boldsymbol C_{m \times n}$$
-          $$c_{ij} = a_{ij} + b_{ij}$$
-
-        - number multiplication
-          $$k \boldsymbol A_{m \times n} = (k a_{ij})$$
-
         - multiplication
           $$\boldsymbol A_{m \times n} \times \boldsymbol B_{n \times p} = \boldsymbol C_{m \times p}$$
           $$c_{ij} = \sum_{k \in 1:n} a_{ik} b_{kj}$$
