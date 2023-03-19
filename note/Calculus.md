@@ -40,7 +40,7 @@
           截断误差: $\epsilon(f,Δx) = h^4 f^{(5)}(c) / 6 = O(h^4)$  
           精度: $O(h^4)$  
 
-    * Gradient, Divergence, Curl
+    * Gradient & Divergence & Curl
       - Define  
         Gradient $\nabla (\cdot): (f: \mathbb R^{\dim} \to \mathbb R) \to (f: \mathbb R^{\dim} \to \mathbb R^{\dim})$, reflects the direction of the maximum rate of change for function $f$ at point $\boldsymbol x_0$.
 

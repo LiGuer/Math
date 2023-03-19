@@ -2,6 +2,20 @@
   - Define
   - Problem 
     * Sort
+
+    * Maximum Subarray Sum
+      - Purpose  
+        For a given sequence $a$, we aim to find the maximum sum of a contiguous subarray.
+        $$\begin{align*}
+          \max_{x \subseteq a} \sum x
+        \end{align*}$$ 
+
+      - Algorithm  
+        Dynamic Program,
+        $$f_i = \max(f_{i-1}, 0) + a_i$$  
+        $$s^* = \max_{i=1}^n(f_i)$$ 
+        where $f_i$ refer to the maximum sum of a contiguous subarray ending at $a_i$. 
+
     * Longest Subsequence Problem
     * Sequence Palindrome
       - Include

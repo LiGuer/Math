@@ -5,12 +5,13 @@
 
     we called $q$ is Division, $r$ is Remainder.
     $$\begin{align*}
-      a / b = q  \tag{Division}\\
-      a \% b = r  \tag{Remainder}
+      a / b &= q  \tag{Division}\\
+      a \% b &= r  \tag{Remainder}\\
+      a &\equiv r \mod b
     \end{align*}$$
 
     If $r = 0$, then we called the $q$ and $b$ is two Factors of $a$, and $b$ divides $a$, $b | a$. For any $a$, $1, a$ are always Factors of $a$.
-    $$b | a \Leftrightarrow (\exists c \in \mathbb Z) a = b \times c$$
+    $$b | a \quad\Leftrightarrow\quad (\exists c \in \mathbb Z) a = b \times c$$
 
   - Concept
     * Common Divisor & Common Multiple
@@ -33,19 +34,19 @@
     * Congruence Equation
       - Define  
         Solve the unknown $0 \le x < m, x \in \mathbb Z$ 
-        $$f(x) \% m = b$$ 
+        $$f(x) \equiv b \mod m$$ 
 
       - Include
         * Linear Congruence Equation
           - Define  
             A type of Congruence Equation with $f(x) = a x$.
-            $$(a x) \% m = b$$
+            $$a x \equiv b \mod m$$
 
           - Include
             * System of Linear Congruence Equations
               - Purpose
                 $$\begin{align*}
-                  \left\{\begin{matrix} x \% m_1 = a_1 \\ \vdots \\ x \% m_n = a_n \end{matrix}\right.
+                  \left\{\begin{matrix} x \equiv a_1 \mod m_1 \\ \vdots \\ x \equiv a_n \mod m_n \end{matrix}\right.
                 \end{align*}$$
 
                 $$x = k \prod_{i=1}^n m_i + \sum_{i=1}^n a_i \left(\prod_{j=1, j≠i}^n m_j\right) \left(\prod_{j=1, j≠i}^n m_j\right)^{-1}$$
@@ -72,4 +73,4 @@
             $$\prod_{i=0}^r A_i^{u_i} \% m$$
           
           - proof
-            $$a^k = a^{\sum_{i=0}^r u_i·2^i}$$
+            $$a^k = a^{\sum\limits_{i=0}^r u_i·2^i}$$

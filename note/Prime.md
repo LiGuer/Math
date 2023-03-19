@@ -1,11 +1,16 @@
 * Prime
   - Define  
+    $$\nexists a \in (\mathbb Z^+ - \{1, p\}), \text{ let } a | p  \tag{Prime}$$ 
     A number that can only be divided by $1$ and itself.
 
   - Property
     * Fundamental Theorem of Arithmetic  
       Any integer $n$ greater than $1$ can be uniquely expressed in the form of prime $p_i$ product.   
       $$n = \prod_i p_i^{\alpha_i} \quad n \in \mathbb Z, n > 1$$
+
+    * Fermat's Little Theorem  
+      $$a^{p-1} \equiv 1 \mod p$$
+      Where $p$ is a prime and $a$ is an any integer that is not a multiple of $p$.
 
     - Problem: Resolving prime factor  
       - Pollard Rho algorithm
