@@ -41,6 +41,7 @@
           $$\hat B_k = \frac{1}{n} \sum\limits_{i=0}^n (X_i - \hat \mu)^k$$
 
   - Problem 
+    * Regression
     * Parameter Estimation
       - Include 
         * Point Estimation

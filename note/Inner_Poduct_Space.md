@@ -1,9 +1,9 @@
 * Inner Product Space
   - Define   
     The space of inner product is defined.
-    
+
   - Concept
-    * Inner product
+    * Inner Product
       - Define   
         Operations that meet the following conditions:
         - Commutative:$\left<x, y\right> = \overline{\left<y, x\right>}$
@@ -16,8 +16,12 @@
         - $|\left<x, y\right>| ≤ |x| |y|$
         - $\left<x, y \right> = x^T y = |x| |y| cos(\theta_{x,y})$
         - Geometric Interpretation:  
-          $\left<x, y \right>$ means the length of $x$ projection toward $y$ multiply length of $y$;   
-					or the length of $y$ projection toward $x$ multiply length of $x$.
+          $\left<x, y \right>$ means the length of $x$ projection toward $y$ multiply length of $y$; or the length of $y$ projection toward $x$ multiply length of $x$.
+
+      - Example
+        * Laplace Transform
+        * Wavelet Transform
+        * Cross Correlation & Convolution
 
   - Include
     * Complete Inner Product Space ; Hilbert Space

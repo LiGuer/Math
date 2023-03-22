@@ -1,13 +1,14 @@
 * Graph 
   - Define  
     $$G = (V, E)  \tag{Graph}$$  
+    $$E = \{(v_i, v_j)\ |\ v_i, v_j \in V\}  \tag{edge set}$$
 
     Graph is a group consist of vertex set $V$ and edge set $E$ with weights of edges $w: E \to \mathbb R$.
 
     |Symbol|Means|
     |---|---|
     |$V$|Vertex set |
-    |$E = \{(v_i, v_j)\ \|\ v_i, v_j \in V\}$|Edge set, a set of paired vertices|
+    |$E$|Edge set, a set of paired vertices|
     |$w: E \to \mathbb R$|weight of edge|  
     |||
 
@@ -30,13 +31,11 @@
 
     - Connectivity
       - Problem: Determine connectivity
-        - Algoritm
-          * Union-Find Sets
-            - Define
-              Union-Find Sets is a data structure that maintains a collection of disjoint sets, each containing a number of elements. It provides two operations: Union and Find.
+        * Union-Find Sets  
+          Union-Find Sets is a data structure that maintains a collection of disjoint sets, each containing a number of elements. It provides two operations: Union and Find.
 
-              The Union operation takes two elements from different sets and merges them into a single set.  
-              The Find operation is used to determine which set an element belongs to. It takes an element as input and returns a representative element of the set containing that element.  
+          The Union operation takes two elements from different sets and merges them into a single set.  
+          The Find operation is used to determine which set an element belongs to. It takes an element as input and returns a representative element of the set containing that element.  
 
     - Directivity
     - Acyclicity

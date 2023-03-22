@@ -1,9 +1,12 @@
 * Metric Space
   - Define  
     A metric space is a pair $(X, d)$ where $X$ is a set and $d: X \times X \to \mathbb R$  is a metric on $X$ satisfying the following axioms $\forall x, y, z \in X$:
-    - $d(x, y) \ge 0$, Non-negativity, with equality if and only if $x = y$
-    - $d(x, y) = d(y, x)$, Symmetry
-    - $d(x, y) \le d(x, z) + d(z, y)$, Triangle Inequality
+    - Non-negativity, with equality if and only if $x = y$
+      $$d(x, y) \ge 0$$ 
+    - Symmetry
+      $$d(x, y) = d(y, x)$$ 
+    - Triangle Inequality
+      $$d(x, y) \le d(x, z) + d(z, y)$$ 
 
   - Property
     - Lipschitz Equivalent  
@@ -38,4 +41,7 @@
       For a complete matric space, if $f: X \to X$ is a contraction, then $f$ has a unique fixed point $x^* \in X$,
       $$f(x^*) = x^*,\quad \lim\limits_{n \to \infty} f^n(x_0) = x^* ,\forall x_0 \in X $$
 
+  - Include
+    * Normed Linear Space
+ 
 

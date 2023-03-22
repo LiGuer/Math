@@ -19,12 +19,14 @@ for file_name in os.listdir('note'):
     file = open('note/' + file_name, 'r', encoding = 'utf-8')
     Str = file.read()
     file.close()
+    #Str = re.sub(r"\t", "  ", Str)
     Str = Str.split('\n')
 
     stack = [root]
     stack_tab = [-2]
     
     for s in Str:
+        # Tab length
         tab = 0
         while(tab < len(s) and s[tab] == ' '):
             tab += 1
@@ -36,44 +38,39 @@ for file_name in os.listdir('note'):
             stack.pop()
             stack_tab.pop()
 
-        if(s[tab] == '*' and s[tab+1] == ' '):
+        if(s[tab:tab+2] == "* "):
             tail = len(s) - 1
             while(tail >= tab and s[tail] == ' '):
                 tail -= 1
-
             title = s[tab+2:tail+1]
 
             if (title in CellLib):
                 newNode = CellLib[title]
-                if(tab == 0):
-                    newNode.file = file_name
 
+                if (tab == 0):
+                    newNode.file = file_name
             else:
                 newNode = Cell(title, file_name)
                 CellLib[title] = newNode
 
+            # add kid into tree
             stack[-1].kid.append(newNode)
             newNode.parent.append(stack[-1])
-
+            # stack push
             stack.append(newNode)
             stack_tab.append(tab)
-
         else:
             stack[-1].content.append(s)
 
-def walk(a, t):
-    if(t == 0):
-        for c in a.kid:
-            if(len(c.parent) == 1):
-                text = '  '*t + '* [' + c.concept + '](note/' + c.file + ')'
-                out.write(text + '\n')
-                walk(c, t+1)
+for e in CellLib.values():
+    if (e in root.kid and len(e.parent) != 1):
+        root.kid.remove(e)
+        e.parent.remove(root)
 
-    else:
-        for c in a.kid:
-            text = '  '*t + '* [' + c.concept + '](note/' + c.file + ')'
-            out.write(text + '\n')
-            walk(c, t+1)
+def walk(a, t):
+    for c in a.kid:
+        out.write('  ' * t + '* [' + c.concept + '](note/' + c.file + ')\n')
+        walk(c, t+1)
 
 walk(root, 0)
 

@@ -12,5 +12,8 @@
         - Countable additivity: For any disjoint sequence $(A_1, ..., A_n), A_i \in \mathcal E$, then
           $$\mu \left(\bigcup_i A_i\right) = \sum_i \mu(A_i)$$   
 
+      - Include
+        * Lebesgue Measure 
+
   - Include
     * Probability Space

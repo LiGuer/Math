@@ -1,5 +1,16 @@
 * Sequence 
   - Define
+  - Property
+    * Sequence::Limit 
+      - Define
+        Limit of Sequence  
+        $$\lim_{n \to \infty} x_n=a \Leftrightarrow |x_n-a|<ε, \forall ε>0, \exists N \in Z_+, n > N  \tag{Limit of Sequence}$$
+
+      - Property
+        - Uniqueness
+        - Boundedness
+        - 保号性
+  
   - Problem 
     * Sort
 

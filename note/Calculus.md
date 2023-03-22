@@ -1,45 +1,32 @@
-* Calculus
-  * Limit
-    - Define  
-      Limit of Sequence  
-      $$\lim_{n \to \infty} x_n=a \Leftrightarrow |x_n-a|<ε, \forall ε>0, \exists N \in Z_+, n > N$$
+* Derivative
+  - Define  
+    For unary functions, the derivative is
+    $$\begin{align*}
+      \frac{df}{dx} &= \lim_{Δx \to 0}  \frac{ f(x + Δx) - f(x - Δx) }{ 2 Δx }  \tag{First derivative}\\
+      \frac{d^n f}{dx^n} &= \lim_{Δx \to 0} \frac{ f^{(n - 1)}(x + Δx) - f^{(n - 1)}(x - Δx)} { 2 Δx }  \tag{$n$-order derivative}
+    \end{align*}$$
 
-      Limit of Function
+    For multi-variate functions, the partial derivative is
 
-    - Property
-      - Uniqueness
-      - Boundedness
-      - 保号性
+    $$\begin{align*}
+      \frac{∂f}{∂x_i} &= \frac{f(...,x_i + Δx_i,...) -  f(..., x_i - Δx_i, ...)}{2 Δx_i}  \\
+      \frac{∂^2 f}{∂x_i^2}  
+      &= \frac{f'(..,x_i+Δx_i,..) -  f'(..,x_i-Δx_i,..)}{Δx_i}   \\
+      &= \frac{f(..,x_i+Δx_i) - 2·f(..,x) + f(..,x_i-Δx_i)}{Δx_i^2}  \\
+      \frac{∂^2 f}{∂x_j ∂x_i}  
+      &= \frac{\partial}{\partial x_j} \left(\frac{\partial f}{\partial x_i} \right)
+    \end{align*}$$
 
-  * Differential
-    * Derivative
-      - Define  
-        For unary functions, the derivative is
-        $$\begin{align*}
-          \frac{df}{dx} &= \lim_{Δx \to 0}  \frac{ f(x + Δx) - f(x - Δx) }{ 2 Δx }  \tag{First derivative}\\
-          \frac{d^n f}{dx^n} &= \lim_{Δx \to 0} \frac{ f^{(n - 1)}(x + Δx) - f^{(n - 1)}(x - Δx)} { 2 Δx }  \tag{$n$-order derivative}
-        \end{align*}$$
+  - Problem : discrete numerical calculation of Derivative
+    - Algorithm : Finite difference, central difference formulas
+      $$f'(x) = \frac{f(x+Δx) -  f(x-Δx)}{2 Δx} + \epsilon(f,Δx)$$
+      截断误差: $\epsilon(f,Δx) = h² f^{(3)}(c) / 6 = O(h²)$  
+      精度: O(h²)  
+      $$f'(x) = \frac{-f(x+2Δx) + 8·f(x+Δx) - 8·f(x-Δx) + f(x-2Δx) }{12 Δx} + \epsilon(f,Δx)$$
+      截断误差: $\epsilon(f,Δx) = h^4 f^{(5)}(c) / 6 = O(h^4)$  
+      精度: $O(h^4)$  
 
-        For multi-variate functions, the partial derivative is
-
-        $$\begin{align*}
-          \frac{∂f}{∂x_i} &= \frac{f(...,x_i + Δx_i,...) -  f(..., x_i - Δx_i, ...)}{2 Δx_i}  \\
-          \frac{∂^2 f}{∂x_i^2}  
-          &= \frac{f'(..,x_i+Δx_i,..) -  f'(..,x_i-Δx_i,..)}{Δx_i}   \\
-          &= \frac{f(..,x_i+Δx_i) - 2·f(..,x) + f(..,x_i-Δx_i)}{Δx_i^2}  \\
-          \frac{∂^2 f}{∂x_j ∂x_i}  
-          &= \frac{\partial}{\partial x_j} \left(\frac{\partial f}{\partial x_i} \right)
-        \end{align*}$$
-
-      - Problem : discrete numerical calculation of Derivative
-        - Algorithm : Finite difference, central difference formulas
-          $$f'(x) = \frac{f(x+Δx) -  f(x-Δx)}{2 Δx} + \epsilon(f,Δx)$$
-          截断误差: $\epsilon(f,Δx) = h² f^{(3)}(c) / 6 = O(h²)$  
-          精度: O(h²)  
-          $$f'(x) = \frac{-f(x+2Δx) + 8·f(x+Δx) - 8·f(x-Δx) + f(x-2Δx) }{12 Δx} + \epsilon(f,Δx)$$
-          截断误差: $\epsilon(f,Δx) = h^4 f^{(5)}(c) / 6 = O(h^4)$  
-          精度: $O(h^4)$  
-
+  - Include
     * Gradient & Divergence & Curl
       - Define  
         Gradient $\nabla (\cdot): (f: \mathbb R^{\dim} \to \mathbb R) \to (f: \mathbb R^{\dim} \to \mathbb R^{\dim})$, reflects the direction of the maximum rate of change for function $f$ at point $\boldsymbol x_0$.
@@ -64,23 +51,23 @@
         - $\nabla \cdot (\phi \boldsymbol F) = (\nabla \phi) \cdot \boldsymbol F + \phi (\nabla \cdot \boldsymbol F)$
         - $\nabla \times (\phi \boldsymbol F) = (\nabla \phi) \times \boldsymbol F + \phi (\nabla \times \boldsymbol F)$
 
-  * Integral
-    - Define  
-      $$\int f(x) \mathrm d x  = F(x)  + const.\tag{Integral}$$ 
-      Integral $f: (f: \mathbb R \to \mathbb R) \to (f: \mathbb R \to \mathbb R)$ represents the anti-derivative of a function $f(x)$. For a given function $f(x)$, an indefinite integral of $f(x)$ is another function $F(x)$ such that the derivative of $F(x)$ with respect to $x$ is equal to $f(x)$.
+* Integral
+  - Define  
+    $$\int f(x) \mathrm d x  = F(x)  + const.\tag{Integral}$$ 
+    Integral $f: (f: \mathbb R \to \mathbb R) \to (f: \mathbb R \to \mathbb R)$ represents the anti-derivative of a function $f(x)$. For a given function $f(x)$, an indefinite integral of $f(x)$ is another function $F(x)$ such that the derivative of $F(x)$ with respect to $x$ is equal to $f(x)$.
 
-      $$\int_a^b f(x) \mathrm d x = F(b) - F(a) \tag{Definite Integral}$$
+    $$\int_a^b f(x) \mathrm d x = F(b) - F(a) \tag{Definite Integral}$$
 
-      Definite Integral $f: (\mathbb R, \mathbb R, f: \mathbb R \to \mathbb R) \to \mathbb R$ of a function f(x) over an interval $[a, b]$ is the limit of a sum of rectangular areas as the width of the rectangles approaches zero. 
+    Definite Integral $f: (\mathbb R, \mathbb R, f: \mathbb R \to \mathbb R) \to \mathbb R$ of a function f(x) over an interval $[a, b]$ is the limit of a sum of rectangular areas as the width of the rectangles approaches zero. 
 
-    - Problem : discrete numerical calculation of Integral
-      - Algorithm : Newton–Cotes formulas
-        $$\int_a^b f(x) \mathrm d x = (b - a) \sum_{k=0}^n  C_k^{n} f(x_i)$$
-        $$C_k^{n} = (-1)^{n-k}(n·k!(n-k)!) \int_0^n \prod_{k≠j} (t-j) \mathrm d t$$ 
-        $n = 1$: $C = \{\frac{1}{2}, \frac{1}{2}\}$  
-        $n = 2$: $C = \{\frac{1}{6}, \frac{4}{6}, \frac{1}{6}\}$  
-        $n = 4$: $C = \{\frac{7}{90}, \frac{32}{90}, \frac{12}{90}, \frac{32}{90}, \frac{7}{90}\}$   
-        Newton–Cotes formulas 在 $n > 8$ 时不具有稳定性
+  - Problem : discrete numerical calculation of Integral
+    - Algorithm : Newton–Cotes formulas
+      $$\int_a^b f(x) \mathrm d x = (b - a) \sum_{k=0}^n  C_k^{n} f(x_i)$$
+      $$C_k^{n} = (-1)^{n-k}(n·k!(n-k)!) \int_0^n \prod_{k≠j} (t-j) \mathrm d t$$ 
+      $n = 1$: $C = \{\frac{1}{2}, \frac{1}{2}\}$  
+      $n = 2$: $C = \{\frac{1}{6}, \frac{4}{6}, \frac{1}{6}\}$  
+      $n = 4$: $C = \{\frac{7}{90}, \frac{32}{90}, \frac{12}{90}, \frac{32}{90}, \frac{7}{90}\}$   
+      Newton–Cotes formulas 在 $n > 8$ 时不具有稳定性
 
-      - Algorithm : 复合求积法  
-        将积分区间分成若干个子区间, 再在每个子区间使用低阶求积公式.
+    - Algorithm : 复合求积法  
+      将积分区间分成若干个子区间, 再在每个子区间使用低阶求积公式.

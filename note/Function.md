@@ -26,3 +26,22 @@
         * Inverse Function
           - Define  
             if $f$ is a bijection, its inverse function is $f^{-1}(b) = a \Leftrightarrow f(a) = b$
+
+  - Example
+    * Real-Value Function & Complex-Value Function
+      - Define
+        $$f: \mathbb R \to \mathbb R  \tag{Real-Value Function}$$  
+        $$f: \mathbb C \to \mathbb C  \tag{Complex-Value Function}$$  
+
+      - Property
+        * Function::Limit
+          - Property
+            - Uniqueness
+            - Boundedness
+            - 保号性
+        * Derivative
+        * Integral 
+
+      - Include
+        * Polynomial Function 
+        * Trigonometric Function & Hyperbolic Function
