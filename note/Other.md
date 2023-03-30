@@ -1,6 +1,5 @@
 * Application
   * Information Theory
-  * Neural Network
   * Reinforcement Learning
   * Statistics
   * Geometry

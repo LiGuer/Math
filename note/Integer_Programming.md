@@ -10,7 +10,7 @@
         A class of problems in which variables can only be 0 or 1.
 
   - Example
-    * Knapsack_Problem
+    * Knapsack Problem
 
   - Algorithm -- Solving Integer Programming & Mixed Integer Programming
     - Branch and Bound Method

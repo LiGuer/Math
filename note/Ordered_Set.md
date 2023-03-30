@@ -2,7 +2,8 @@
   - Include
     * Ordered Pair
       - Define
-        $$(a, b)$$    
+        $$(a, b) = \{\{a\}, \{a, b\}\}$$
+        Ordered pair is a pair of two items in which order matters. Formally, it is defined as $\{\{a\}, \{a, b\}\}$.
 
   - Property
     * Permutation

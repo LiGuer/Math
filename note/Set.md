@@ -91,7 +91,7 @@
 
       * Power Set
         
-  - Include
+  - Example
     * Empty Set
       - Define 
         $$\emptyset = \{\}  \tag{Empty Set}$$
@@ -101,3 +101,6 @@
         - $\emptyset \in S, \forall \text{ set } S$
         - $A \cap \emptyset = \emptyset$
         - $A \cup \emptyset = A$
+
+  - Example
+    * Ordered Set 

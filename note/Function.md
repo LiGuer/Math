@@ -29,3 +29,4 @@
 
   - Example
     * Real-Value Function & Complex-Value Function
+    * Sequence

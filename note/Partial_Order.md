@@ -20,3 +20,9 @@
       - Define  
         $$\nexists a \in S, \text{ let } a < m \quad, m \in S \tag{Minimal element}$$ 
         $$\nexists a \in S, \text{ let } g < a \quad, g \in S \tag{Maximal element}$$ 
+
+  - Include
+    * Total Order
+      - Define  
+        Total Order is a partial order in which any two elements are comparable, such that, 
+        - strongly connected, formerly called total: $a \le b$ or $b \le a$.

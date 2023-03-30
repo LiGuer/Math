@@ -1,15 +1,26 @@
 * Sequence 
   - Define
+    $$f: \mathbb N \to S  \tag{Sequence}$$ 
+    $$(a_1, a_2, \cdots, a_n)  \tag{Finite sequence}$$
+    $$(a_1, a_2, \cdots)  \tag{Infinite sequence}$$
+
+    A sequence can be defined as a function from natural numbers (the positions of elements in the sequence) to the elements at each position.
+
   - Property
     * Sequence::Limit 
-      - Define
-        Limit of Sequence  
+      - Define  
         $$\lim_{n \to \infty} x_n=a \Leftrightarrow |x_n-a|<ε, \forall ε>0, \exists N \in Z_+, n > N  \tag{Limit of Sequence}$$
 
       - Property
         - Uniqueness
         - Boundedness
         - 保号性
+
+    - Convergence of sequence
+
+    * Subsequence
+      - Define  
+        Subsequence of a sequence $(a_n)$ is $(a_{g(n)})$ where $g : \mathbb N \to \mathbb N$ is strictly increasing.  
   
   - Problem 
     * Sort

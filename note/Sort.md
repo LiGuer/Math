@@ -4,7 +4,7 @@
       - Process  
         Quick sort is a divide-and-conquer sorting algorithm. Based on the first value $a_1$, we divide the array into two sub-arrays according to whether they are greater than $a_1$ or less than $a_1$.
 
-        $$\left\{a^{(t + 1, 2 k - 1)},\{a^{(t, k)}_1\}, a^{(t + 1, 2 k)} \right\} = \text{partition}\left(a^{(t, k)} \right)$$
+        $$\left\{a^{(t + 1, 2 k - 1)}, \left(a^{(t, k)}_1 \right), a^{(t + 1, 2 k)} \right\} = \text{partition}\left(a^{(t, k)} \right)$$
         $$\begin{align*}
             a^{(t + 1, 2 k - 1)} &\prec a^{(t, k)}_1  \\
             a^{(t + 1, 2 k)} &\succeq a^{(t, k)}_1
@@ -13,13 +13,31 @@
         We repeat the above operation for two sub-arrays untill the array cannot be devided.
 
         ```c
-        void quickSort(int arr[], int l, int r) {
+        void quickSort(int[] a, int l, int r) {
           if (l >= r) 
             return;
 
-          int pi = partition(arr, l, r);
-          quickSort(arr, l, pi - 1);
-          quickSort(arr, pi + 1, r);
+          int p = partition(a, l, r);
+          quickSort(a, l, p - 1);
+          quickSort(a, p + 1, r);
+        }
+        ```
+
+        Where partition can be implemented like,
+        ```c
+        void partition(int[] a, int l, int r) {
+            int i = l - 1;
+
+            for (int j = l ; j > r; j++) 
+                if(a[j] <= a[i]) {
+                    i++;
+                    swap(a[i], a[j]);
+                }
+
+            i++;
+            swap(a[i], a[j]);
+
+            return i;
         }
         ```
 
@@ -32,14 +50,14 @@
         $$b^{(l, l)} \gets a^{(l, l)}$$
         $$b^{(l, r)} \gets \text{merge} (b^{(l, m)}, b^{(m+1, r)})$$
         ```c
-        void mergeSort(int arr[], int l, int r) { 
+        void mergeSort(int[] a, int l, int r) { 
           if (l >= r) 
             return;
             
           int m = l + (r - l) / 2; 
-          mergeSort(arr, l, m); 
-          mergeSort(arr, m + 1, r); 
-          merge(arr, l, m, r); 
+          mergeSort(a, l, m); 
+          mergeSort(a, m + 1, r); 
+          merge(a, l, m, r); 
         } 
         ```
 
@@ -53,13 +71,13 @@
         In heap sort, the array is first turned into a binary heap, and the root node, which is either the maximum or minimum element, is swapped with the last element of the array. The heap is then rebuilt without the last element, and the process repeats until the heap is empty. By swapping the root node with the last element, we ensure that the largest or smallest element moves to the end of the array, and the array is partially sorted.
 
         ```c
-        void heapSort(int arr[], int n) {
+        void heapSort(int[] a, int n) {
             for (int i = n / 2 - 1; i >= 0; i--)
-                heapify(arr, n, i);
+                heapify(a, n, i);
         
             for (int i=n-1; i>=0; i--) {
-                swap(arr[0], arr[i]);
-                heapify(arr, i, 0);
+                swap(a[0], a[i]);
+                heapify(a, i, 0);
             }
         }
         ```
@@ -72,16 +90,16 @@
         we start from the left side of the array, and compare each element with the element next to it. If the element on the right is smaller than the element on the left, the two elements are swapped. This process continues until the end of the list is reached.
 
         ```c
-        void insertionSort(int arr[], int n) {
+        void insertionSort(int[] a, int n) {
             for (int i = 1; i < n; i++) {
-                int key = arr[i],
+                int key = a[i],
                     j = i-1;
           
-                while (j >= 0 && arr[j] > key) {
-                    arr[j+1] = arr[j];
+                while (j >= 0 && a[j] > key) {
+                    a[j+1] = a[j];
                     j = j - 1;
                 }
-                arr[j+1] = key;
+                a[j+1] = key;
             }
         }
         ```
@@ -103,11 +121,11 @@
         Bubble sort works by repeatedly swapping adjacent elements if they are in the wrong order until the list is sorted.
 
         ```c
-        void bubbleSort(int arr[], int n) {
+        void bubbleSort(int[] a, int n) {
           for (int i = 0; i < n-1; i++)
               for (int j = 0; j < n-i-1; j++)
-                  if (arr[j] > arr[j+1]) 
-                      swap(arr[j], arr[j+1]);
+                  if (a[j] > a[j+1]) 
+                      swap(a[j], a[j+1]);
         }
         ```
 
