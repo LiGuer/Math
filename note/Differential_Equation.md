@@ -10,37 +10,41 @@
   - Algorithm: Solving Ordinary Differential Equation
     * Runge Kutta Method   
       - Process 
-        常微分方程组
-          $$\begin{align*}
-            \boldsymbol y' &= f(\boldsymbol  x, \boldsymbol  y)  \\
-            \boldsymbol  y(\boldsymbol  x_0) &= \boldsymbol  y_0
-          \end{align*}$$
-          迭代求解 $\boldsymbol  y(x)$ 的一点/一区间的数值解.
-          $$\begin{align*}
-            y(x + dx) &= y(x) + \frac{dx}{6} · (k_1 + 2 k_2 + 2 k_3 + k_4)  \\
-            k_1 &= f \left(x_n , y_n \right)            \tag{区间开始斜率}  \\
-            k_2 &= f \left(x_n + \frac{dx}{2}, y_n + \frac{dx}{2}·k_1 \right)    \tag{区间中点斜率,通过欧拉法采用$k_1$决定y在$x_n+\frac{dx}{2}$值}  \\
-            k_3 &= f \left(x_n + \frac{dx}{2}, y_n + \frac{dx}{2}·k_2 \right)    \tag{区间中点斜率,采用$k_2$决定y值}  \\
-            k_4 &= f \left(x_n + dx, y_n + dx·k_3 \right)      \tag{区间终点斜率}
-          \end{align*}$$
+        Ordinary differential equations  
+        $$\begin{align*}
+          \boldsymbol y' &= f(\boldsymbol  x, \boldsymbol  y)  \\
+          \boldsymbol  y(\boldsymbol  x_0) &= \boldsymbol  y_0
+        \end{align*}$$
+        Iterative solve Numerical solution for a point/interval of $\boldsymbol  y(x)$.
+        $$\begin{align*}
+          y(x + dx) &= y(x) + \frac{dx}{6} · (k_1 + 2 k_2 + 2 k_3 + k_4)  \\
+          k_1 &= f \left(x_n , y_n \right)            \tag{Interval start slope}  \\
+          k_2 &= f \left(x_n + \frac{dx}{2}, y_n + \frac{dx}{2}·k_1 \right)    \tag{Interval midpoint slope, through the Euler method $k_1$ determines $y$ at $x_n+\frac{dx}{2}$}  \\
+          k_3 &= f \left(x_n + \frac{dx}{2}, y_n + \frac{dx}{2}·k_2 \right)    \tag{Interval midpoint slope,$k_2$ determines $y$ value}  \\
+          k_4 &= f \left(x_n + dx, y_n + dx·k_3 \right)  \tag{Interval end slope}
+        \end{align*}$$
 
       - Property  
-        RK4法是四阶方法，每步误差是h⁵阶，总积累误差为h⁴阶
+        The RK4 method is a fourth order method, with each step error of order $h^4$, and the total cumulative error of order $h^5$
 
   - Include
-    * Linear Partial Differential Equation
+    * Linear Differential Equation
       - Define
-        $$\sum_{k=0}^K a_k(x) D^k u(x) = f(x)$$
+        $$\sum_{k=0}^K a_k(x) u^{(k)}(x) = f(x)  \tag{Linear ODE}$$
+        $$\sum_{k=0}^K a_k(x) D^k u(x) = f(x)  \tag{Linear PDE}$$
+
+      - Property
+        - The solution set of a linear differential equation constitutes a linear space.
 
     * Second Order Nonlinear Partial Differential Equation
       - Define
         $$\sum_{ij} a_{ij}(x) \frac{∂^2 u}{∂ x_i ∂ x_j} + \sum_i b_i(x) \frac{∂ u}{∂ x_i} + c(x) u(x) = f(x)$$
-        系数矩阵 $A(x) = (a_{ij}(x))_{m \times m}$
+        coefficient matrix $A(x) = (a_{ij}(x))_{m \times m}$
 
       - Include
         * Elliptic Partial Differential Equation
           - Define  
-            指$A(x)$负定.
+            $A(x)$ is negative definite.
 
           - Include
             * Poisson's Equations
@@ -51,7 +55,7 @@
 
         * Hyperbolic Partial Differential Equation
           - Define  
-            指$A(x)$的特征值由1个0和其他负数组成.
+            eigenvalue of $A(x)$ consists of a $0$ and other negative numbers
 
           - Include
             * Diffusion equation
@@ -60,7 +64,7 @@
 
         * Parabolic Partial Differential Equation
           - Define
-            指$A(x)$的特征值由1个正数和其他负数组成.
+            eigenvalue of $A(x)$ consists of of a positive number and other negative numbers.
 
           - Include
             * Wave equation

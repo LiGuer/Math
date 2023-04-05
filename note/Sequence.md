@@ -92,6 +92,7 @@
             k \gets& k+i-l_i \quad; b_{i+1} \neq a_{k+i}\\
             i \gets& i+1 \quad; b_{i+1} = a_{k+i}\\
           \end{matrix}$$
-          
+
+    * Dynamic Time Warping , DTW
   - Include 
     * Deque

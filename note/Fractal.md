@@ -15,3 +15,5 @@
 
       - Property
         - $|Z_n|>2$ impossible to converge. Hence, Mandelbrot Set is in the circle with a radius of 2.
+
+    * Newton Fractal   

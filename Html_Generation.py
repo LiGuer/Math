@@ -32,6 +32,7 @@ def bfs (root, position):
         for kid in node.kid:
             if kid not in position:
                 queue.append((kid, level + 1))
+                position[kid] = [-1, -1] 
 
 def draw_tree(root, filename='tree.svg'):
     position = {}
@@ -49,7 +50,8 @@ def draw_tree(root, filename='tree.svg'):
     dwg = svgwrite.Drawing(filename, profile='full')
     dwg.defs.add(dwg.style('a:hover { cursor: pointer; }'))
 
-    draw_node(dwg, root, position, 10)
+    visited = set([])
+    draw_node(dwg, root, position, visited, 10)
     svg_string = dwg.tostring()
 
     # 生成 HTML 文件
@@ -76,7 +78,7 @@ def draw_tree(root, filename='tree.svg'):
         f.write("</body>\n")
         f.write("</html>\n")
 
-def draw_node(dwg, node, position, radius):
+def draw_node(dwg, node, position, visited, radius):
     # Draw the node
     dwg.add(dwg.circle(center=position[node], r=radius, stroke='red', fill='white'))
     link_element = dwg.add(dwg.a(href=("note/" + node.file if node.file != "" else "ReadMe.md")))
@@ -84,10 +86,12 @@ def draw_node(dwg, node, position, radius):
 
     # Draw children
     for i, child in enumerate(node.kid):
-        draw_edge(dwg, 
-                  position[node][0] + radius, position[node][1], 
-                  position[child][0] - radius, position[child][1], radius)
-        draw_node(dwg, child, position, radius)
+        if (node, child) not in visited:
+            visited.add((node, child))
+            draw_edge(dwg, 
+                    position[node][0] + radius, position[node][1], 
+                    position[child][0] - radius, position[child][1], radius)
+            draw_node(dwg, child, position, visited, radius)
 
 def draw_edge(dwg, x1, y1, x2, y2, radius):
     # Draw a Bezier curve between nodes

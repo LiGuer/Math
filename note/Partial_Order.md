@@ -26,3 +26,6 @@
       - Define  
         Total Order is a partial order in which any two elements are comparable, such that, 
         - strongly connected, formerly called total: $a \le b$ or $b \le a$.
+
+  - Problem
+    * Optimization Problem 

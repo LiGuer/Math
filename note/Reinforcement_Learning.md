@@ -37,17 +37,15 @@
         Action-Value function: 智能体在当前状态$S_t$和策略$π$下, 在做出动作$A_t$后的期望累计收益$G_t$.
         
   - Include  
-    * 单状态强化学习
+    * Single State Reinforcement Learning
       - Define  
-        只有一个恒定状态$S_0$的强化学习问题. 
-        $$
-        \begin{align*}
+        Reinforcement Learning with only a constant state $S_0$. 
+        $$\begin{align*}
           \max_{\pi} \quad & G = \sum_{t = 0}^\infty R_t  \tag{objective}\\
           s.t. \quad
           & R_t = f(A_{t})  \tag{Environmental response}\\
-        \end{align*}
-        $$
-        获得奖励的概率:
+        \end{align*}$$
+        Probability of rewards,
         $$\mathbb P (R_t | A_t)$$
 
     * Markov Decision Process

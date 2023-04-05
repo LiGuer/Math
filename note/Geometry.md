@@ -44,6 +44,11 @@
 
     * Fractal
 
+    * Voronoi Diagram
+      - Define  
+        $$R_k = \{x \ |\ x  \in X, d(x, P_k) \le d(x, P_j), \forall P_j \in P, P_j \neq P_k\}  \tag{Voronoi region}$$ 
+        For a metric space with distance function $d$ and a point set $P$, The Voronoi region $R_k$ associated with the point $P_k$ is the set of all point in $X$ whose distance to $P_k$ is not greater than their distance to the other point $P_j, j \neq k$.
+
   - Problem
     * Intersection Problem
 
@@ -57,3 +62,7 @@
         - Create a new triangle connecting the new point to the vertices of the containing triangle.
         - Flip any edges that violate the Delaunay property (i.e., any edges whose endpoints do not form the circumcircle of any triangle in the current triangulation).
         - Repeat steps 2-4 for all remaining points.
+
+    - Problem: Integerization of geometric set
+      * Bresenham Algorithm::Line
+      * Bresenham Algorithm::Circle

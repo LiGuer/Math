@@ -33,5 +33,28 @@
     * Lagrange Function
     * Lagrange Dual function, Dual Problem
 
+  - Problem: Solving unconstrained optimization problems
+    * Descent Method
+      - Include 
+        * Gradient Descent Method  
+          $$\boldsymbol x_{k+1} = x_k - \alpha_k \nabla f(\boldsymbol x_k)$$
+
+          - Inlcude
+            * Steepest Descent Method
+              $$\boldsymbol x_{k+1} = \boldsymbol x_k + \alpha_k \cdot \arg\min \{ (\nabla f(\boldsymbol x_k))^T \boldsymbol v \ |\ ||\boldsymbol v|| = 1 \}$$
+
+            * Stochastic Gradient Descent
+
+            * Adaptive Moment Estimation
+
+        * Newton-Raphson Method
+          $$\boldsymbol x_{k+1} = \boldsymbol x_k - \alpha_k (\nabla^2 f(\boldsymbol x_k))^{-1} \nabla f(\boldsymbol x_k)$$
+
+        * Quasi-Newton Method
+          $$\boldsymbol x_{k+1} = \boldsymbol x_k - \alpha_k B_k^{-1} \nabla f(\boldsymbol x_k)$$
+
+          Where, $B_k^{-1}$ is an approximate Hessian matrix to simplify the time consuming calculation of the Hessian matrix.
+
+
   
     
