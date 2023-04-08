@@ -23,6 +23,14 @@
       - Define  
         A holomorphic function is a complex-valued function on an open set $U$ if it is complex differentiable at every point of $U$.
 
+      - Property
+        - $$\frac{\partial f}{\partial \bar z} = 0$$
+        * Cauchy-Riemann Equations
+          - Describe  
+            For a complex function $f(z) = u(x,y) + i v(x,y)$, where $u(x,y)$ and $v(x,y)$ are real and imaginary part respectively. 
+
+            $$\frac{\partial u}{\partial x} = \frac{\partial v}{\partial y}, \quad \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x} \tag{Cauchy-Riemann Equations}$$
+
     * Meromorphic Function
       - Define  
         A meromorphic function on an open subset $D$ of the complex plane is a function that is holomorphic on all of $D$ except for a set of isolated points, which are poles of the function.

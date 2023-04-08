@@ -26,6 +26,12 @@
 
       - Property
         - $1 \le G, G \le G$
+        
+      - Include
+        * Normal Subgroup
+          - Define
+            $$H \lhd G \quad\Leftrightarrow\quad  g^{-1}hg \in H, \forall h \in H \le G, g \in  G \tag{Normal Subgroup}$$ 
+            Normal Subgroup is a subgroup $H \le G$ if it is invariant under conjugation, that is, $\forall h \in H, g \in G$, we have $g^{-1}hg \in H$.
 
     * Group Homomorphism
       - Define

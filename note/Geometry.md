@@ -49,6 +49,22 @@
         $$R_k = \{x \ |\ x  \in X, d(x, P_k) \le d(x, P_j), \forall P_j \in P, P_j \neq P_k\}  \tag{Voronoi region}$$ 
         For a metric space with distance function $d$ and a point set $P$, The Voronoi region $R_k$ associated with the point $P_k$ is the set of all point in $X$ whose distance to $P_k$ is not greater than their distance to the other point $P_j, j \neq k$.
 
+  - Property
+    * Genus
+      - Define  
+        Genus of a non-empty connected surface is defined as the maximum number of non-intersecting simple closed curves that can be drawn on the surface without dividing it into two disconnected pieces. The genus is a topological invariant that characterizes its "number of holes". 
+
+        Genus $g$ can be defined in terms of the Euler characteristic $\chi$, where $b$ is the number of boundary components.
+
+        $$g = \frac{2 - \chi - b}{2}  \tag{Genus}$$
+
+    * Euler Characteristic
+      - Define  
+        Euler Characteristic is a topological invariant and defined as an alternating sum of the ranks of the homology groups of the space.
+
+        In a polyhedra, the Euler characteristic was classically defined for surfaces of polyhedra with the numbers of vertices $V$ (corners), edges $E$ and faces $F$. Any convex polyhedron's surface has Euler characteristic $\chi = 2$.
+        $$\chi = V - E + F  \tag{Euler Characteristic}$$
+
   - Problem
     * Intersection Problem
 
