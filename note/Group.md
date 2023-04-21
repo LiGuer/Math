@@ -8,15 +8,16 @@
   
   - Property
     - $1$ is unique
-      - Proof
-        $1_1 = 1_1 \cdot 1_2 = 1_2$
+      - Proof  
+        $$1_1 = 1_1 \cdot 1_2 = 1_2$$
     - The inverse of each element is unique.
     - Absorbing Element
-      $$x \cdot 0 = 0 \cdot x = 0  \quad; \forall x \in G  \tag{absorbing element}$$   
-    - $\forall a \in G, (a^{-1})^{-1} = a$
-    - $\forall a,b \in G, (a \cdot b)^{-1} = b^{-1} \cdot a^{-1}$
-    - $\forall a,b,c \in G, a\cdot b = a \cdot c  \quad\Rightarrow\quad b = c$
-    - $\forall a,b,c \in G, b\cdot a = c \cdot a  \quad\Rightarrow\quad b = c$ 
+      $$x \cdot 0 = 0 \cdot x = 0  \quad; \forall x \in G  \tag{absorbing element}$$  
+    - 1 
+      - $\forall a \in G, (a^{-1})^{-1} = a$
+      - $\forall a,b \in G, (a \cdot b)^{-1} = b^{-1} \cdot a^{-1}$
+      - $\forall a,b,c \in G, a\cdot b = a \cdot c  \quad\Rightarrow\quad b = c$
+      - $\forall a,b,c \in G, b\cdot a = c \cdot a  \quad\Rightarrow\quad b = c$ 
 
     * Subgroup
       - Define  
@@ -24,14 +25,28 @@
 
         For a group $(G, \cdot)$ and a nonempty subset $H$ of $G$, if $(H, \cdot)$ is also group, then $(H, \cdot)$ is a subgroup of $(G, \cdot)$.
 
-      - Property
+      - Property  
         - $1 \le G, G \le G$
-        
+
+        * Coset
+          - Define  
+            For a subgroup $H$ of the group $G$ and an element $g \in G$, the left cosets of $H$ in $G$ are the sets obtained by multiplying each element of $H$ by a fixed element $g$ (where $g$ is the left factor).
+            $$gH = \{gh \ |\ h \in H\} \quad, \text{for } g \in G  \tag{left cosets}$$
+
+            The right cosets are defined similarly, except that the element g is now a right factor.
+            $$Hg = \{hg \ |\ h \in H\} \quad, \text{for } g \in G  \tag{right cosets}$$
+
+          - Property
+            * Quotient Group
+      
       - Include
         * Normal Subgroup
           - Define
             $$H \lhd G \quad\Leftrightarrow\quad  g^{-1}hg \in H, \forall h \in H \le G, g \in  G \tag{Normal Subgroup}$$ 
             Normal Subgroup is a subgroup $H \le G$ if it is invariant under conjugation, that is, $\forall h \in H, g \in G$, we have $g^{-1}hg \in H$.
+
+          - Property
+            * Quotient Group
 
     * Group Homomorphism
       - Define

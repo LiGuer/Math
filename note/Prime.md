@@ -45,3 +45,6 @@
                         break
             return primes
           ```  
+
+  - Include
+    * Mersenne Prime

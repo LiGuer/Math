@@ -11,6 +11,9 @@
         - 保号性
     * Derivative
     * Integral 
+    * Kolmogorov-Arnold Representation Theorem  
+      $$f(\boldsymbol x) = f(x_1, ..., x_n) = \sum_{q=0}^{2n} \Phi_q\left( \sum_{p=1}^n \phi_{q, p}(x_p) \right)$$
+      Kolmogorov-Arnold representation theorem states that every multivariate continuous function can be represented as a superposition of the two-argument addition of continuous functions of one variable. 
 
   - Include
     * Analytic Function

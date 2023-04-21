@@ -26,6 +26,8 @@
 
         A chart $(U, \phi)$ is centered at $p$ for $p \in U$ if $\phi(p) = 0$.
 
+    * Borel $\sigma$-algebra 
+
   - Include
     * Hausdorff Space
       - Define  

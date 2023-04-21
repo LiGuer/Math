@@ -14,6 +14,7 @@
 
       - Include
         * Lebesgue Measure 
+        * Probability
 
   - Include
     * Probability Space

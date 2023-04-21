@@ -1,45 +1,36 @@
 * Moment
   - Define  
     K-order Moment & K-order Central Moment:
-    $$
-    \begin{align*}
+    $$\begin{align*}
       \mathbb E(X^k) &= \sum_i x_i^k \mathbb P_X(x_i)  \tag{Moment (Discrete)}  \\
         &= \int_{-\infty}^\infty x^k f_X(x) \mathrm d x  \tag{Moment (Continuous)}  \\
       \mathbb E((X-μ_x)^k) &= \sum_i (x_i-μ_x)^k \mathbb P_X(x_i)  \tag{Central Moment (Discrete)}  \\
         &= \int_{-\infty}^\infty (x-μ_x)^k f_X(x) \mathrm d x  \tag{Central Moment (Continuous)}
-    \end{align*}
-    $$
+    \end{align*}$$
 
     Symbol: $\mu_x = \mathbb E(X)$
       
   - Include
     * Expectation
       - Define
-        $$
-        \begin{align*}
+        $$\begin{align*}
           \mathbb E(X) = \mu_x &= \sum x_i \mathbb P_X(x_i)  \tag{Discrete}  \\
             &= \int_{-\infty}^\infty x f_X(x) \mathrm d x  \tag{Continuous}  \\
           \mathbb E(\boldsymbol X) &= \left(\begin{matrix} \bar X_i \\ \vdots \end{matrix}\right) 
-        \end{align*}
-        $$
+        \end{align*}$$
 
       - Property
-        $$
-        \begin{align*}
+        $$\begin{align*}
           \mathbb E(Y) &= \int_{-\infty}^\infty g(x) f_X(x) \mathrm d x  \\
           Y &= g(X)  \tag{$g$ is a measurable function}
-        \end{align*}
-        $$
+        \end{align*}$$
 
     * Variance & Standard Deviation
       - Define
-        $$
-        \begin{align*}
+        $$\begin{align*}
           Var(X) = \sigma_x^2 &= \mathbb E((X - \mu_x)^2)  \tag{Variance}\\
           \sigma_x &= \sqrt{\mathbb E((X - \mu_x)^2)}  \tag{Standard Deviation}
-        \end{align*}
-        $$
-        $$$$ 
+        \end{align*}$$
 
       - Property
         - $Var(X) = \mathbb E((X - \mu_x)^2) = \mathbb E(X^2) - \mathbb E(X)^2$
@@ -52,12 +43,10 @@
 
     * Mixed Moment  
       - Define  
-        $$
-        \begin{align*}
+        $$\begin{align*}
           &\mathbb E(X^i Y^j) \tag{$ij$-order Joint Moment}  \\
           &\mathbb E((X-\bar X)^i (Y-\bar Y)^j) \tag{$ij$-order Joint Central Moment}
-        \end{align*}
-        $$
+        \end{align*}$$
 
       - Include
         * Correlation & Covariance  
@@ -88,7 +77,7 @@
                 \end{align*}$$
 
               - Property
-                - $\rho_{XY} \in [-1, 1]$, Correlations equal to +1 or −1 correspond to data points lying exactly on a line.
+                - $\rho_{XY} \in [-1, 1]$, Correlations equal to $+1$ or $−1$ correspond to data points lying exactly on a line.
                 - $\rho_{XY} = \rho_{YX}$
                 - $\rho_{XY} = \rho_{(a + b X)\ (c + d Y)} \quad; b, d > 0$  
                   it is invariant under separate changes in location and scale in the two variables.

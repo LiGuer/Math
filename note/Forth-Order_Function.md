@@ -1,12 +1,14 @@
 * Quartic Function
   - Define
+    $$f(x) = \sum_{i=0}^{4} a_i x^i  \tag{Univariate}$$
+
     $$\begin{align*}
-      f(x) &= \sum_{i=0}^{4} a_i x^i  \tag{Univariate}  \\
-      f(\boldsymbol x) =& \sum_{i_1=1}^{\dim} \sum_{i_2=1}^{\dim} \sum_{i_3=1}^{\dim} \sum_{i_4=1}^{\dim} a_{i_1 i_2 i_3 i_4} · x_{i_1} x_{i_2} x_{i_3} x_{i_4} +    \\
-        &\sum_{i_1=1}^{\dim} \sum_{i_2=1}^{\dim} \sum_{i_3=1}^{\dim} b_{i_1 i_2 i_3} · x_{i_1} x_{i_2} x_{i_3} +    \\
-        &\sum_{i_1=1}^{\dim} \sum_{i_2=1}^{\dim} c_{i_1 i_2} · x_{i_1} x_{i_2} +    \\
-        &\sum_{i_1=1}^{\dim} d_{i_1} x_{i_1} +    \\
-        &e  \tag{Multivariate}
+      f(\boldsymbol x) =& \sum_{i_1=1}^{\dim} \sum_{i_2=i_1}^{\dim} \sum_{i_3=i_2}^{\dim} \sum_{i_4=i_3}^{\dim} a_{i_1 i_2 i_3 i_4} · x_{i_1} x_{i_2} x_{i_3} x_{i_4} +    \\
+      &\sum_{i_1=1}^{\dim} \sum_{i_2=i_1}^{\dim} \sum_{i_3=i_2}^{\dim} b_{i_1 i_2 i_3} · x_{i_1} x_{i_2} x_{i_3} +    \\
+      &\sum_{i_1=1}^{\dim} \sum_{i_2=i_1}^{\dim} c_{i_1 i_2} · x_{i_1} x_{i_2} +    \\
+      &\sum_{i_1=0}^{\dim} d_{i_1} x_{i_1} +    \\
+      &e  \tag{Multivariate}  \\
+      =& \sum_{i_0=0}^{\dim} \sum_{i_1=i_0}^{\dim} \sum_{i_2=i_1}^{\dim} \sum_{i_3=i_2}^{\dim} \sum_{i_4=i_3}^{\dim} a_{i_0 i_1 i_2 i_3 i_4} · x_{i_0} x_{i_1} x_{i_2} x_{i_3} x_{i_4}  \quad, x_0 = 1
     \end{align*}$$
 
   - Property

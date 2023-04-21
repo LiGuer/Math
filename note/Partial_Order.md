@@ -21,6 +21,16 @@
         $$\nexists a \in S, \text{ let } a < m \quad, m \in S \tag{Minimal element}$$ 
         $$\nexists a \in S, \text{ let } g < a \quad, g \in S \tag{Maximal element}$$ 
 
+    * Infimum & Supremum
+      - Define  
+        Infimum (greatest lower bound) of a subset $S$ of a partially ordered set $(P, \le)$ is an element $a^*\in P$ such that,
+        $$a \le x \quad, \forall x \in S  \tag{lower bounds}$$
+        $$a \le a^*, \forall a \tag{Infimum}$$ 
+
+        Supremum (least upper bound) of a subset $S$ of a partially ordered set $(P, \le)$ is an element $b^* \in P$ such that,
+        $$x \le b \quad, \forall x \in S  \tag{upper bounds}$$
+        $$b^* \le b, \forall b \tag{Supremum}$$ 
+
   - Include
     * Total Order
       - Define  

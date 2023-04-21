@@ -98,7 +98,7 @@
           Greed by vertices, put the shortest edge $(u,v)$ of $u$ from the searched vertices into the result edge sequence every time, and $v$ does not belong to the searched vertices. $T_{\min, k}$ refers to a sub-tree of $T_{\min}$ with $k+1$ vertices and $k$ edges.
 
           $$\begin{align*} 
-            T_{\min, 0} &= (\{v_1\}, \empty)  \tag{initial}\\
+            T_{\min, 0} &= (\{v_1\}, \emptyset)  \tag{initial}\\
             T_{\min, n} &= T_{\min}  \tag{answer}
           \end{align*}$$
 
@@ -118,7 +118,7 @@
           Greed by edges. $T_{\min, k}$ refers to a sub-tree of $T_{\min}$ with $k$ edges.
 
           $$\begin{align*} 
-            T_{\min, 0} &= (V^{(G)}, \empty)  \tag{initial}\\
+            T_{\min, 0} &= (V^{(G)}, \emptyset)  \tag{initial}\\
             T_{\min, n} &= T_{\min}  \tag{answer}
           \end{align*}$$
 

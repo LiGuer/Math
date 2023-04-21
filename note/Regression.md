@@ -23,6 +23,3 @@
     - Algorithm
       * Least Square Method  
         $$\min_{\boldsymbol w} \quad \sum_{i=0}^n (f(\boldsymbol x_i, \boldsymbol w) - y_i)^2$$
-
-  - Algorithm
-    * Neural Network 

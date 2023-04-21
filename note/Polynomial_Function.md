@@ -2,7 +2,7 @@
   - Define
     $$\begin{align*}
       f(x) &= \sum_{i=0}^{n} a_i x^i  \tag{one variable}  \\
-      f(\boldsymbol x) &= \sum_{\boldsymbol i=(0,...,0)_n}^{(\dim,...,\dim)_n} \left(a_{\boldsymbol i} · \prod_{i_j \in \boldsymbol i, x_0 = 1}x_{i_j} \right)  \tag{multi-variate}  
+      f(\boldsymbol x) &= \sum_{\boldsymbol i=(0,...,0)_n, i_j \le i_k, \forall j \le k}^{(\dim,...,\dim)_n} \left(a_{\boldsymbol i} · \prod_{i_j \in \boldsymbol i, x_0 = 1}x_{i_j} \right)  \tag{multi-variate}  
     \end{align*}$$
 
   - Property

@@ -25,5 +25,11 @@
           - Proof  
             De Morgan's law
 
+      - Concept
+        * Measurable Space & Measure Space
+
+      - Include
+        * Borel $\sigma$-algebra 
+
     * Conbination
     * Topological Space & Open Set

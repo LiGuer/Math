@@ -52,6 +52,9 @@
           Power Spectral Density is the Fourier transform of autocorrelation function of Weak-sense stationary process.  
           Power Spectral Density consists of real numbers greater than 0.
 
+      - Problem: Test the Stationary
+        * Unit Root Test 
+
     * Markov Process
     * Gaussian Process
     * Autoregressive Process
