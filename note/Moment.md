@@ -4,8 +4,8 @@
     $$\begin{align*}
       \mathbb E(X^k) &= \sum_i x_i^k \mathbb P_X(x_i)  \tag{Moment (Discrete)}  \\
         &= \int_{-\infty}^\infty x^k f_X(x) \mathrm d x  \tag{Moment (Continuous)}  \\
-      \mathbb E((X-μ_x)^k) &= \sum_i (x_i-μ_x)^k \mathbb P_X(x_i)  \tag{Central Moment (Discrete)}  \\
-        &= \int_{-\infty}^\infty (x-μ_x)^k f_X(x) \mathrm d x  \tag{Central Moment (Continuous)}
+      \mathbb E((X-\mu_x)^k) &= \sum_i (x_i-\mu_x)^k \mathbb P_X(x_i)  \tag{Central Moment (Discrete)}  \\
+        &= \int_{-\infty}^\infty (x-\mu_x)^k f_X(x) \mathrm d x  \tag{Central Moment (Continuous)}
     \end{align*}$$
 
     Symbol: $\mu_x = \mathbb E(X)$
@@ -63,7 +63,7 @@
               &= \left(\begin{matrix} E(X_i X_j) & ... \\ \vdots & \ddots \end{matrix}\right)  \tag{AutoCorrelation matrix}  \\
 
 
-              \boldsymbol Σ_{\boldsymbol X\boldsymbol X} &= \mathbb E((\boldsymbol X - \bar{\boldsymbol X}) (X - \bar{\boldsymbol X})^T)  \tag{AutoCovariance matrix}\\
+              \boldsymbol \Sigma_{\boldsymbol X\boldsymbol X} &= \mathbb E((\boldsymbol X - \bar{\boldsymbol X}) (X - \bar{\boldsymbol X})^T)  \tag{AutoCovariance matrix}\\
               &= \left(\begin{matrix} E((X_i - \bar X_i) (X_j - \bar X_j)) & ... \\ \vdots & \ddots \end{matrix}\right)  
             \end{align*}$$
 
@@ -77,7 +77,7 @@
                 \end{align*}$$
 
               - Property
-                - $\rho_{XY} \in [-1, 1]$, Correlations equal to $+1$ or $−1$ correspond to data points lying exactly on a line.
+                - $\rho_{XY} \in [-1, 1]$, Correlations equal to $+1$ or $-1$ correspond to data points lying exactly on a line.
                 - $\rho_{XY} = \rho_{YX}$
                 - $\rho_{XY} = \rho_{(a + b X)\ (c + d Y)} \quad; b, d > 0$  
                   it is invariant under separate changes in location and scale in the two variables.
@@ -86,7 +86,7 @@
             - $Cov(X,Y) = Cov(Y,X)$
             - $Cov(X,X) = Var(X,X)$
             - relation between AutoCorrelation & AutoCovariance matrix
-              $$\boldsymbol Σ_{\boldsymbol X\boldsymbol X} = \boldsymbol R_{\boldsymbol X\boldsymbol X} - \bar{\boldsymbol X} \bar{\boldsymbol X}^T$$
-            - Autocovariance matrix $Σ_{\boldsymbol X\boldsymbol X}$ is a positive semi-definite matrix.
-            - $\boldsymbol Y = \boldsymbol A \boldsymbol X \Rightarrow \boldsymbol Σ_{\boldsymbol Y\boldsymbol Y} = \boldsymbol A \boldsymbol Σ_{\boldsymbol X\boldsymbol X} \boldsymbol A^T$
+              $$\boldsymbol \Sigma_{\boldsymbol X\boldsymbol X} = \boldsymbol R_{\boldsymbol X\boldsymbol X} - \bar{\boldsymbol X} \bar{\boldsymbol X}^T$$
+            - Autocovariance matrix $\Sigma_{\boldsymbol X\boldsymbol X}$ is a positive semi-definite matrix.
+            - $\boldsymbol Y = \boldsymbol A \boldsymbol X \Rightarrow \boldsymbol \Sigma_{\boldsymbol Y\boldsymbol Y} = \boldsymbol A \boldsymbol \Sigma_{\boldsymbol X\boldsymbol X} \boldsymbol A^T$
 

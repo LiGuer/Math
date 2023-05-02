@@ -104,3 +104,5 @@
 
   - Example
     * Ordered Set 
+    * Algebra Structure
+    * Graph

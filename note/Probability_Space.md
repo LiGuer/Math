@@ -19,3 +19,4 @@
 
   - Problem
     * Statistics 
+    * Information Theory

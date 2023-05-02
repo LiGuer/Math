@@ -1,8 +1,5 @@
 * Application
-  * Information Theory
-  * Reinforcement Learning
   * Geometry
-  * Neural Network
   * Other Algorithms
     * Autoregressive Integrated Moving Average , ARIMA
     * Season Autoregressive Integrated Moving Average
